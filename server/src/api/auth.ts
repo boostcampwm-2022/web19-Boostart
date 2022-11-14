@@ -2,7 +2,7 @@ import express from 'express';
 import { GITHUB_CLIENT_ID, GITHUB_CLIENT_SECRET } from '../constants';
 import axios from 'axios';
 import qs from 'qs';
-import { generateAccessToken } from '../utils/auth';
+import { authenticateToken, generateAccessToken } from '../utils/auth';
 
 const router = express.Router();
 
@@ -42,7 +42,11 @@ router.get(`/login/github/callback/`, async (req, res) => {
     httpOnly: true,
   });
 
-  res.redirect(`http://localhost:8000`);
+  res.redirect(`http://localhost:3000/main`);
+});
+
+router.get('/check-login', authenticateToken, (req, res) => {
+  res.send(200);
 });
 
 export default router;

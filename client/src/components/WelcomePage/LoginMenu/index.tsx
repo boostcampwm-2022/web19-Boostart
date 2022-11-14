@@ -4,6 +4,7 @@ import useInput from '../../../hooks/useInput';
 import { Link } from 'react-router-dom';
 import icon1 from '../../../assets/kakao_icon.svg';
 import icon2 from '../../../assets/github_icon.png';
+import { useAuthorization } from '../../../hooks/useAuthorization';
 
 const LoginMenu = () => {
   const [id, onChangeId, setId] = useInput('');
@@ -26,6 +27,11 @@ const LoginMenu = () => {
   //     setErr("로그인에 실패했습니다.");
   // })
 
+  const handleOAuthLoginButtonClick = (type: string) => async () => {
+    console.log(type);
+    window.location.href = `http://localhost:8000/api/v1/auth/login/${type}`;
+  };
+
   return (
     <S.LoginContainer>
       <S.LoginTitle>WELCOME :&gt;</S.LoginTitle>
@@ -39,7 +45,7 @@ const LoginMenu = () => {
         </Link>
       </S.LoginForm>
       <S.SocialLogin>
-        <S.Icon src={icon1} /> <S.Icon src={icon2} />
+        <S.Icon src={icon1} /> <S.Icon src={icon2} onClick={handleOAuthLoginButtonClick('github')} />
       </S.SocialLogin>
     </S.LoginContainer>
   );
