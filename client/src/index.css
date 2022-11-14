@@ -10,3 +10,13 @@ body {
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace;
 }
+
+:root {
+  --color-main: #99b1db;
+  --color-gray1: #f1f1f1;
+  --color-gray2: #e4e4e4;
+  --color-gray3: #dcdcdc;
+  --color-gray4: lightgray;
+  --color-gray5: #a3a3a3;
+  --color-gray6: gray;
+}
