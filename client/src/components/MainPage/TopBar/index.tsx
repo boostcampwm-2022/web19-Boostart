@@ -1,15 +1,15 @@
 import React from 'react';
 import Clock from './Clock';
-import { MainTitle, TopBarContainer } from './style';
+import * as S from './style';
 
 const GNB = () => {
   return (
     <>
-      <TopBarContainer>
+      <S.TopBarContainer>
         <Clock />
-        <MainTitle>Boostart</MainTitle>
+        <S.MainTitle>Boostart</S.MainTitle>
         <img src="./menu.svg" />
-      </TopBarContainer>
+      </S.TopBarContainer>
     </>
   );
 };

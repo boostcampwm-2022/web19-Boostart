@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { DigitalClock } from './style';
+import * as S from './style';
 
 interface CurrentTime {
   hour: string;
@@ -29,9 +29,9 @@ const Clock = () => {
   }, []);
   return (
     <>
-      <DigitalClock>
+      <S.DigitalClock>
         {clockInfo.hour}:{clockInfo.minute}
-      </DigitalClock>
+      </S.DigitalClock>
     </>
   );
 };
