@@ -10,7 +10,8 @@ function App() {
     <Router>
       <GlobalStyle />
       <Routes>
-        <Route path="/" element={<MainPage />} />
+        <Route path="/" element={<WelcomePage />} />
+        <Route path="/main" element={<MainPage />} />
       </Routes>
     </Router>
   );
