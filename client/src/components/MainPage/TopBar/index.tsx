@@ -8,7 +8,7 @@ const GNB = () => {
       <S.TopBarContainer>
         <Clock />
         <S.MainTitle>Boostart</S.MainTitle>
-        <img src="./menu.svg" />
+        <S.MenuIcon src="./menu.svg" />
       </S.TopBarContainer>
     </>
   );
