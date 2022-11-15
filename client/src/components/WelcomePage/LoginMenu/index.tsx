@@ -17,21 +17,22 @@ const LoginMenu = () => {
       user_id: id,
       password: pw,
     };
-  };
 
-  // axios.post('/users/login', data).then(res=>{
-  //     //main으로 이동
-  // })
-  // .catch(error => {
-  //     setErr("로그인에 실패했습니다.");
-  // })
+    // axios.post('/users/login', data).then(res=>{
+    //     //main으로 이동
+    // })
+    // .catch(error => {
+    //     setErr("로그인에 실패했습니다.");
+    // })
+  };
 
   return (
     <S.Container>
+      <S.MainTitle>Boostart</S.MainTitle>
       <S.LoginContainer>
         <S.LoginTitle>WELCOME :&gt;</S.LoginTitle>
         <S.LoginForm onSubmit={onLogin}>
-          <S.InputBar value={id} onChange={onChangeId} placeholder="EMAIL" />
+          <S.InputBar value={id} onChange={onChangeId} placeholder="ID" />
           <S.InputBar value={pw} onChange={onChangePw} placeholder="PASSWORD" type="password" />
           <h3>{err}</h3>
           <S.LoginButton type="submit">LOGIN</S.LoginButton>
