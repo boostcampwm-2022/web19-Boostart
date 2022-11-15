@@ -7,14 +7,14 @@ const SignupMenu = () => {
   const [id, onChangeId, setId] = useInput('');
   const [pw, onChangePw, setPw] = useInput('');
   const [name, onChangeName, setName] = useInput('');
-  const [img, setImg] = useState<File | null>(null);
+  const [profileimg, setProfileImg] = useState<File | null>(null);
   const [err, setErr] = useState('');
 
   const history = useNavigate();
 
-  const onImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleProfileImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
-      setImg(e.target.files[0]);
+      setProfileImg(e.target.files[0]);
     }
   };
 
@@ -22,9 +22,9 @@ const SignupMenu = () => {
     e.preventDefault();
 
     const formData = new FormData();
-    formData.append('userImage', img!);
+    formData.append('userImage', profileimg!);
 
-    const data = {
+    const signUpData = {
       user_id: id,
       password: pw,
       username: name,
@@ -51,9 +51,9 @@ const SignupMenu = () => {
         <S.SignupTitle>LET'S JOIN US !</S.SignupTitle>
         <S.SignupForm onSubmit={onSignup}>
           <S.ProfileImage>
-            {img ? <img src={URL.createObjectURL(img)} alt="profile-img" /> : <img src="https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460__480.png" alt="profile-img" />}
+            {profileimg ? <img src={URL.createObjectURL(profileimg)} alt="profile-img" /> : <img src="https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460__480.png" alt="profile-img" />}
             <S.EditRound>
-              <input type="file" onChange={onImageChange} />
+              <input type="file" onChange={handleProfileImageChange} />
               <S.EditIcon />
             </S.EditRound>
           </S.ProfileImage>
