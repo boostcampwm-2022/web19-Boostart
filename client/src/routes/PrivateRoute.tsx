@@ -10,7 +10,7 @@ interface Props {
 export default function PrivateRoute({ component: RouteComponent }: Props): React.ReactElement | null {
   const isAuthenticated = useAuthorization();
 
-  if (isAuthenticated == null) return <></>;
+  if (isAuthenticated === undefined) return <></>;
 
   return isAuthenticated === false ? <Navigate to="/" /> : <RouteComponent />;
 }
