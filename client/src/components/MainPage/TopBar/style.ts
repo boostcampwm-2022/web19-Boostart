@@ -15,3 +15,7 @@ export const MainTitle = styled.span`
   font-size: 7.5rem;
   font-family: 'Baumans', cursive;
 `;
+
+export const MenuIcon = styled.img`
+  align-self: center;
+`;
