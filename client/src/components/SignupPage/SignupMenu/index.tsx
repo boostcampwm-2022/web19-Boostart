@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import * as S from './style';
 import useInput from '../../../hooks/useInput';
 import { Link, useNavigate } from 'react-router-dom';
+import { DEFAULT_PROFILE_IMG_URL } from '../../../constants';
 
 const SignupMenu = () => {
   const [userId, onChangeUserId, setUserId] = useInput('');
@@ -28,7 +29,7 @@ const SignupMenu = () => {
         <S.SignupTitle>LET'S JOIN US !</S.SignupTitle>
         <S.SignupForm>
           <S.ProfileImage>
-            {profileImg ? <img src={URL.createObjectURL(profileImg)} alt="profile-img" /> : <img src="https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460__480.png" alt="profile-img" />}
+            <img src={profileImg ? URL.createObjectURL(profileImg) : DEFAULT_PROFILE_IMG_URL} alt="profile-img" />
             <S.EditRound>
               <input type="file" onChange={handleProfileImageChange} />
               <S.EditIcon />
