@@ -5,7 +5,7 @@ const MainPage = () => {
   return (
     <>
       <GNB />
-      <MainContents />;
+      <MainContents />
     </>
   );
 };
