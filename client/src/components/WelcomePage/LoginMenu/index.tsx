@@ -2,8 +2,9 @@ import React, { useState } from 'react';
 import * as S from './style';
 import useInput from '../../../hooks/useInput';
 import { Link } from 'react-router-dom';
-import icon1 from '../../../assets/kakao_icon.svg';
-import icon2 from '../../../assets/github_icon.png';
+import kakaoIcon from '../../../assets/kakao_icon.svg';
+import githubIcon from '../../../assets/github_icon.png';
+import { HOST } from '../../../constants';
 
 const LoginMenu = () => {
   const [id, onChangeId, setId] = useInput('');
@@ -27,23 +28,26 @@ const LoginMenu = () => {
   // })
 
   return (
-    <S.Container>
-      <S.LoginContainer>
-        <S.LoginTitle>WELCOME :&gt;</S.LoginTitle>
-        <S.LoginForm onSubmit={onLogin}>
-          <S.InputBar value={id} onChange={onChangeId} placeholder="EMAIL" />
-          <S.InputBar value={pw} onChange={onChangePw} placeholder="PASSWORD" type="password" />
-          <h3>{err}</h3>
-          <S.LoginButton type="submit">LOGIN</S.LoginButton>
-          <Link to={'/signup'} style={{ color: 'inherit', textDecoration: 'inherit' }}>
-            <S.SignUpButton>SIGN UP</S.SignUpButton>
-          </Link>
-        </S.LoginForm>
-        <S.SocialLogin>
-          <S.Icon src={icon1} /> <S.Icon src={icon2} />
-        </S.SocialLogin>
-      </S.LoginContainer>
-    </S.Container>
+    <S.LoginContainer>
+      <S.LoginTitle>WELCOME :&gt;</S.LoginTitle>
+      <S.LoginForm onSubmit={onLogin}>
+        <S.InputBar value={id} onChange={onChangeId} placeholder="EMAIL" />
+        <S.InputBar value={pw} onChange={onChangePw} placeholder="PASSWORD" type="password" />
+        <h3>{err}</h3>
+        <S.LoginButton type="submit">LOGIN</S.LoginButton>
+        <Link to={'/signup'} style={{ color: 'inherit', textDecoration: 'inherit' }}>
+          <S.SignUpButton>SIGN UP</S.SignUpButton>
+        </Link>
+      </S.LoginForm>
+      <S.SocialLogin>
+        <a href={`${HOST}/api/v1/auth/login/kakao`}>
+          <S.Icon src={kakaoIcon} />
+        </a>
+        <a href={`${HOST}/api/v1/auth/login/github`}>
+          <S.Icon src={githubIcon} />
+        </a>
+      </S.SocialLogin>
+    </S.LoginContainer>
   );
 };
 
