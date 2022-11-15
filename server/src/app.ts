@@ -1,13 +1,13 @@
 import express from 'express';
 import cookieParser from 'cookie-parser';
-import { port, version } from './constants';
+import { CORS_ORIGIN, port, version } from './constants';
 import apiRouter from './api/index';
 import cors from 'cors';
 
 const app = express();
 
 const corsOptions = {
-  origin: 'http://localhost:3000',
+  origin: CORS_ORIGIN,
   credentials: true,
 };
 app.use(cookieParser());

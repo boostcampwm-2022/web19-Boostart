@@ -4,6 +4,7 @@ import useInput from '../../../hooks/useInput';
 import { Link } from 'react-router-dom';
 import kakaoIcon from '../../../assets/kakao_icon.svg';
 import githubIcon from '../../../assets/github_icon.png';
+import { HOST } from '../../../constants';
 
 const LoginMenu = () => {
   const [id, onChangeId, setId] = useInput('');
@@ -39,10 +40,10 @@ const LoginMenu = () => {
         </Link>
       </S.LoginForm>
       <S.SocialLogin>
-        <a href={'http://localhost:8000/api/v1/auth/login/kakao'}>
+        <a href={`${HOST}/api/v1/auth/login/kakao`}>
           <S.Icon src={kakaoIcon} />
         </a>
-        <a href={'http://localhost:8000/api/v1/auth/login/github'}>
+        <a href={`${HOST}/api/v1/auth/login/github`}>
           <S.Icon src={githubIcon} />
         </a>
       </S.SocialLogin>
