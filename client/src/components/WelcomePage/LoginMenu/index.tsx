@@ -26,8 +26,9 @@ const LoginMenu = () => {
   //     setErr("로그인에 실패했습니다.");
   // })
 
-  const handleOAuthLoginButtonClick = (type: string) => async () => {
-    window.location.href = `http://localhost:8000/api/v1/auth/login/${type}`;
+  type OAuthType = 'github' | 'kakao';
+  const handleOAuthLoginButtonClick = (oauthType: OAuthType) => async () => {
+    window.location.href = `http://localhost:8000/api/v1/auth/login/${oauthType}`;
   };
 
   return (
