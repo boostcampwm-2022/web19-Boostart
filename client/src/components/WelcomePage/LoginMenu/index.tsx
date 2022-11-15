@@ -37,7 +37,7 @@ const LoginMenu = () => {
           <h3>{err}</h3>
           <S.LoginButton type="submit">LOGIN</S.LoginButton>
           <Link to={'/signup'} style={{ color: 'inherit', textDecoration: 'inherit' }}>
-            <S.SignUpButton>SIGN UP</S.SignUpButton>
+            <S.SignupButton>SIGN UP</S.SignupButton>
           </Link>
         </S.LoginForm>
         <S.SocialLogin>

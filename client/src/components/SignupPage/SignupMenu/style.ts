@@ -7,7 +7,7 @@ export const Container = styled.div`
   display: grid;
   place-items: center;
 `;
-export const LoginContainer = styled.div`
+export const SignupContainer = styled.div`
   width: 39rem;
   height: 39rem;
   background: white;
@@ -20,14 +20,14 @@ export const LoginContainer = styled.div`
   box-shadow: 0px 0px 10px 5px rgba(175, 175, 175, 0.25);
 `;
 
-export const LoginTitle = styled.div`
+export const SignupTitle = styled.div`
   font-family: 'Press Start 2P', cursive;
   font-size: 1rem;
   color: var(--color-main);
   margin-bottom: 2.1rem;
 `;
 
-export const LoginForm = styled.div`
+export const SignupForm = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -101,7 +101,7 @@ export const InputBar = styled.input`
   }
 `;
 
-export const LoginButton = styled.button`
+export const SignupButton = styled.button`
   background: var(--color-main);
   font-family: 'Press Start 2P', cursive;
   border: 0px;
@@ -114,7 +114,7 @@ export const LoginButton = styled.button`
   cursor: pointer;
 `;
 
-export const SignUpButton = styled.button`
+export const LoginButton = styled.button`
   background: white;
   font-family: 'Press Start 2P', cursive;
   border: 3px solid var(--color-main);

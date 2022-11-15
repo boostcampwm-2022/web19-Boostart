@@ -82,7 +82,7 @@ export const LoginButton = styled.button`
   cursor: pointer;
 `;
 
-export const SignUpButton = styled.button`
+export const SignupButton = styled.button`
   background: white;
   font-family: 'Press Start 2P', cursive;
   border: 3px solid var(--color-main);

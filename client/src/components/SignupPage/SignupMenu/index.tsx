@@ -47,9 +47,9 @@ const SignupMenu = () => {
 
   return (
     <S.Container>
-      <S.LoginContainer>
-        <S.LoginTitle>LET'S JOIN US !</S.LoginTitle>
-        <S.LoginForm onSubmit={onSignup}>
+      <S.SignupContainer>
+        <S.SignupTitle>LET'S JOIN US !</S.SignupTitle>
+        <S.SignupForm onSubmit={onSignup}>
           <S.ProfileImage>
             {img ? <img src={URL.createObjectURL(img)} alt="profile-img" /> : <img src="https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460__480.png" alt="profile-img" />}
             <S.EditRound>
@@ -62,12 +62,12 @@ const SignupMenu = () => {
           <S.InputBar value={pw} onChange={onChangePw} placeholder="PASSWORD" type="password" />
           <S.InputBar value={name} onChange={onChangeName} placeholder="NICKNAME" type="password" />
           <h3>{err}</h3>
-          <S.LoginButton type="submit">SIGN UP</S.LoginButton>
+          <S.SignupButton type="submit">SIGN UP</S.SignupButton>
           <Link to={'/'} style={{ color: 'inherit', textDecoration: 'inherit' }}>
-            <S.SignUpButton>LOGIN PAGE</S.SignUpButton>
+            <S.LoginButton>LOGIN PAGE</S.LoginButton>
           </Link>
-        </S.LoginForm>
-      </S.LoginContainer>
+        </S.SignupForm>
+      </S.SignupContainer>
     </S.Container>
   );
 };
