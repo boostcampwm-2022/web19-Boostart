@@ -26,11 +26,6 @@ const LoginMenu = () => {
   //     setErr("로그인에 실패했습니다.");
   // })
 
-  type OAuthType = 'github' | 'kakao';
-  const handleOAuthLoginButtonClick = (oauthType: OAuthType) => async () => {
-    window.location.href = `http://localhost:8000/api/v1/auth/login/${oauthType}`;
-  };
-
   return (
     <S.LoginContainer>
       <S.LoginTitle>WELCOME :&gt;</S.LoginTitle>
@@ -44,7 +39,12 @@ const LoginMenu = () => {
         </Link>
       </S.LoginForm>
       <S.SocialLogin>
-        <S.Icon src={kakaoIcon} onClick={handleOAuthLoginButtonClick('kakao')} /> <S.Icon src={githubIcon} onClick={handleOAuthLoginButtonClick('github')} />
+        <a href={'http://localhost:8000/api/v1/auth/login/kakao'}>
+          <S.Icon src={kakaoIcon} />
+        </a>
+        <a href={'http://localhost:8000/api/v1/auth/login/github'}>
+          <S.Icon src={githubIcon} />
+        </a>
       </S.SocialLogin>
     </S.LoginContainer>
   );
