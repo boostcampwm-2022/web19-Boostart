@@ -1,6 +1,6 @@
 export const HOST = process.env.REACT_APP_HOST;
 export enum EngMonth {
-  'JAUARY',
+  'JANUARY',
   'FABUARY',
   'MARCH',
   'APRIL',
@@ -22,4 +22,6 @@ export enum Days {
   '금',
   '토',
 }
+export const Menus = ['LOG', 'DIARY', 'PLAN', 'MAP'];
+
 export const WEEK_LENGTH = Object.keys(Days).length / 2;

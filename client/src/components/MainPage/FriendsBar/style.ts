@@ -9,7 +9,7 @@ export const FriendsBarContainer = styled.div`
   padding: 0.5rem;
   display: flex;
   align-items: center;
-  transform: translateY(-0.4rem);
+  transform: translateY(-0.35rem);
   box-shadow: 0px 0px 10px 5px rgba(175, 175, 175, 0.25);
 `;
 

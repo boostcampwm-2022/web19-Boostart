@@ -7,6 +7,6 @@ declare module 'GlobalType' {
   }
   export interface CurrentDate {
     year: number;
-    month: string;
+    month: number;
   }
 }

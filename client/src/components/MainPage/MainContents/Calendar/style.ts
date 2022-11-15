@@ -10,7 +10,7 @@ export const CalendarTitle = styled.span`
 `;
 export const CalendarContainer = styled.div`
   width: 100%;
-  height: 37.5rem;
+  height: 36rem;
   background: white;
   border-radius: 1rem;
   display: flex;
@@ -20,10 +20,11 @@ export const CalendarContainer = styled.div`
   margin-top: 0rem;
   margin-bottom: 1rem;
   box-shadow: 0px 0px 10px 5px rgba(175, 175, 175, 0.25);
+  user-select: none;
 `;
-export const DateSelector = styled.div`
-  width: 100%;
-  height: 4rem;
+export const MonthSelector = styled.div`
+  width: 20rem;
+  height: 3rem;
   display: grid;
   grid-template-areas:
     '. year .'
@@ -36,35 +37,34 @@ export const CurrentYear = styled.div`
   display: flex;
   justify-content: center;
   color: #99b1db;
-  font-size: 1.5rem;
+  font-size: 1rem;
   font-family: 'Press Start 2P', cursive;
   grid-area: year;
+  cursor: default;
 `;
 
 export const CurrentMonth = styled.div`
   display: flex;
   justify-content: center;
   color: #99b1db;
-  font-size: 2rem;
+  font-size: 1.5rem;
   font-family: 'Press Start 2P', cursive;
   grid-area: month;
+  cursor: default;
 `;
-export const LeftArrow = styled.div`
+export const Arrow = styled.div<{
+  direction: string;
+}>`
   color: #99b1db;
-  font-size: 2rem;
+  font-size: 1.5rem;
   font-family: 'Press Start 2P', cursive;
-  grid-area: left;
-`;
-export const RightArrow = styled.div`
-  color: #99b1db;
-  font-size: 2rem;
-  font-family: 'Press Start 2P', cursive;
-  grid-area: right;
+  grid-area: ${(props) => props.direction};
+  cursor: pointer;
 `;
 export const DaysHeader = styled.div`
-  width: 25.5rem;
-  height: 2rem;
-  margin: 2.5rem auto 1.5rem;
+  width: 20rem;
+  height: 1.5rem;
+  margin: 2.25rem auto 0.5rem;
   padding: 0 0.5rem;
   border: 1px solid #ededed;
   border-radius: 2rem;
@@ -75,6 +75,66 @@ export const DaysHeader = styled.div`
 `;
 export const DaysText = styled.span`
   color: #8f8f8f;
+  font-size: 0.625rem;
+  font-family: 'Noto Sans KR', sans-serif;
+  cursor: default;
+`;
+export const DateSelector = styled.div`
+  width: 19.7rem;
+  height: 18rem;
+  margin-bottom: 2rem;
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  grid-template-rows: repeat(auto-fill, minmax(3rem, 1fr));
+`;
+
+export const DateBox = styled.div`
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  color: #8b8b8b;
+  font-size: 0.6rem;
+  font-weight: 700;
+  font-family: 'Noto Sans KR', sans-serif;
+`;
+
+export const Date = styled.span`
+  font-size: 0.5rem;
+  text-align: center;
+  margin-top: -0.25rem;
+  cursor: pointer;
+`;
+
+export const DateLogo = styled.span<{
+  percentage: string;
+}>`
+  font-size: 2rem;
+  font-family: 'Baumans', cursive;
+  background: linear-gradient(to top, #99b1db ${(props) => props.percentage}%, #ddd 0%);
+  -webkit-background-clip: text;
+  color: transparent;
+  cursor: pointer;
+`;
+
+export const MenuSelector = styled.div`
+  width: 17.5rem;
+  height: 2.5rem;
+  border: 1px solid #e4e4e4;
+  border-radius: 2.5rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+`;
+
+export const MenuBtns = styled.div<{
+  isActivatedMenu: boolean;
+}>`
+  width: 3.5rem;
+  color: ${(props) => (props.isActivatedMenu ? '#000000' : '#a3a3a3')};
   font-size: 0.8rem;
-  font-family: 'NOTO Sans KR';
+  font-weight: ${(props) => (props.isActivatedMenu ? '700' : '400')};
+  font-family: 'Inter', sans-serif;
+  text-align: center;
+  cursor: pointer;
 `;
