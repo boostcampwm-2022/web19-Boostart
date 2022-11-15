@@ -89,26 +89,34 @@ router.post('/signup', async (req, res) => {
   // req.file.filename;
 
   if (!(userId && password && username && profileImg)) return res.sendStatus(400);
-  if (!validateOAuthType(oauthType)) return res.sendStatus(400);
   // TODO: 유효성 검증
 
   if (oauthType) {
+    if (!validateOAuthType(oauthType)) return res.sendStatus(400);
     // TODO: 쿠키 뜯어서 토큰 정보와 요청 정보 대조하기
 
     if (false) return res.sendStatus(401); // 대조 실패한 경우
   }
 
-  const userIdAlreadyExists = await executeSql('select * from where user_id = ?', [userId]);
-  if (userIdAlreadyExists) return res.sendStatus(400);
-  const userAlreadySignedUp = await executeSql('select * from where oauth_type = ? and oauth_email = ?', [oauthType, oauthEmail]);
-  if (userAlreadySignedUp) return res.sendStatus(400);
+  let user: object;
+  [user] = await executeSql('select * from user where user_id = ?', [userId]);
+  if (user) {
+    console.log(`ID 중복: ${userId}`);
+    return res.sendStatus(202);
+  }
+  // [user] = await executeSql('select * from where oauth_type = ? and oauth_email = ?', [oauthType, oauthEmail]);
+  // if (user) {
+  //   console.log(`이미 가입된 계정: ${oauthType}, ${oauthEmail}`);
+  //   return res.sendStatus(202);
+  // }
 
-  await executeSql('insert into user (user_id, password, username, oauth_type, oauth_email) values (?, ?, ?, ?, ?)', [userId, password, username, profileImg, oauthType, oauthEmail]);
-  res.sendStatus(200);
+  await executeSql('insert into `user` (user_id, password, username) values (?, ?, ?)', [userId, password, username]);
+  console.log(`회원가입 성공: ${userId}, ${username}`);
+  res.sendStatus(201);
 });
 
 router.get('/check-login', authenticateToken, (req, res) => {
-  res.send(200);
+  res.sendStatus(200);
 });
 
 export default router;

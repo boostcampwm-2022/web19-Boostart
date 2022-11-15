@@ -10,6 +10,7 @@ const corsOptions = {
   origin: CORS_ORIGIN,
   credentials: true,
 };
+app.use(express.json());
 app.use(cookieParser());
 app.use(cors(corsOptions));
 app.use(`/api/${API_VERSION}`, apiRouter);

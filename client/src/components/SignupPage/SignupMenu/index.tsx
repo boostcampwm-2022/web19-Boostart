@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import * as S from './style';
 import useInput from '../../../hooks/useInput';
 import { Link, useNavigate } from 'react-router-dom';
-import { DEFAULT_PROFILE_IMG_URL } from '../../../constants';
+import { DEFAULT_PROFILE_IMG_URL, HOST } from '../../../constants';
 
 const SignupMenu = () => {
   const [userId, onChangeUserId, setUserId] = useInput('');
@@ -19,8 +19,19 @@ const SignupMenu = () => {
     }
   };
 
-  const handleSignupButtonClick = (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSignupButtonClick = async () => {
+    const response = await fetch(`${HOST}/api/v1/auth/signup`, {
+      method: 'post',
+      credentials: 'include',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ userId, password, username }),
+    });
+
+    if (response.ok) {
+      navigate('/');
+    }
   };
 
   return (
