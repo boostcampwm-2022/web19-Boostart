@@ -2,7 +2,7 @@ import styled from 'styled-components';
 
 export const MainContentContainer = styled.div`
   width: 89.5rem;
-  margin-top: 2.5rem;
+  margin: 2.5rem auto 0;
   justify-content: space-between;
 `;
 export const LeftSection = styled.div`

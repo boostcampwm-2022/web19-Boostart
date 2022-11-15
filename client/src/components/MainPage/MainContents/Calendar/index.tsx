@@ -1,24 +1,7 @@
 import React, { useState, useEffect } from 'react';
+import { CurrentDate } from 'GlobalType';
+import { EngMonth, Days, WEEK_LENGTH } from '../../../../constants';
 import * as S from './style';
-
-interface CurrentDate {
-  year: number;
-  month: string;
-}
-enum EngMonth {
-  'JAUARY',
-  'FABUARY',
-  'MARCH',
-  'APRIL',
-  'MAY',
-  'JUNE',
-  'JULY',
-  'AUGUST',
-  'SEPTEMBER',
-  'OCTOBER',
-  'NOVEMBER',
-  'DECEMBER',
-}
 
 const Calendar = () => {
   const [currentDate, setCurrentDate] = useState<CurrentDate>({ year: 2022, month: '' });
@@ -37,6 +20,11 @@ const Calendar = () => {
           <S.LeftArrow>{'<'}</S.LeftArrow>
           <S.RightArrow>{'>'}</S.RightArrow>
         </S.DateSelector>
+        <S.DaysHeader>
+          {new Array(WEEK_LENGTH).fill(true).map((_, idx) => {
+            return <S.DaysText>{Days[idx]}</S.DaysText>;
+          })}
+        </S.DaysHeader>
       </S.CalendarContainer>
     </>
   );

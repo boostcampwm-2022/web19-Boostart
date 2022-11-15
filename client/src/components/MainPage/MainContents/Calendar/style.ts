@@ -58,3 +58,20 @@ export const RightArrow = styled.div`
   font-family: 'Press Start 2P', cursive;
   grid-area: right;
 `;
+export const DaysHeader = styled.div`
+  width: 25.5rem;
+  height: 2rem;
+  margin: 2.5rem auto 1.5rem;
+  padding: 0 0.5rem;
+  border: 1px solid #ededed;
+  border-radius: 2rem;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+  align-items: center;
+`;
+export const DaysText = styled.span`
+  color: #8f8f8f;
+  font-size: 0.8rem;
+  font-family: 'NOTO Sans KR';
+`;
