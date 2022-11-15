@@ -45,7 +45,7 @@ const LoginMenu = () => {
         </Link>
       </S.LoginForm>
       <S.SocialLogin>
-        <S.Icon src={icon1} /> <S.Icon src={icon2} onClick={handleOAuthLoginButtonClick('github')} />
+        <S.Icon src={icon1} onClick={handleOAuthLoginButtonClick('kakao')} /> <S.Icon src={icon2} onClick={handleOAuthLoginButtonClick('github')} />
       </S.SocialLogin>
     </S.LoginContainer>
   );
