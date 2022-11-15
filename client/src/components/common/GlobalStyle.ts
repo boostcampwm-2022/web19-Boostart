@@ -3,7 +3,7 @@ import { createGlobalStyle } from 'styled-components';
 export const GlobalStyle = createGlobalStyle`
   body {
     background: linear-gradient(var(--color-main) 55%, #ffffff 50%);
-    height: 100vh;
+    height: 100%;
     width: 100vw;
   }
 `;

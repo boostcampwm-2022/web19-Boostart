@@ -5,6 +5,7 @@ export const Container = styled.div`
   display: grid;
   place-items: center;
 `;
+
 export const LoginContainer = styled.div`
   width: 39rem;
   height: 28rem;
