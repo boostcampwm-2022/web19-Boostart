@@ -27,21 +27,23 @@ const LoginMenu = () => {
   // })
 
   return (
-    <S.LoginContainer>
-      <S.LoginTitle>WELCOME :&gt;</S.LoginTitle>
-      <S.LoginForm onSubmit={onLogin}>
-        <S.InputBar value={id} onChange={onChangeId} placeholder="EMAIL" />
-        <S.InputBar value={pw} onChange={onChangePw} placeholder="PASSWORD" type="password" />
-        <h3>{err}</h3>
-        <S.LoginButton type="submit">LOGIN</S.LoginButton>
-        <Link to={'/signup'} style={{ color: 'inherit', textDecoration: 'inherit' }}>
-          <S.SignUpButton>SIGN UP</S.SignUpButton>
-        </Link>
-      </S.LoginForm>
-      <S.SocialLogin>
-        <S.Icon src={icon1} /> <S.Icon src={icon2} />
-      </S.SocialLogin>
-    </S.LoginContainer>
+    <S.Container>
+      <S.LoginContainer>
+        <S.LoginTitle>WELCOME :&gt;</S.LoginTitle>
+        <S.LoginForm onSubmit={onLogin}>
+          <S.InputBar value={id} onChange={onChangeId} placeholder="EMAIL" />
+          <S.InputBar value={pw} onChange={onChangePw} placeholder="PASSWORD" type="password" />
+          <h3>{err}</h3>
+          <S.LoginButton type="submit">LOGIN</S.LoginButton>
+          <Link to={'/signup'} style={{ color: 'inherit', textDecoration: 'inherit' }}>
+            <S.SignUpButton>SIGN UP</S.SignUpButton>
+          </Link>
+        </S.LoginForm>
+        <S.SocialLogin>
+          <S.Icon src={icon1} /> <S.Icon src={icon2} />
+        </S.SocialLogin>
+      </S.LoginContainer>
+    </S.Container>
   );
 };
 
