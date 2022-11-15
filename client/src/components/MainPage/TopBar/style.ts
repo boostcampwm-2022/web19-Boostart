@@ -7,7 +7,6 @@ export const TopBarContainer = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: baseline;
-  transform: translate(0, -100px);
 `;
 
 export const MainTitle = styled.span`
