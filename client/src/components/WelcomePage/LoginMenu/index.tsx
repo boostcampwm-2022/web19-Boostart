@@ -2,9 +2,8 @@ import React, { useState } from 'react';
 import * as S from './style';
 import useInput from '../../../hooks/useInput';
 import { Link } from 'react-router-dom';
-import icon1 from '../../../assets/kakao_icon.svg';
-import icon2 from '../../../assets/github_icon.png';
-import { useAuthorization } from '../../../hooks/useAuthorization';
+import kakaoIcon from '../../../assets/kakao_icon.svg';
+import githubIcon from '../../../assets/github_icon.png';
 
 const LoginMenu = () => {
   const [id, onChangeId, setId] = useInput('');
@@ -28,7 +27,6 @@ const LoginMenu = () => {
   // })
 
   const handleOAuthLoginButtonClick = (type: string) => async () => {
-    console.log(type);
     window.location.href = `http://localhost:8000/api/v1/auth/login/${type}`;
   };
 
@@ -45,7 +43,7 @@ const LoginMenu = () => {
         </Link>
       </S.LoginForm>
       <S.SocialLogin>
-        <S.Icon src={icon1} onClick={handleOAuthLoginButtonClick('kakao')} /> <S.Icon src={icon2} onClick={handleOAuthLoginButtonClick('github')} />
+        <S.Icon src={kakaoIcon} onClick={handleOAuthLoginButtonClick('kakao')} /> <S.Icon src={githubIcon} onClick={handleOAuthLoginButtonClick('github')} />
       </S.SocialLogin>
     </S.LoginContainer>
   );
