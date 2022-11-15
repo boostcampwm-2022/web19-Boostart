@@ -1,12 +1,6 @@
 import React, { useEffect, useState } from 'react';
+import { FriendsList } from 'GlobalType';
 import * as S from './style';
-
-interface FriendsList {
-  idx: number;
-  userId: string;
-  username: string;
-  profileImg: string;
-}
 
 const FriendsBar = () => {
   const dummy = [
