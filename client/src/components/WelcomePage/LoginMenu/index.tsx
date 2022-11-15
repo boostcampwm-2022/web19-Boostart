@@ -28,29 +28,29 @@ const LoginMenu = () => {
   };
 
   return (
-   <S.Container>
-    <S.MainTitle>Boostart</S.MainTitle>
-    <S.LoginContainer>
-      <S.LoginTitle>WELCOME :&gt;</S.LoginTitle>
+    <S.Container>
+      <S.MainTitle>Boostart</S.MainTitle>
+      <S.LoginContainer>
+        <S.LoginTitle>WELCOME :&gt;</S.LoginTitle>
         <S.LoginForm onSubmit={onLogin}>
           <S.InputBar value={id} onChange={onChangeId} placeholder="EMAIL" />
           <S.InputBar value={pw} onChange={onChangePw} placeholder="PASSWORD" type="password" />
           <h3>{err}</h3>
           <S.LoginButton type="submit">LOGIN</S.LoginButton>
           <Link to={'/signup'} style={{ color: 'inherit', textDecoration: 'inherit' }}>
-            <S.SignUpButton>SIGN UP</S.SignUpButton>
+            <S.SignupButton>SIGN UP</S.SignupButton>
           </Link>
         </S.LoginForm>
         <S.SocialLogin>
-         <a href={`${HOST}/api/v1/auth/login/kakao`}>
-          <S.Icon src={kakaoIcon} />
-         </a>
-         <a href={`${HOST}/api/v1/auth/login/github`}>
-          <S.Icon src={githubIcon} />
-         </a>
+          <a href={`${HOST}/api/v1/auth/login/kakao`}>
+            <S.Icon src={kakaoIcon} />
+          </a>
+          <a href={`${HOST}/api/v1/auth/login/github`}>
+            <S.Icon src={githubIcon} />
+          </a>
         </S.SocialLogin>
-    </S.LoginContainer>
-  </S.Container>
+      </S.LoginContainer>
+    </S.Container>
   );
 };
 
