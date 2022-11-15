@@ -7,9 +7,9 @@ interface Props {
   path?: string;
 }
 
-export default function PrivateRoute({ component: RouteComponent }: Props): React.ReactElement {
+export default function RestrictedRoute({ component: RouteComponent }: Props): React.ReactElement {
   const isAuthenticated = useAuthorization();
 
   if (isAuthenticated === undefined) return <></>;
-  return isAuthenticated === false ? <Navigate to="/" /> : <RouteComponent />;
+  return isAuthenticated === true ? <Navigate to="/main" /> : <RouteComponent />;
 }
