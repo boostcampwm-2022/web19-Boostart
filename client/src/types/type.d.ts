@@ -26,6 +26,7 @@ declare module 'GlobalType' {
     endedAt: string;
     lat: number;
     lng: number;
+    location: string;
     public: boolean;
     tag_idx: number;
     tag_name: string;

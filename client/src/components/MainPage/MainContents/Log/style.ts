@@ -74,7 +74,7 @@ export const SortOptionSelect = styled.select`
   border-radius: 0.5rem;
   margin-left: 1rem;
   color: #616161;
-  font-size: 1rem;
+  font-size: 0.825rem;
   font-family: 'Noto Sans KR', sans-serif;
   text-align: center;
   option {
@@ -93,8 +93,70 @@ export const DateController = styled.span`
 
 export const LogMainSection = styled.div`
   width: 100%;
-  height: 100%;
-  background: yellow;
+  height: fit-content;
+  display: flex;
+  flex-wrap: wrap;
+  font-family: 'Noto Sans KR', sans-serif;
   grid-area: main;
   cursor: default;
+`;
+
+export const TagWrap = styled.div`
+  display: flex;
+  margin: 0 0.25rem;
+  flex-direction: column;
+  z-index: 5;
+`;
+export const TagTitle = styled.div`
+  width: 11rem;
+  height: 2rem;
+  margin: 0.25rem 0.25rem;
+  padding: 0 0.75rem;
+  display: flex;
+  align-items: center;
+  color: #616161;
+  font-size: 0.75rem;
+  background: #ffcece;
+  border: 1px solid gray;
+  border-radius: 0.25rem;
+`;
+
+export const TagItems = styled.div`
+  width: 11rem;
+  height: 2rem;
+  margin: 0.25rem 0.25rem;
+  padding: 0 0.75rem;
+  display: flex;
+  align-items: center;
+  font-size: 0.75rem;
+  background: white;
+  border: 1px solid gray;
+  border-radius: 0.25rem;
+  & span {
+    margin: 0 0.25rem 0 0;
+    color: #959595;
+  }
+`;
+
+export const SelectedItem = styled.div<{
+  x: number;
+  y: number;
+}>`
+  width: 11rem;
+  height: 2rem;
+  margin: 0.25rem 0.25rem;
+  padding: 0 0.75rem;
+  position: absolute;
+  top: ${(props) => props.y}px;
+  left: ${(props) => props.x}px;
+  display: flex;
+  align-items: center;
+  font-size: 0.75rem;
+  background: white;
+  border: 1px solid gray;
+  border-radius: 0.25rem;
+  & span {
+    margin: 0 0.25rem 0 0;
+    color: #959595;
+  }
 `;
