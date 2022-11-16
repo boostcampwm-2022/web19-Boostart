@@ -5,7 +5,7 @@ import { EngMonth, Days, WEEK_LENGTH, Menus } from '../../../../constants';
 import * as S from './style';
 
 const Calendar = () => {
-  const [currentDate, setCurrentDate, prevMonth, nextMonth] = useCurrentDate({ year: 2022, month: 0 });
+  const [currentDate, prevMonth, nextMonth] = useCurrentDate({ year: 2022, month: 0 });
   const [selectedMenu, setSelectedMenu] = useState<string>('LOG');
 
   const handleMenuClickEvent = (e: React.MouseEvent) => {
@@ -22,11 +22,6 @@ const Calendar = () => {
     return new Array(lastDate).fill(Math.ceil(Math.random() * 100).toString());
   };
 
-  useEffect(() => {
-    const currentYear = new Date().getFullYear();
-    const currentMonth = new Date().getMonth();
-    setCurrentDate({ year: currentYear, month: currentMonth });
-  }, []);
   return (
     <>
       <S.CalendarTitle>CAL</S.CalendarTitle>
