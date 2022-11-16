@@ -65,7 +65,7 @@ const SignupMenu = () => {
           </S.ProfileImage>
           <S.InputBar value={userId} onChange={onChangeUserId} placeholder="ID" />
           <S.InputBar value={password} onChange={onChangePassword} placeholder="PASSWORD" type="password" />
-          <S.InputBar value={username} onChange={onChangeUsername} placeholder="NICKNAME" type="password" />
+          <S.InputBar value={username} onChange={onChangeUsername} placeholder="NICKNAME" />
           <h3>{err}</h3>
           <S.SignupButton type="button" onClick={handleSignupButtonClick}>
             SIGN UP
