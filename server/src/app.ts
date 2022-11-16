@@ -1,6 +1,6 @@
 import express from 'express';
 import cookieParser from 'cookie-parser';
-import { CORS_ORIGIN, port, version } from './constants';
+import { CORS_ORIGIN, PORT, API_VERSION } from './constants';
 import apiRouter from './api/index';
 import cors from 'cors';
 
@@ -12,8 +12,8 @@ const corsOptions = {
 };
 app.use(cookieParser());
 app.use(cors(corsOptions));
-app.use(`/api/${version}`, apiRouter);
+app.use(`/api/${API_VERSION}`, apiRouter);
 
-app.listen(port, () => {
-  console.log(`app listening to port ${port}`);
+app.listen(PORT, () => {
+  console.log(`app listening to port ${PORT}`);
 });

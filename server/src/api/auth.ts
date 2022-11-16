@@ -1,8 +1,10 @@
 import express from 'express';
-import { GITHUB_CLIENT_ID, GITHUB_CLIENT_SECRET, KAKAO_CLIENT_ID, KAKAO_REDIRECT_URI } from '../constants';
+import { GITHUB_CLIENT_ID, GITHUB_CLIENT_SECRET, KAKAO_CLIENT_ID, KAKAO_REDIRECT_URI, OAUTH_TYPES } from '../constants';
 import axios from 'axios';
 import qs from 'qs';
 import { authenticateToken, generateAccessToken } from '../utils/auth';
+import { generateUnionTypeChecker } from '../utils/validate';
+import { executeSql } from '../db';
 
 const router = express.Router();
 
@@ -77,6 +79,32 @@ router.get('/login/kakao/callback', async (req, res) => {
   });
 
   res.redirect('http://localhost:3000/main');
+});
+
+const validateOAuthType = generateUnionTypeChecker(...OAUTH_TYPES);
+
+router.post('/signup', async (req, res) => {
+  const { userId, password, username, oauthType, oauthEmail } = req.body;
+  const profileImg = 'profile'; // TODO: multer
+  // req.file.filename;
+
+  if (!(userId && password && username && profileImg)) return res.sendStatus(400);
+  if (!validateOAuthType(oauthType)) return res.sendStatus(400);
+  // TODO: 유효성 검증
+
+  if (oauthType) {
+    // TODO: 쿠키 뜯어서 토큰 정보와 요청 정보 대조하기
+
+    if (false) return res.sendStatus(401); // 대조 실패한 경우
+  }
+
+  const userIdAlreadyExists = await executeSql('select * from where user_id = ?', [userId]);
+  if (userIdAlreadyExists) return res.sendStatus(400);
+  const userAlreadySignedUp = await executeSql('select * from where oauth_type = ? and oauth_email = ?', [oauthType, oauthEmail]);
+  if (userAlreadySignedUp) return res.sendStatus(400);
+
+  await executeSql('insert into user (user_id, password, username, oauth_type, oauth_email) values (?, ?, ?, ?, ?)', [userId, password, username, profileImg, oauthType, oauthEmail]);
+  res.sendStatus(200);
 });
 
 router.get('/check-login', authenticateToken, (req, res) => {
