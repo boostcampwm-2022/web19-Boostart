@@ -1,7 +1,7 @@
 import express from 'express';
 import cookieParser from 'cookie-parser';
-import { CORS_ORIGIN, port, version } from './constants';
-import apiRouter from './api/index';
+import { CORS_ORIGIN, port, version } from './src/constants';
+import apiRouter from './src/api/index';
 import cors from 'cors';
 
 const app = express();
