@@ -31,76 +31,58 @@ const httpGetKakaoIdx = async (token) => {
   return data.id;
 };
 
-const httpGetGithubAccessToken = async (code) => {
-  const url = 'https://github.com/login/oauth/access_token';
-  const response = await axios.post(url, null, {
-    params: {
-      client_id: GITHUB_CLIENT_ID,
-      client_secret: GITHUB_CLIENT_SECRET,
-      code: code,
-    },
-  });
+const httpGetAccessToken = async (oauthType, code) => {
+  const url = OAUTH_TOKEN_REQUEST_URI[oauthType];
+  const params = { ...OAUTH_REQUEST_PARAMS[oauthType], code };
+  const response = await axios.post(url, null, { params });
   const { access_token } = qs.parse(response.data);
   return access_token;
 };
 
-const httpGetKaKaoAccessToken = async (code) => {
-  const url = 'https://kauth.kakao.com/oauth/token';
-  const response = await axios.post(url, null, {
-    params: {
-      grant_type: 'authorization_code',
-      client_id: KAKAO_CLIENT_ID,
-      redirect_uri: KAKAO_REDIRECT_URI,
-      code,
-    },
-  });
-  const { access_token } = qs.parse(response.data);
-  return access_token;
+const OAUTH_REDIRECT_URI = {
+  github: `https://github.com/login/oauth/authorize?client_id=${GITHUB_CLIENT_ID}&scope=user:email`,
+  kakao: `https://kauth.kakao.com/oauth/authorize?response_type=code&client_id=${KAKAO_CLIENT_ID}&redirect_uri=${KAKAO_REDIRECT_URI}`,
 };
-
-router.get(`/login/github`, (req, res) => {
-  res.redirect(`https://github.com/login/oauth/authorize?client_id=${GITHUB_CLIENT_ID}&scope=user:email`);
-});
-
-router.get('/login/kakao', (req, res) => {
-  res.redirect(`https://kauth.kakao.com/oauth/authorize?response_type=code&client_id=${KAKAO_CLIENT_ID}&redirect_uri=${KAKAO_REDIRECT_URI}`);
-});
-
-router.get(`/login/github/callback/`, async (req, res) => {
-  const { code } = req.query;
-
-  const accessToken = await httpGetGithubAccessToken(code);
-  const oauthType = 'github';
-  const oauthEmail = await httpGetGithubEmail(accessToken);
-
-  const [user] = await executeSql('select * from user where oauth_type = ? and oauth_email = ?', [oauthType, oauthEmail]);
-  const token = generateAccessToken(user ? { userId: user.user_id } : { oauthType, oauthEmail });
-
-  res.cookie('token', token, {
-    httpOnly: true,
-  });
-
-  res.redirect(`http://localhost:3000/${user ? 'main' : 'signup'}`);
-});
-
-router.get('/login/kakao/callback', async (req, res) => {
-  const { code } = req.query;
-
-  const accessToken = await httpGetKaKaoAccessToken(code);
-  const oauthType = 'kakao';
-  const oauthEmail = await httpGetKakaoIdx(accessToken); // 변수 이름. (카카오에서는 이메일 얻기 위해 검수 필요)
-
-  const [user] = await executeSql('select * from user where oauth_type = ? and oauth_email = ?', [oauthType, oauthEmail]);
-  const token = generateAccessToken(user ? { userId: user.user_id } : { oauthType, oauthEmail });
-
-  res.cookie('token', token, {
-    httpOnly: true,
-  });
-
-  res.redirect(`http://localhost:3000/${user ? 'main' : 'signup'}`);
-});
+const OAUTH_TOKEN_REQUEST_URI = {
+  github: 'https://github.com/login/oauth/access_token',
+  kakao: 'https://kauth.kakao.com/oauth/token',
+};
+const OAUTH_REQUEST_PARAMS = {
+  github: {
+    client_id: GITHUB_CLIENT_ID,
+    client_secret: GITHUB_CLIENT_SECRET,
+  },
+  kakao: {
+    grant_type: 'authorization_code',
+    client_id: KAKAO_CLIENT_ID,
+    redirect_uri: KAKAO_REDIRECT_URI,
+  },
+};
 
 const validateOAuthType = generateUnionTypeChecker(...OAUTH_TYPES);
+
+router.get(`/login/:oauth_type`, (req, res) => {
+  const oauthType = req.params.oauth_type;
+  if (!validateOAuthType(oauthType)) return res.sendStatus(400);
+  res.redirect(OAUTH_REDIRECT_URI[oauthType]);
+});
+
+router.get('/login/:oauth_type/callback', async (req, res) => {
+  const { code } = req.query;
+  const oauthType = req.params.oauth_type;
+
+  const accessToken = await httpGetAccessToken(oauthType, code);
+  const oauthEmail = await (oauthType === 'github' ? httpGetGithubEmail(accessToken) : httpGetKakaoIdx(accessToken)); // 변수 이름. (카카오에서는 이메일 얻기 위해 검수 필요)
+
+  const [user] = await executeSql('select * from user where oauth_type = ? and oauth_email = ?', [oauthType, oauthEmail]);
+  const token = generateAccessToken(user ? { userId: user.user_id } : { oauthType, oauthEmail });
+
+  res.cookie('token', token, {
+    httpOnly: true,
+  });
+
+  res.redirect(`http://localhost:3000/${user ? 'main' : 'signup'}`);
+});
 
 router.post('/signup', async (req, res) => {
   const { userId, password, username } = req.body;
