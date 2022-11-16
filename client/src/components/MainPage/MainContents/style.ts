@@ -9,6 +9,7 @@ export const MainContentContainer = styled.div`
   width: 70rem;
   height: 100%;
   margin-top: 0rem;
+  display: flex;
   justify-content: space-between;
 `;
 export const LeftSection = styled.div`
