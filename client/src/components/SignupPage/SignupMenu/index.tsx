@@ -4,6 +4,14 @@ import useInput from '../../../hooks/useInput';
 import { Link, useNavigate } from 'react-router-dom';
 import { DEFAULT_PROFILE_IMG_URL, HOST } from '../../../constants';
 
+const userIdValidation = (userId: string) => {
+  return userId.length >= 3 && userId.length <= 20;
+};
+
+const passwordValidation = (password: string) => {
+  return password.length >= 4 && password.length <= 30;
+};
+
 const SignupMenu = () => {
   const [userId, onChangeUserId, setUserId] = useInput('');
   const [password, onChangePassword, setPassword] = useInput('');
@@ -20,6 +28,15 @@ const SignupMenu = () => {
   };
 
   const handleSignupButtonClick = async () => {
+    if (!userIdValidation(userId)) {
+      alert('아이디 형식 오류');
+      return;
+    }
+    if (!passwordValidation(password)) {
+      alert('비밀번호 형식 오류');
+      return;
+    }
+
     const response = await fetch(`${HOST}/api/v1/auth/signup`, {
       method: 'post',
       credentials: 'include',
