@@ -59,6 +59,22 @@ const OAUTH_REQUEST_PARAMS = {
   },
 };
 
+router.post('/login', async (req, res) => {
+  const { userId, password } = req.body;
+  let user;
+  [user] = await executeSql('select * from user where user_id = ?', [userId]);
+  if (!user) res.sendStatus(401);
+  [user] = await executeSql('select * from user where user_id = ? and password = ?', [userId, password]);
+  if (!user) res.sendStatus(401);
+
+  const token = generateAccessToken({ userId: user.user_id });
+  res.cookie('token', token, {
+    httpOnly: true,
+  });
+
+  res.redirect(`http://localhost:3000/main`);
+});
+
 const validateOAuthType = generateUnionTypeChecker(...OAUTH_TYPES);
 
 router.get(`/login/:oauth_type`, (req, res) => {
