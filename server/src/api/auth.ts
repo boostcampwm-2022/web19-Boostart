@@ -19,25 +19,30 @@ const encrypt = (plain, salt) => {
   return crypto.scryptSync(plain, salt, 64).toString('base64');
 };
 
-const httpGetGithubEmail = async (token) => {
-  const response = await axios.get('https://api.github.com/user/emails', {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  });
+const httpGetOAuthUserIdentifier = async (oauthType, token) => {
+  switch (oauthType) {
+    case OAUTH_TYPES.github: {
+      const response = await axios.get('https://api.github.com/user/emails', {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
 
-  const primaryEmail = response.data[0].email;
-  return primaryEmail;
-};
-
-const httpGetKakaoIdx = async (token) => {
-  const { data } = await axios.get('https://kapi.kakao.com/v2/user/me', {
-    headers: {
-      Authorization: `Bearer ${token}`,
-      'Content-Type': 'application/x-www-form-urlencoded;charset=utf-8',
-    },
-  });
-  return data.id;
+      const primaryEmail = response.data[0].email;
+      return primaryEmail;
+    }
+    case OAUTH_TYPES.kakao: {
+      const { data } = await axios.get('https://kapi.kakao.com/v2/user/me', {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/x-www-form-urlencoded;charset=utf-8',
+        },
+      });
+      return data.id;
+    }
+    default: {
+    }
+  }
 };
 
 const httpGetAccessToken = async (oauthType, code) => {
@@ -101,7 +106,7 @@ router.get('/login/:oauth_type/callback', async (req, res) => {
   if (!validateOAuthType(oauthType)) return res.sendStatus(400);
 
   const accessToken = await httpGetAccessToken(oauthType, code);
-  const oauthEmail = await (oauthType === OAUTH_TYPES.github ? httpGetGithubEmail(accessToken) : httpGetKakaoIdx(accessToken)); // 변수 이름. (카카오에서는 이메일 얻기 위해 검수 필요)
+  const oauthEmail = await httpGetOAuthUserIdentifier(oauthType, accessToken); // 변수 이름. (카카오에서는 이메일 얻기 위해 검수 필요)
 
   const [user] = await executeSql('select * from user where oauth_type = ? and oauth_email = ?', [oauthType, oauthEmail]);
   const token = generateAccessToken(user ? { userId: user.user_id } : { oauthType, oauthEmail });
