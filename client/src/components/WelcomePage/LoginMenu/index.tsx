@@ -42,10 +42,10 @@ const LoginMenu = () => {
           </Link>
         </S.LoginForm>
         <S.SocialLogin>
-          <a href={`${HOST}/api/v1/auth/login/kakao`}>
+          <a href={'/api/v1/auth/login/kakao'}>
             <S.Icon src={kakaoIcon} />
           </a>
-          <a href={`${HOST}/api/v1/auth/login/github`}>
+          <a href={'/api/v1/auth/login/github'}>
             <S.Icon src={githubIcon} />
           </a>
         </S.SocialLogin>
