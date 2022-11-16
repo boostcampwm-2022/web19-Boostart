@@ -10,7 +10,7 @@ import { AuthorizedRequest } from '../types';
 
 const router = express.Router();
 
-const httpGetUserEmail = async (token) => {
+const httpGetGithubEmail = async (token) => {
   const response = await axios.get('https://api.github.com/user/emails', {
     headers: {
       Authorization: `Bearer ${token}`,
@@ -19,6 +19,43 @@ const httpGetUserEmail = async (token) => {
 
   const primaryEmail = response.data[0].email;
   return primaryEmail;
+};
+
+const httpGetKakaoIdx = async (token) => {
+  const { data } = await axios.get('https://kapi.kakao.com/v2/user/me', {
+    headers: {
+      Authorization: `Bearer ${token}`,
+      'Content-Type': 'application/x-www-form-urlencoded;charset=utf-8',
+    },
+  });
+  return data.id;
+};
+
+const httpGetGithubAccessToken = async (code) => {
+  const url = 'https://github.com/login/oauth/access_token';
+  const response = await axios.post(url, null, {
+    params: {
+      client_id: GITHUB_CLIENT_ID,
+      client_secret: GITHUB_CLIENT_SECRET,
+      code: code,
+    },
+  });
+  const { access_token } = qs.parse(response.data);
+  return access_token;
+};
+
+const httpGetKaKaoAccessToken = async (code) => {
+  const url = 'https://kauth.kakao.com/oauth/token';
+  const response = await axios.post(url, null, {
+    params: {
+      grant_type: 'authorization_code',
+      client_id: KAKAO_CLIENT_ID,
+      redirect_uri: KAKAO_REDIRECT_URI,
+      code,
+    },
+  });
+  const { access_token } = qs.parse(response.data);
+  return access_token;
 };
 
 router.get(`/login/github`, (req, res) => {
@@ -30,20 +67,11 @@ router.get('/login/kakao', (req, res) => {
 });
 
 router.get(`/login/github/callback/`, async (req, res) => {
-  const url = 'https://github.com/login/oauth/access_token';
   const { code } = req.query;
 
-  const response = await axios.post(url, null, {
-    params: {
-      client_id: GITHUB_CLIENT_ID,
-      client_secret: GITHUB_CLIENT_SECRET,
-      code: code,
-    },
-  });
-
-  const { access_token } = qs.parse(response.data);
+  const accessToken = await httpGetGithubAccessToken(code);
   const oauthType = 'github';
-  const oauthEmail = await httpGetUserEmail(access_token);
+  const oauthEmail = await httpGetGithubEmail(accessToken);
 
   const [user] = await executeSql('select * from user where oauth_type = ? and oauth_email = ?', [oauthType, oauthEmail]);
   const token = generateAccessToken(user ? { userId: user.user_id } : { oauthType, oauthEmail });
@@ -56,28 +84,12 @@ router.get(`/login/github/callback/`, async (req, res) => {
 });
 
 router.get('/login/kakao/callback', async (req, res) => {
-  const url = 'https://kauth.kakao.com/oauth/token';
   const { code } = req.query;
 
-  const response = await axios.post(url, null, {
-    params: {
-      grant_type: 'authorization_code',
-      client_id: KAKAO_CLIENT_ID,
-      redirect_uri: KAKAO_REDIRECT_URI,
-      code,
-    },
-  });
-
-  const { access_token } = qs.parse(response.data);
-  const { data } = await axios.get('https://kapi.kakao.com/v2/user/me', {
-    headers: {
-      Authorization: 'Bearer ' + access_token,
-      'Content-Type': 'application/x-www-form-urlencoded;charset=utf-8',
-    },
-  });
-
+  const accessToken = await httpGetKaKaoAccessToken(code);
   const oauthType = 'kakao';
-  const oauthEmail = data.id;
+  const oauthEmail = await httpGetKakaoIdx(accessToken); // 변수 이름. (카카오에서는 이메일 얻기 위해 검수 필요)
+
   const [user] = await executeSql('select * from user where oauth_type = ? and oauth_email = ?', [oauthType, oauthEmail]);
   const token = generateAccessToken(user ? { userId: user.user_id } : { oauthType, oauthEmail });
 
@@ -85,7 +97,7 @@ router.get('/login/kakao/callback', async (req, res) => {
     httpOnly: true,
   });
 
-  res.redirect('http://localhost:3000/main');
+  res.redirect(`http://localhost:3000/${user ? 'main' : 'signup'}`);
 });
 
 const validateOAuthType = generateUnionTypeChecker(...OAUTH_TYPES);
@@ -108,12 +120,7 @@ router.post('/signup', async (req, res) => {
     if (!(oauthType && oauthEmail)) return res.sendStatus(401);
     if (!validateOAuthType(oauthType)) return res.sendStatus(401);
 
-    // ---
-    const a = await executeSql('select * from user');
-    console.log(a);
-    // ---
     [user] = await executeSql('select * from user where oauth_type = ? and oauth_email = ?', [oauthType, oauthEmail]);
-    console.log(user);
     if (user) {
       console.log(`이미 가입된 계정: ${oauthType}, ${oauthEmail}`);
       return res.sendStatus(202);
@@ -134,8 +141,7 @@ router.post('/signup', async (req, res) => {
 });
 
 router.get('/check-login', authenticateToken, (req: AuthorizedRequest, res) => {
-  console.log(req.user);
-  res.send(req.user.userId ?? 401);
+  res.send(req.user ?? 401);
 });
 
 export default router;
