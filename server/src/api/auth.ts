@@ -7,8 +7,17 @@ import { generateUnionTypeChecker } from '../utils/validate';
 import { executeSql } from '../db';
 import jwt from 'jsonwebtoken';
 import { AuthorizedRequest } from '../types';
+import crypto from 'crypto';
 
 const router = express.Router();
+
+const generateSalt = () => {
+  return crypto.randomBytes(64).toString('hex');
+};
+
+const encrypt = (plain, salt) => {
+  return crypto.scryptSync(plain, salt, 64).toString('base64');
+};
 
 const httpGetGithubEmail = async (token) => {
   const response = await axios.get('https://api.github.com/user/emails', {
@@ -65,7 +74,9 @@ router.post('/login', async (req, res) => {
   let user;
   [user] = await executeSql('select * from user where user_id = ?', [userId]);
   if (!user) return res.sendStatus(401);
-  [user] = await executeSql('select * from user where user_id = ? and password = ?', [userId, password]);
+
+  const encrypted = encrypt(password, user.salt);
+  [user] = await executeSql('select * from user where user_id = ? and password = ?', [userId, encrypted]);
   if (!user) return res.sendStatus(401);
 
   const token = generateAccessToken({ userId: user.user_id });
@@ -132,9 +143,11 @@ router.post('/signup', async (req, res) => {
     return res.sendStatus(202);
   }
 
+  const salt = generateSalt();
+  const encrypted = encrypt(password, salt);
   await (oauthType
-    ? executeSql('insert into `user` (user_id, password, username, oauth_type, oauth_email) values (?, ?, ?, ?, ?)', [userId, password, username, oauthType, oauthEmail])
-    : executeSql('insert into `user` (user_id, password, username) values (?, ?, ?)', [userId, password, username]));
+    ? executeSql('insert into `user` (user_id, password, username, oauth_type, oauth_email, salt) values (?, ?, ?, ?, ?, ?)', [userId, encrypted, username, oauthType, oauthEmail, salt])
+    : executeSql('insert into `user` (user_id, password, username, salt) values (?, ?, ?, ?)', [userId, encrypted, username, salt]));
   console.log(`회원가입 성공: ${userId}, ${username}`);
   res.sendStatus(201);
 });
