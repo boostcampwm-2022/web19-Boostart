@@ -1,10 +1,12 @@
 import express from 'express';
-import { GITHUB_CLIENT_ID, GITHUB_CLIENT_SECRET, KAKAO_CLIENT_ID, KAKAO_REDIRECT_URI, OAUTH_TYPES } from '../constants';
+import { GITHUB_CLIENT_ID, GITHUB_CLIENT_SECRET, KAKAO_CLIENT_ID, KAKAO_REDIRECT_URI, OAUTH_TYPES, TOKEN_SECRET } from '../constants';
 import axios from 'axios';
 import qs from 'qs';
 import { authenticateToken, generateAccessToken } from '../utils/auth';
 import { generateUnionTypeChecker } from '../utils/validate';
 import { executeSql } from '../db';
+import jwt from 'jsonwebtoken';
+import { AuthorizedRequest } from '../types';
 
 const router = express.Router();
 
@@ -40,15 +42,17 @@ router.get(`/login/github/callback/`, async (req, res) => {
   });
 
   const { access_token } = qs.parse(response.data);
-  const userEmail = await httpGetUserEmail(access_token);
+  const oauthType = 'github';
+  const oauthEmail = await httpGetUserEmail(access_token);
 
-  const token = generateAccessToken({ email: userEmail });
+  const [user] = await executeSql('select * from user where oauth_type = ? and oauth_email = ?', [oauthType, oauthEmail]);
+  const token = generateAccessToken(user ? { userId: user.user_id } : { oauthType, oauthEmail });
 
   res.cookie('token', token, {
     httpOnly: true,
   });
 
-  res.redirect(`http://localhost:3000/main`);
+  res.redirect(`http://localhost:3000/${user ? 'main' : 'signup'}`);
 });
 
 router.get('/login/kakao/callback', async (req, res) => {
@@ -72,7 +76,10 @@ router.get('/login/kakao/callback', async (req, res) => {
     },
   });
 
-  const token = generateAccessToken({ id: data.id });
+  const oauthType = 'kakao';
+  const oauthEmail = data.id;
+  const [user] = await executeSql('select * from user where oauth_type = ? and oauth_email = ?', [oauthType, oauthEmail]);
+  const token = generateAccessToken(user ? { userId: user.user_id } : { oauthType, oauthEmail });
 
   res.cookie('token', token, {
     httpOnly: true,
@@ -84,39 +91,51 @@ router.get('/login/kakao/callback', async (req, res) => {
 const validateOAuthType = generateUnionTypeChecker(...OAUTH_TYPES);
 
 router.post('/signup', async (req, res) => {
-  const { userId, password, username, oauthType, oauthEmail } = req.body;
+  const { userId, password, username } = req.body;
   const profileImg = 'profile'; // TODO: multer
   // req.file.filename;
 
   if (!(userId && password && username && profileImg)) return res.sendStatus(400);
   // TODO: 유효성 검증
 
-  if (oauthType) {
-    if (!validateOAuthType(oauthType)) return res.sendStatus(400);
-    // TODO: 쿠키 뜯어서 토큰 정보와 요청 정보 대조하기
-
-    if (false) return res.sendStatus(401); // 대조 실패한 경우
-  }
+  const token = req.cookies.token;
 
   let user: object;
+  let oauthType: string;
+  let oauthEmail: string;
+  if (token) {
+    ({ oauthType, oauthEmail } = jwt.verify(token, TOKEN_SECRET));
+    if (!(oauthType && oauthEmail)) return res.sendStatus(401);
+    if (!validateOAuthType(oauthType)) return res.sendStatus(401);
+
+    // ---
+    const a = await executeSql('select * from user');
+    console.log(a);
+    // ---
+    [user] = await executeSql('select * from user where oauth_type = ? and oauth_email = ?', [oauthType, oauthEmail]);
+    console.log(user);
+    if (user) {
+      console.log(`이미 가입된 계정: ${oauthType}, ${oauthEmail}`);
+      return res.sendStatus(202);
+    }
+  }
+
   [user] = await executeSql('select * from user where user_id = ?', [userId]);
   if (user) {
     console.log(`ID 중복: ${userId}`);
     return res.sendStatus(202);
   }
-  // [user] = await executeSql('select * from where oauth_type = ? and oauth_email = ?', [oauthType, oauthEmail]);
-  // if (user) {
-  //   console.log(`이미 가입된 계정: ${oauthType}, ${oauthEmail}`);
-  //   return res.sendStatus(202);
-  // }
 
-  await executeSql('insert into `user` (user_id, password, username) values (?, ?, ?)', [userId, password, username]);
+  await (oauthType
+    ? executeSql('insert into `user` (user_id, password, username, oauth_type, oauth_email) values (?, ?, ?, ?, ?)', [userId, password, username, oauthType, oauthEmail])
+    : executeSql('insert into `user` (user_id, password, username) values (?, ?, ?)', [userId, password, username]));
   console.log(`회원가입 성공: ${userId}, ${username}`);
   res.sendStatus(201);
 });
 
-router.get('/check-login', authenticateToken, (req, res) => {
-  res.sendStatus(200);
+router.get('/check-login', authenticateToken, (req: AuthorizedRequest, res) => {
+  console.log(req.user);
+  res.send(req.user.userId ?? 401);
 });
 
 export default router;
