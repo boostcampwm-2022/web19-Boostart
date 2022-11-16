@@ -31,7 +31,7 @@ const LoginMenu = () => {
       <S.LoginContainer>
         <S.LoginTitle>WELCOME :&gt;</S.LoginTitle>
         <S.LoginForm>
-          <S.InputBar value={userId} onChange={onChangeUserId} placeholder="EMAIL" />
+          <S.InputBar value={userId} onChange={onChangeUserId} placeholder="ID" />
           <S.InputBar value={password} onChange={onChangePassword} placeholder="PASSWORD" type="password" />
           <h3>{err}</h3>
           <S.LoginButton type="button" onClick={handleLoginButtonClick}>
