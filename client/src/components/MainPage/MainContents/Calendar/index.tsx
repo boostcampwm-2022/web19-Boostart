@@ -38,16 +38,16 @@ const Calendar = () => {
         </S.MonthSelector>
         <S.DaysHeader>
           {new Array(WEEK_LENGTH).fill(true).map((_, idx) => {
-            return <S.DaysText>{Days[idx]}</S.DaysText>;
+            return <S.DaysText key={idx}>{Days[idx]}</S.DaysText>;
           })}
         </S.DaysHeader>
         <S.DateSelector>
           {new Array(startDay).fill(true).map((_, idx) => {
-            return <S.DateBox></S.DateBox>;
+            return <S.DateBox key={idx}></S.DateBox>;
           })}
           {new Array(lastDate).fill(true).map((_, idx) => {
             return (
-              <S.DateBox>
+              <S.DateBox key={idx}>
                 <S.DateLogo percentage={DummyPercentage(currentDate)[idx]}>B</S.DateLogo>
                 <S.Date>{idx + 1}</S.Date>
               </S.DateBox>

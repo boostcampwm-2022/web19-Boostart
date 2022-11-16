@@ -2,11 +2,7 @@ import React from 'react';
 import LoginMenu from '../components/WelcomePage/LoginMenu';
 
 const WelcomePage = () => {
-  return (
-    <>
-      <LoginMenu />
-    </>
-  );
+  return <LoginMenu />;
 };
 
 export default WelcomePage;
