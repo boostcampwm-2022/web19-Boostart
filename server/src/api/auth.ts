@@ -49,19 +49,19 @@ const httpGetAccessToken = async (oauthType, code) => {
 };
 
 const OAUTH_REDIRECT_URI = {
-  github: `https://github.com/login/oauth/authorize?client_id=${GITHUB_CLIENT_ID}&scope=user:email`,
-  kakao: `https://kauth.kakao.com/oauth/authorize?response_type=code&client_id=${KAKAO_CLIENT_ID}&redirect_uri=${KAKAO_REDIRECT_URI}`,
+  [OAUTH_TYPES.github]: `https://github.com/login/oauth/authorize?client_id=${GITHUB_CLIENT_ID}&scope=user:email`,
+  [OAUTH_TYPES.kakao]: `https://kauth.kakao.com/oauth/authorize?response_type=code&client_id=${KAKAO_CLIENT_ID}&redirect_uri=${KAKAO_REDIRECT_URI}`,
 };
 const OAUTH_TOKEN_REQUEST_URI = {
-  github: 'https://github.com/login/oauth/access_token',
-  kakao: 'https://kauth.kakao.com/oauth/token',
+  [OAUTH_TYPES.github]: 'https://github.com/login/oauth/access_token',
+  [OAUTH_TYPES.kakao]: 'https://kauth.kakao.com/oauth/token',
 };
 const OAUTH_REQUEST_PARAMS = {
-  github: {
+  [OAUTH_TYPES.github]: {
     client_id: GITHUB_CLIENT_ID,
     client_secret: GITHUB_CLIENT_SECRET,
   },
-  kakao: {
+  [OAUTH_TYPES.kakao]: {
     grant_type: 'authorization_code',
     client_id: KAKAO_CLIENT_ID,
     redirect_uri: KAKAO_REDIRECT_URI,
@@ -70,7 +70,7 @@ const OAUTH_REQUEST_PARAMS = {
 
 router.post('/login', async (req, res) => {
   const { userId, password } = req.body;
-  if (!(userId && password)) res.sendStatus(400);
+  if (!(userId && password)) return res.sendStatus(400);
   let user;
   [user] = await executeSql('select * from user where user_id = ?', [userId]);
   if (!user) return res.sendStatus(401);
@@ -87,7 +87,7 @@ router.post('/login', async (req, res) => {
   res.sendStatus(200);
 });
 
-const validateOAuthType = generateUnionTypeChecker(...OAUTH_TYPES);
+const validateOAuthType = generateUnionTypeChecker(OAUTH_TYPES);
 
 router.get(`/login/:oauth_type`, (req, res) => {
   const oauthType = req.params.oauth_type;
@@ -98,9 +98,10 @@ router.get(`/login/:oauth_type`, (req, res) => {
 router.get('/login/:oauth_type/callback', async (req, res) => {
   const { code } = req.query;
   const oauthType = req.params.oauth_type;
+  if (!validateOAuthType(oauthType)) return res.sendStatus(400);
 
   const accessToken = await httpGetAccessToken(oauthType, code);
-  const oauthEmail = await (oauthType === 'github' ? httpGetGithubEmail(accessToken) : httpGetKakaoIdx(accessToken)); // 변수 이름. (카카오에서는 이메일 얻기 위해 검수 필요)
+  const oauthEmail = await (oauthType === OAUTH_TYPES.github ? httpGetGithubEmail(accessToken) : httpGetKakaoIdx(accessToken)); // 변수 이름. (카카오에서는 이메일 얻기 위해 검수 필요)
 
   const [user] = await executeSql('select * from user where oauth_type = ? and oauth_email = ?', [oauthType, oauthEmail]);
   const token = generateAccessToken(user ? { userId: user.user_id } : { oauthType, oauthEmail });
