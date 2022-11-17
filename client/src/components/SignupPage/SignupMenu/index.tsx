@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import * as S from './style';
 import { Link, useNavigate } from 'react-router-dom';
 import { DEFAULT_PROFILE_IMG_URL, HOST } from '../../../constants';
@@ -46,10 +46,15 @@ const SignupMenu = () => {
   const signupFormSubmit = async (d: any) => {
     const response = await httpPostSignup(d);
     if (response.ok) {
-      alert('good');
       navigate('/');
+    } else {
+      setErr('이미 존재하는 아이디인 것 같아요');
     }
   };
+
+  useEffect(() => {
+    setErr(Object.keys(errors).length !== 0 ? '회원가입 양식이 틀렸어요' : '');
+  }, [errors]);
 
   return (
     <S.Container>
