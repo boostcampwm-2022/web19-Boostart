@@ -18,12 +18,6 @@ const useCurrentDate = (initDate: CurrentDate) => {
     setCurrentDate({ year: currentTime.getFullYear(), month: currentTime.getMonth() });
   };
 
-  useEffect(() => {
-    const currentYear = new Date().getFullYear();
-    const currentMonth = new Date().getMonth();
-    setCurrentDate({ year: currentYear, month: currentMonth });
-  }, []);
-
   return [currentDate, prevMonth, nextMonth] as [CurrentDate, onClickType, onClickType];
 };
 export default useCurrentDate;

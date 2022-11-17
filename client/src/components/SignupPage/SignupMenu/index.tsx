@@ -1,16 +1,41 @@
 import React, { useState } from 'react';
 import * as S from './style';
-import useInput from '../../../hooks/useInput';
 import { Link, useNavigate } from 'react-router-dom';
+import { DEFAULT_PROFILE_IMG_URL, HOST } from '../../../constants';
+import { useForm } from 'react-hook-form';
+import { yupResolver } from '@hookform/resolvers/yup';
+import * as yup from 'yup';
+
+const httpPostSignup = async ({ userId, password, username }: any) => {
+  const response = await fetch(`${HOST}/api/v1/auth/signup`, {
+    method: 'post',
+    credentials: 'include',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ userId, password, username }),
+  });
+  return response;
+};
 
 const SignupMenu = () => {
-  const [id, onChangeId, setId] = useInput('');
-  const [pw, onChangePw, setPw] = useInput('');
-  const [name, onChangeName, setName] = useInput('');
-  const [profileimg, setProfileImg] = useState<File | null>(null);
+  const [profileImg, setProfileImg] = useState<File>();
   const [err, setErr] = useState('');
 
-  const history = useNavigate();
+  const schema = yup.object().shape({
+    userId: yup.string().required('id is required.'),
+    password: yup.string().min(8).max(15).required('password must be 8 - 15 characters.'),
+  });
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm({
+    resolver: yupResolver(schema),
+  });
+
+  const navigate = useNavigate();
 
   const handleProfileImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
@@ -18,53 +43,33 @@ const SignupMenu = () => {
     }
   };
 
-  const onSignup = (e: React.FormEvent) => {
-    e.preventDefault();
-
-    const formData = new FormData();
-    formData.append('userImage', profileimg!);
-
-    const signUpData = {
-      user_id: id,
-      password: pw,
-      username: name,
-      profile_img: formData,
-      oauth_type: '',
-      oauth_email: '',
-    };
-    //axios.post('/signup', data).then(res=>{
-    //   if(res.data.isSuccess)
-    //   {
-    //       alert("가입이 완료되었습니다.");
-    //       history.push('/');
-    //   }
-    // })
-    // .catch(error => {
-    //     에러코드 식별
-    //     setErr("회원가입에 실패했습니다.");
-    // })
+  const signupFormSubmit = async (d: any) => {
+    const response = await httpPostSignup(d);
+    if (response.ok) {
+      alert('good');
+      navigate('/');
+    }
   };
 
   return (
     <S.Container>
       <S.SignupContainer>
         <S.SignupTitle>LET'S JOIN US !</S.SignupTitle>
-        <S.SignupForm onSubmit={onSignup}>
+        <S.SignupForm onSubmit={handleSubmit(signupFormSubmit)}>
           <S.ProfileImage>
-            {profileimg ? <img src={URL.createObjectURL(profileimg)} alt="profile-img" /> : <img src="https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460__480.png" alt="profile-img" />}
+            <img src={profileImg ? URL.createObjectURL(profileImg) : DEFAULT_PROFILE_IMG_URL} alt="profile-img" />
             <S.EditRound>
               <input type="file" onChange={handleProfileImageChange} />
               <S.EditIcon />
             </S.EditRound>
           </S.ProfileImage>
-
-          <S.InputBar value={id} onChange={onChangeId} placeholder="ID" />
-          <S.InputBar value={pw} onChange={onChangePw} placeholder="PASSWORD" type="password" />
-          <S.InputBar value={name} onChange={onChangeName} placeholder="NICKNAME" type="password" />
+          <S.InputBar {...register('userId')} placeholder="ID" />
+          <S.InputBar {...register('password')} placeholder="PASSWORD" type="password" />
+          <S.InputBar {...register('username')} placeholder="NICKNAME" />
           <h3>{err}</h3>
-          <S.SignupButton type="submit">SIGN UP</S.SignupButton>
+          <S.SignupButton>SIGN UP</S.SignupButton>
           <Link to={'/'} style={{ color: 'inherit', textDecoration: 'inherit' }}>
-            <S.LoginButton>LOGIN PAGE</S.LoginButton>
+            <S.LoginButton type="button">LOGIN PAGE</S.LoginButton>
           </Link>
         </S.SignupForm>
       </S.SignupContainer>

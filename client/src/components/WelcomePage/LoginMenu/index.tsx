@@ -1,40 +1,60 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import * as S from './style';
-import useInput from '../../../hooks/useInput';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import kakaoIcon from '../../../assets/kakao_icon.svg';
 import githubIcon from '../../../assets/github_icon.png';
 import { HOST } from '../../../constants';
+import { useForm } from 'react-hook-form';
+import { yupResolver } from '@hookform/resolvers/yup';
+import * as yup from 'yup';
+
+const httpPostLogin = async ({ userId, password }: any) => {
+  const response = await fetch(`${HOST}/api/v1/auth/login`, {
+    method: 'post',
+    credentials: 'include',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ userId, password }),
+  });
+  return response;
+};
 
 const LoginMenu = () => {
-  const [id, onChangeId, setId] = useInput('');
-  const [pw, onChangePw, setPw] = useInput('');
+  const navigate = useNavigate();
   const [err, setErr] = useState('');
 
-  const onLogin = (e: React.FormEvent) => {
-    e.preventDefault();
+  const schema = yup.object().shape({
+    userId: yup.string().required('id is required.'),
+    password: yup.string().min(8).max(15).required('password must be 8 - 15 characters.'),
+  });
 
-    const data = {
-      user_id: id,
-      password: pw,
-    };
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm({
+    resolver: yupResolver(schema),
+  });
 
-    // axios.post('/users/login', data).then(res=>{
-    //     //main으로 이동
-    // })
-    // .catch(error => {
-    //     setErr("로그인에 실패했습니다.");
-    // })
+  const loginFormSubmit = async (d: any) => {
+    const response = await httpPostLogin(d);
+    if (response.ok) navigate('/main');
+    else setErr('아이디 또는 비밀번호가 틀렸어요');
   };
+
+  useEffect(() => {
+    setErr(Object.keys(errors).length !== 0 ? '아이디 또는 비밀번호 양식이 틀렸어요' : '');
+  }, [errors]);
 
   return (
     <S.Container>
       <S.MainTitle>Boostart</S.MainTitle>
       <S.LoginContainer>
         <S.LoginTitle>WELCOME :&gt;</S.LoginTitle>
-        <S.LoginForm onSubmit={onLogin}>
-          <S.InputBar value={id} onChange={onChangeId} placeholder="EMAIL" />
-          <S.InputBar value={pw} onChange={onChangePw} placeholder="PASSWORD" type="password" />
+        <S.LoginForm onSubmit={handleSubmit(loginFormSubmit)}>
+          <S.InputBar {...register('userId')} placeholder="ID" />
+          <S.InputBar {...register('password')} placeholder="PASSWORD" type="password" />
           <h3>{err}</h3>
           <S.LoginButton type="submit">LOGIN</S.LoginButton>
           <Link to={'/signup'} style={{ color: 'inherit', textDecoration: 'inherit' }}>
