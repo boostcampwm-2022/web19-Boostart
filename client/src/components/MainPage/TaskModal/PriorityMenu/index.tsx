@@ -1,22 +1,20 @@
 import React, { useState } from 'react';
 import * as S from './style';
 
-const ReviewMenu = () => {
-  //clicked 배열로 평점 별 관리
-  const [clicked, setClicked] = useState([false, false, false, false, false]);
-  const [score, setScore] = useState(0);
+const PriorityMenu = () => {
+  const [clicked, setClicked] = useState([false, false, false, false, false]); //clicked 배열로 별 관리
+  const [priority, setPriority] = useState(0);
 
   const handleStarClick = (e: React.MouseEvent, index: Number) => {
     e.preventDefault();
     let clickStates = [...clicked];
-    setScore(0);
+    setPriority(0);
     for (let i = 0; i < 5; i++) {
       if (i <= index) {
         clickStates[i] = true;
-        setScore((prevCount) => prevCount + 1);
+        setPriority((prevCount) => prevCount + 1);
       } else clickStates[i] = false;
     }
-    console.log(clickStates);
     setClicked(clickStates);
   };
 
@@ -33,4 +31,4 @@ const ReviewMenu = () => {
   );
 };
 
-export default ReviewMenu;
+export default PriorityMenu;
