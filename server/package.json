@@ -21,7 +21,8 @@
     "typescript": "^4.8.4"
   },
   "scripts": {
-    "start": "nodemon ./app.ts",
+    "start": "export MODE=prod && nodemon ./app.ts",
+    "dev": "export MODE=dev && nodemon ./app.ts",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
