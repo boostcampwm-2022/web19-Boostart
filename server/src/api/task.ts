@@ -7,7 +7,7 @@ const router = Router();
 
 router.get('/', authenticateToken, async (req: AuthorizedRequest, res) => {
   const { userIdx } = req.user;
-  const rows = await executeSql('select * from task where user_idx = ?', [userIdx]);
+  const rows = await executeSql('select * from task where user_idx = ?', [userIdx.toString()]);
   res.json(rows);
 });
 
