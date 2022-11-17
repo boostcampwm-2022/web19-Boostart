@@ -5,13 +5,19 @@ import { EngMonth, Days, WEEK_LENGTH, Menus } from '../../../../constants';
 import * as S from './style';
 
 const Calendar = () => {
-  const [currentDate, prevMonth, nextMonth] = useCurrentDate({ year: 2022, month: 0 });
-  const [selectedMenu, setSelectedMenu] = useState<string>('LOG');
+  const currentYear = new Date().getFullYear();
+  const currentMonth = new Date().getMonth();
+  const [currentDate, prevMonth, nextMonth] = useCurrentDate({ year: currentYear, month: currentMonth });
+  const [selectedMenu, setSelectedMenu] = useState('LOG');
 
   const handleMenuClickEvent = (e: React.MouseEvent) => {
     const target = e.target as HTMLDivElement;
     const index = target.dataset.menu;
     if (index) setSelectedMenu(index);
+  };
+
+  const elementList = (count: number) => {
+    return new Array(count).fill(true);
   };
 
   const startDay = new Date(currentDate.year, currentDate.month, 1).getDay();
@@ -37,17 +43,17 @@ const Calendar = () => {
           </S.Arrow>
         </S.MonthSelector>
         <S.DaysHeader>
-          {new Array(WEEK_LENGTH).fill(true).map((_, idx) => {
-            return <S.DaysText key={idx}>{Days[idx]}</S.DaysText>;
+          {elementList(WEEK_LENGTH).map((_, idx) => {
+            return <S.DaysText key={Days[idx]}>{Days[idx]}</S.DaysText>;
           })}
         </S.DaysHeader>
         <S.DateSelector>
-          {new Array(startDay).fill(true).map((_, idx) => {
-            return <S.DateBox key={idx}></S.DateBox>;
+          {elementList(startDay).map((_, idx) => {
+            return <S.DateBox key={'emptyBox' + idx}></S.DateBox>;
           })}
-          {new Array(lastDate).fill(true).map((_, idx) => {
+          {elementList(lastDate).map((_, idx) => {
             return (
-              <S.DateBox key={idx}>
+              <S.DateBox key={'date' + (idx + 1)}>
                 <S.DateLogo percentage={DummyPercentage(currentDate)[idx]}>B</S.DateLogo>
                 <S.Date>{idx + 1}</S.Date>
               </S.DateBox>
@@ -55,9 +61,9 @@ const Calendar = () => {
           })}
         </S.DateSelector>
         <S.MenuSelector>
-          {Menus.map((menu, idx) => {
+          {Menus.map((menu) => {
             return (
-              <S.MenuBtns key={idx} data-menu={menu} onClick={handleMenuClickEvent} isActivatedMenu={menu === selectedMenu}>
+              <S.MenuBtns key={menu} data-menu={menu} onClick={handleMenuClickEvent} isActivatedMenu={menu === selectedMenu}>
                 {menu}
               </S.MenuBtns>
             );
