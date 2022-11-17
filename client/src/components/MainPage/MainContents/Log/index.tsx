@@ -194,7 +194,7 @@ const Log = () => {
   dummy.forEach((data) => {
     dummyMap.set(data.idx, data);
   });
-  
+
   const handleMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
     if (!(e.target instanceof HTMLDivElement)) return;
     const target = e.target;
@@ -236,7 +236,6 @@ const Log = () => {
       setActiveTag(activeIdx);
       calculateTime(dummyMap.get(activeIdx).startedAt, dummyMap.get(activeIdx).endedAt);
     }
-
   };
 
   useEffect(() => {
@@ -253,7 +252,6 @@ const Log = () => {
           taskContainerRef.current.scrollBy(10, 0);
         }
       }
-
     };
     const handleMouseUp = (e: MouseEvent) => {
       if (selectedElement === null || !selectedRef.current) return;
@@ -282,12 +280,11 @@ const Log = () => {
       )}
       <S.LogTitle>LOG</S.LogTitle>
       <S.LogContainer>
-
         <S.slideObserver data-direction="left" direction="left"></S.slideObserver>
         <S.TimeBarSection>
           <img src="./timebar-clock.svg" />
           <S.TimeBar>
-            <S.timeMarker startedAt={timeMarkerData[0]} duration={timeMarkerData[1]}></S.timeMarker>
+            <S.TimeMarker startedAt={timeMarkerData[0]} duration={timeMarkerData[1]}></S.TimeMarker>
           </S.TimeBar>
         </S.TimeBarSection>
         <S.LogNavBarSection>
@@ -308,7 +305,6 @@ const Log = () => {
                   .filter((data: Tasks) => data.tag_name === tag)
                   .map((data) => {
                     return (
-
                       <S.TagItems onMouseDown={handleMouseDown} data-idx={data.idx} data-tag={data.tag_name} data-active={data.idx === activeTag}>
                         <div>
                           <S.TagTime>{data.startedAt}</S.TagTime> {data.title}
