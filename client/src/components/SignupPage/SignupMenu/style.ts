@@ -1,25 +1,15 @@
 import styled from 'styled-components';
+import { BsFillCameraFill } from 'react-icons/bs';
+
 export const Container = styled.div`
   width: 100vw;
   height: 100vh;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
+  display: grid;
   place-items: center;
 `;
-
-export const MainTitle = styled.div`
-  color: white;
-  font-size: 5.7rem;
-  font-family: 'Baumans', cursive;
-  height: 5.3rem;
-  margin: 0px;
-  z-index: 1;
-`;
-
-export const LoginContainer = styled.div`
+export const SignupContainer = styled.div`
   width: 39rem;
-  height: 29rem;
+  height: 39rem;
   background: white;
   border: 1px solid var(--color-gray1);
   display: flex;
@@ -30,15 +20,17 @@ export const LoginContainer = styled.div`
   box-shadow: 0px 0px 10px 5px rgba(175, 175, 175, 0.25);
 `;
 
-export const LoginTitle = styled.div`
+export const SignupTitle = styled.div`
   font-family: 'Press Start 2P', cursive;
   font-size: 1rem;
   color: var(--color-main);
-  margin: 2.1rem;
+  margin-bottom: 2.1rem;
 `;
 
-export const LoginForm = styled.form`
-  text-align: center;
+export const SignupForm = styled.form`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 
   h3 {
     color: grey;
@@ -49,6 +41,46 @@ export const LoginForm = styled.form`
     font-size: 0.7rem;
     font-weight: bold;
   }
+`;
+
+export const ProfileImage = styled.div`
+  width: 140px;
+  position: relative;
+  margin: auto;
+  margin-bottom: 1.3rem;
+  img {
+    border: 6px solid var(--color-gray1);
+    height: 8rem;
+    width: 8rem;
+    object-fit: cover;
+    border-radius: 10rem;
+  }
+`;
+
+export const EditRound = styled.div`
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  background: var(--color-main);
+  width: 2.6rem;
+  height: 2.6rem;
+  border-radius: 3rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  input[type='file'] {
+    position: absolute;
+    transform: scale(2);
+    opacity: 0;
+    cursor: pointer;
+  }
+`;
+
+export const EditIcon = styled(BsFillCameraFill)`
+  width: 1.4rem;
+  height: 1.4rem;
+  display: block;
+  color: white;
 `;
 
 export const InputBar = styled.input`
@@ -69,7 +101,7 @@ export const InputBar = styled.input`
   }
 `;
 
-export const LoginButton = styled.button`
+export const SignupButton = styled.button`
   background: var(--color-main);
   font-family: 'Press Start 2P', cursive;
   border: 0px;
@@ -82,7 +114,7 @@ export const LoginButton = styled.button`
   cursor: pointer;
 `;
 
-export const SignupButton = styled.button`
+export const LoginButton = styled.button`
   background: white;
   font-family: 'Press Start 2P', cursive;
   border: 3px solid var(--color-main);
@@ -96,15 +128,3 @@ export const SignupButton = styled.button`
 `;
 
 export const Form = styled.form``;
-
-export const SocialLogin = styled.div`
-  display: flex;
-  width: 100%;
-  justify-content: center;
-  margin: 1rem 0rem 0.5rem 0rem;
-`;
-export const Icon = styled.img`
-  width: 2.7rem;
-  height: 2.7rem;
-  margin: 0.6rem;
-`;
