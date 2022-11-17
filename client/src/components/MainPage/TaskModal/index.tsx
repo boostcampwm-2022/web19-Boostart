@@ -1,6 +1,6 @@
 import React from 'react';
 import * as S from './style';
-import PriorityMenu from './PriorityMenu';
+import ImportanceInput from './ImportanceInput';
 interface Props {
   setIsModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }
@@ -37,7 +37,7 @@ const TaskModal = (props: Props) => {
               <tr>
                 <td>중요도</td>
                 <td>
-                  <PriorityMenu />
+                  <ImportanceInput />
                 </td>
               </tr>
               <tr>
