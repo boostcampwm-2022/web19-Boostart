@@ -1,5 +1,5 @@
 import express from 'express';
-import { GITHUB_CLIENT_ID, GITHUB_CLIENT_SECRET, KAKAO_CLIENT_ID, KAKAO_REDIRECT_URI, OAUTH_TYPES, TOKEN_SECRET } from '../constants';
+import { CLIENT, GITHUB_CLIENT_ID, GITHUB_CLIENT_SECRET, KAKAO_CLIENT_ID, KAKAO_REDIRECT_URI, OAUTH_TYPES, TOKEN_SECRET } from '../constants';
 import axios from 'axios';
 import qs from 'qs';
 import { authenticateToken, generateAccessToken } from '../utils/auth';
@@ -115,7 +115,7 @@ router.get('/login/:oauth_type/callback', async (req, res) => {
     httpOnly: true,
   });
 
-  res.redirect(`http://localhost:3000/${user ? 'main' : 'signup'}`);
+  res.redirect(`${CLIENT}/${user ? 'main' : 'signup'}`);
 });
 
 router.post('/signup', async (req, res) => {
