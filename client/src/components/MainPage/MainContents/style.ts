@@ -7,10 +7,9 @@ export const Container = styled.div`
 
 export const MainContentContainer = styled.div`
   width: 70rem;
-  height: 100%;
-  margin-top: 0rem;
   display: flex;
   justify-content: space-between;
+  height: 0rem;
 `;
 export const LeftSection = styled.div`
   width: 24.6rem;

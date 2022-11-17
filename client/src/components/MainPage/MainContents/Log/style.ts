@@ -15,7 +15,6 @@ export const LogContainer = styled.div`
   background: white;
   border-radius: 1rem;
   margin-top: 0rem;
-  margin-bottom: 1rem;
   padding: 0.5rem;
   display: grid;
   grid-template-areas:
