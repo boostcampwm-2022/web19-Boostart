@@ -11,4 +11,11 @@ router.get('/', authenticateToken, async (req: AuthorizedRequest, res) => {
   res.json(rows);
 });
 
+router.post('/', authenticateToken, async (req: AuthorizedRequest, res) => {
+  const { userIdx } = req.user;
+  const { title, importance, startedAt, endedAt, location, isPublic, tagIdx, labels } = req.body;
+  await executeSql('insert into task (title, importance, public, user_idx) values (?, ?, ?)', [title, importance, isPublic, userIdx]);
+  res.send(200);
+});
+
 export default router;
