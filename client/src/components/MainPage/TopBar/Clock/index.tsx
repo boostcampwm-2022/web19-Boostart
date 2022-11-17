@@ -23,9 +23,12 @@ const Clock = () => {
       setClockInfo({ hour: currentHour, minute: currentMinute });
     };
 
-    setInterval(() => {
+    const Interval = setInterval(() => {
       changeMinute();
     }, 1000);
+    return () => {
+      clearInterval(Interval);
+    };
   }, []);
   return (
     <>

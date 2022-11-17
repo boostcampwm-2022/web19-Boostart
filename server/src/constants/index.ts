@@ -18,3 +18,4 @@ export const OAUTH_TYPES = {
   kakao: 'kakao',
   github: 'github',
 } as const;
+export const HOST = process.env.MODE === 'dev' ? process.env.DEV_HOST : process.env.PROD_HOST;
