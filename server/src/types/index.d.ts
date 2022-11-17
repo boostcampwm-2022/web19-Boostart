@@ -2,7 +2,7 @@ import { Request } from 'express';
 
 declare interface AuthorizedRequest extends Request {
   user?: {
-    userId?: string;
+    userIdx?: string;
     oauthType?: string;
     oauthEmail?: string;
   };

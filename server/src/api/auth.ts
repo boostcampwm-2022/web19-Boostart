@@ -84,7 +84,7 @@ router.post('/login', async (req, res) => {
   [user] = await executeSql('select * from user where user_id = ? and password = ?', [userId, encrypted]);
   if (!user) return res.sendStatus(401);
 
-  const token = generateAccessToken({ userId: user.user_id });
+  const token = generateAccessToken({ userIdx: user.idx });
   res.cookie('token', token, {
     httpOnly: true,
   });
@@ -109,7 +109,7 @@ router.get('/login/:oauth_type/callback', async (req, res) => {
   const oauthEmail = await httpGetOAuthUserIdentifier(oauthType, accessToken); // 변수 이름. (카카오에서는 이메일 얻기 위해 검수 필요)
 
   const [user] = await executeSql('select * from user where oauth_type = ? and oauth_email = ?', [oauthType, oauthEmail]);
-  const token = generateAccessToken(user ? { userId: user.user_id } : { oauthType, oauthEmail });
+  const token = generateAccessToken(user ? { userIdx: user.idx } : { oauthType, oauthEmail });
 
   res.cookie('token', token, {
     httpOnly: true,
