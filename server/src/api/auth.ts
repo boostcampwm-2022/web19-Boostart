@@ -1,5 +1,5 @@
 import express from 'express';
-import { GITHUB_CLIENT_ID, GITHUB_CLIENT_SECRET, KAKAO_CLIENT_ID, KAKAO_REDIRECT_URI, OAUTH_TYPES, TOKEN_SECRET } from '../constants';
+import { CLIENT, GITHUB_CLIENT_ID, GITHUB_CLIENT_SECRET, KAKAO_CLIENT_ID, KAKAO_REDIRECT_URI, OAUTH_TYPES, TOKEN_SECRET } from '../constants';
 import axios from 'axios';
 import qs from 'qs';
 import { authenticateToken, generateAccessToken } from '../utils/auth';
@@ -84,7 +84,7 @@ router.post('/login', async (req, res) => {
   [user] = await executeSql('select * from user where user_id = ? and password = ?', [userId, encrypted]);
   if (!user) return res.sendStatus(401);
 
-  const token = generateAccessToken({ userId: user.user_id });
+  const token = generateAccessToken({ userIdx: user.idx });
   res.cookie('token', token, {
     httpOnly: true,
   });
@@ -109,13 +109,13 @@ router.get('/login/:oauth_type/callback', async (req, res) => {
   const oauthEmail = await httpGetOAuthUserIdentifier(oauthType, accessToken); // 변수 이름. (카카오에서는 이메일 얻기 위해 검수 필요)
 
   const [user] = await executeSql('select * from user where oauth_type = ? and oauth_email = ?', [oauthType, oauthEmail]);
-  const token = generateAccessToken(user ? { userId: user.user_id } : { oauthType, oauthEmail });
+  const token = generateAccessToken(user ? { userIdx: user.idx } : { oauthType, oauthEmail });
 
   res.cookie('token', token, {
     httpOnly: true,
   });
 
-  res.redirect(`http://localhost:3000/${user ? 'main' : 'signup'}`);
+  res.redirect(`${CLIENT}/${user ? 'main' : 'signup'}`);
 });
 
 router.post('/signup', async (req, res) => {
@@ -139,14 +139,14 @@ router.post('/signup', async (req, res) => {
     [user] = await executeSql('select * from user where oauth_type = ? and oauth_email = ?', [oauthType, oauthEmail]);
     if (user) {
       console.log(`이미 가입된 계정: ${oauthType}, ${oauthEmail}`);
-      return res.sendStatus(202);
+      return res.sendStatus(409);
     }
   }
 
   [user] = await executeSql('select * from user where user_id = ?', [userId]);
   if (user) {
     console.log(`ID 중복: ${userId}`);
-    return res.sendStatus(202);
+    return res.sendStatus(409);
   }
 
   const salt = generateSalt();

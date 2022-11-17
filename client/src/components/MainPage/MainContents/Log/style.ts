@@ -47,7 +47,7 @@ export const TimeBar = styled.div`
   border: 2px solid #e3e3e3;
   border-radius: 0.5rem;
 `;
-export const timeMarker = styled.div<{
+export const TimeMarker = styled.div<{
   startedAt: number;
   duration: number;
 }>`
@@ -101,8 +101,7 @@ export const LogMainSection = styled.div`
   grid-area: main;
   cursor: default;
 `;
-// ::-webkit-scrollbar {
-// }
+
 export const TagWrap = styled.div`
   height: 29rem;
   display: flex;
@@ -175,6 +174,7 @@ export const SelectedItem = styled.div<{
   border-radius: 0.25rem;
   z-index: 6;
   pointer-events: none;
+
   & span {
     margin: 0 0.25rem 0 0;
     color: #959595;

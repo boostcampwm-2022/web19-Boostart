@@ -194,7 +194,7 @@ const Log = () => {
   dummy.forEach((data) => {
     dummyMap.set(data.idx, data);
   });
-
+  
   const handleMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
     if (!(e.target instanceof HTMLDivElement)) return;
     const target = e.target;
@@ -236,11 +236,13 @@ const Log = () => {
       setActiveTag(activeIdx);
       calculateTime(dummyMap.get(activeIdx).startedAt, dummyMap.get(activeIdx).endedAt);
     }
+
   };
 
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
       if (selectedElement === null) return;
+
       if (!(e.target instanceof HTMLDivElement)) return;
       const target = e.target;
       setMousePos([e.pageX - mouseOffsetRef.current[0], e.pageY - mouseOffsetRef.current[1]]);
@@ -251,6 +253,7 @@ const Log = () => {
           taskContainerRef.current.scrollBy(10, 0);
         }
       }
+
     };
     const handleMouseUp = (e: MouseEvent) => {
       if (selectedElement === null || !selectedRef.current) return;
@@ -258,6 +261,7 @@ const Log = () => {
       if (target.dataset.tag) dummyMap.get(selectedElement).tag_name = target.dataset.tag;
       setDummyData([...dummy]);
       selectedRef.current.style.visibility = 'visible';
+
       selectedRef.current = null;
       setSelectedElement(null);
     };
@@ -278,6 +282,7 @@ const Log = () => {
       )}
       <S.LogTitle>LOG</S.LogTitle>
       <S.LogContainer>
+
         <S.slideObserver data-direction="left" direction="left"></S.slideObserver>
         <S.TimeBarSection>
           <img src="./timebar-clock.svg" />
@@ -303,6 +308,7 @@ const Log = () => {
                   .filter((data: Tasks) => data.tag_name === tag)
                   .map((data) => {
                     return (
+
                       <S.TagItems onMouseDown={handleMouseDown} data-idx={data.idx} data-tag={data.tag_name} data-active={data.idx === activeTag}>
                         <div>
                           <S.TagTime>{data.startedAt}</S.TagTime> {data.title}
