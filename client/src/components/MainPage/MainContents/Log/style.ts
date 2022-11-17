@@ -15,7 +15,9 @@ export const LogContainer = styled.div`
   background: white;
   border-radius: 1rem;
   margin-top: 0rem;
+  margin-bottom: 1rem;
   padding: 0.5rem;
+  position: relative;
   display: grid;
   grid-template-areas:
     'time nav'
@@ -39,24 +41,23 @@ export const TimeBarSection = styled.div`
 
 export const TimeBar = styled.div`
   width: 0.8rem;
-  height: 32rem;
+  height: 31.2rem;
   position: relative;
   margin: 0.75rem 0 0;
   border: 2px solid #e3e3e3;
   border-radius: 0.5rem;
 `;
-export const timeMarker = styled.div`
+export const TimeMarker = styled.div<{
+  startedAt: number;
+  duration: number;
+}>`
   width: 0.85rem;
-  height: 1.3rem;
+  height: ${(props) => props.duration * 1.3}rem;
   position: absolute;
   background: #99b1db;
-  top: 10.4rem;
+  top: ${(props) => props.startedAt * 1.3}rem;
   transition: all 0.5s;
 `;
-// <{
-//   startedAt: string;
-//   duration: string;
-// }>
 export const LogNavBarSection = styled.div`
   width: 100%;
   height: 100%;
@@ -94,13 +95,15 @@ export const LogMainSection = styled.div`
   width: 100%;
   height: fit-content;
   display: flex;
-  flex-wrap: wrap;
+  flex-wrap: no-wrap;
+  overflow-x: scroll;
   font-family: 'Noto Sans KR', sans-serif;
   grid-area: main;
   cursor: default;
 `;
 
 export const TagWrap = styled.div`
+  height: 29rem;
   display: flex;
   margin: 0 0.25rem;
   flex-direction: column;
@@ -131,10 +134,25 @@ export const TagItems = styled.div`
   background: white;
   border: 1px solid gray;
   border-radius: 0.25rem;
-  & span {
-    margin: 0 0.25rem 0 0;
-    color: #959595;
+  transition: height 1s;
+  &[data-active='true'] {
+    height: 10rem;
+    padding: 0.5rem 0.75rem;
+    flex-direction: column;
+    align-items: flex-start;
+    overflow: hidden;
   }
+  & hr {
+    width: 10rem;
+  }
+  & * {
+    pointer-events: none;
+  }
+`;
+
+export const TagTime = styled.span`
+  margin: 0 0.25rem 0 0;
+  color: #959595;
 `;
 
 export const SelectedItem = styled.div<{
@@ -154,8 +172,21 @@ export const SelectedItem = styled.div<{
   background: white;
   border: 1px solid gray;
   border-radius: 0.25rem;
+  z-index: 6;
+  pointer-events: none;
+
   & span {
     margin: 0 0.25rem 0 0;
     color: #959595;
   }
+`;
+
+export const slideObserver = styled.div<{
+  direction: string;
+}>`
+  width: 3rem;
+  height: 100%;
+  position: absolute;
+  z-index: 7;
+  ${(props) => (props.direction === 'right' ? 'right: 0;' : 'left: 0;')}
 `;

@@ -178,36 +178,88 @@ const dummy: Tasks[] = [
     ],
   },
 ];
+
 const Log = () => {
   const [selectedElement, setSelectedElement] = useState<number | null>(null);
-  const selectedRef = useRef<HTMLDivElement | null>(null);
   const [mousePos, setMousePos] = useState<number[]>([0, 0]);
+  const [dummyData, setDummyData] = useState<Tasks[]>(dummy);
+  const [activeTag, setActiveTag] = useState<number | null>(null);
+  const [timeMarkerData, setTimeMarkerData] = useState<number[]>([0, 0]);
+  const selectedRef = useRef<HTMLDivElement | null>(null);
+  const mouseOffsetRef = useRef<number[]>([0, 0]);
+  const taskContainerRef = useRef<HTMLDivElement | null>(null);
+
   const dummyMap = new Map();
   const tagList = ['부스트캠프', '육아', '일상', '생존', '테스트'];
   dummy.forEach((data) => {
     dummyMap.set(data.idx, data);
   });
-  const [dummyData, setDummyData] = useState<Tasks[]>(dummy);
 
   const handleMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
-    let target = e.target as HTMLDivElement;
+    if (!(e.target instanceof HTMLDivElement)) return;
+    const target = e.target;
     if (!target.dataset.idx) return;
-    setSelectedElement(parseInt(target.dataset.idx));
-    selectedRef.current = target;
-    selectedRef.current.style.display = 'none';
+    mouseOffsetRef.current = [e.nativeEvent.offsetX, e.nativeEvent.offsetY];
+    setMousePos([e.pageX - mouseOffsetRef.current[0], e.pageY - mouseOffsetRef.current[1]]);
+    const timeout = setTimeout(() => {
+      if (target.dataset.idx) {
+        setSelectedElement(parseInt(target.dataset.idx));
+        selectedRef.current = target;
+        selectedRef.current.style.visibility = 'hidden';
+      }
+    }, 700);
+    e.target.addEventListener('mouseup', () => {
+      clearTimeout(timeout);
+    });
+    e.target.addEventListener('mouseleave', () => {
+      clearTimeout(timeout);
+    });
+  };
+
+  const calculateTime = (startedAt: string, endedAt: string) => {
+    const [startHour, startMin] = startedAt.split(':').map((v) => parseInt(v));
+    const [endHour, endMin] = endedAt.split(':').map((v) => parseInt(v));
+    const startedTime = startHour + startMin / 60;
+    const duration = endHour + endMin / 60 - startedTime;
+    setTimeMarkerData([startedTime, duration]);
+  };
+
+  const handleTagWrapClick = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (!(e.target instanceof HTMLDivElement)) return;
+    const target = e.target;
+    const activeTaskIdx = target.dataset.idx;
+    if (activeTaskIdx === undefined || parseInt(activeTaskIdx) == activeTag) {
+      setActiveTag(null);
+      setTimeMarkerData([0, 0]);
+    } else {
+      const activeIdx = parseInt(activeTaskIdx);
+      setActiveTag(activeIdx);
+      calculateTime(dummyMap.get(activeIdx).startedAt, dummyMap.get(activeIdx).endedAt);
+    }
   };
 
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
       if (selectedElement === null) return;
-      setMousePos([e.pageX, e.pageY]);
+
+      if (!(e.target instanceof HTMLDivElement)) return;
+      const target = e.target;
+      setMousePos([e.pageX - mouseOffsetRef.current[0], e.pageY - mouseOffsetRef.current[1]]);
+      if (target.dataset.direction && taskContainerRef.current) {
+        if (target.dataset.direction === 'left') {
+          taskContainerRef.current.scrollBy(-10, 0);
+        } else {
+          taskContainerRef.current.scrollBy(10, 0);
+        }
+      }
     };
     const handleMouseUp = (e: MouseEvent) => {
       if (selectedElement === null || !selectedRef.current) return;
       let target = e.target as HTMLDivElement;
       if (target.dataset.tag) dummyMap.get(selectedElement).tag_name = target.dataset.tag;
       setDummyData([...dummy]);
-      selectedRef.current.style.display = 'flex';
+      selectedRef.current.style.visibility = 'visible';
+
       selectedRef.current = null;
       setSelectedElement(null);
     };
@@ -228,10 +280,11 @@ const Log = () => {
       )}
       <S.LogTitle>LOG</S.LogTitle>
       <S.LogContainer>
+        <S.slideObserver data-direction="left" direction="left"></S.slideObserver>
         <S.TimeBarSection>
           <img src="./timebar-clock.svg" />
           <S.TimeBar>
-            <S.timeMarker></S.timeMarker>
+            <S.TimeMarker startedAt={timeMarkerData[0]} duration={timeMarkerData[1]}></S.TimeMarker>
           </S.TimeBar>
         </S.TimeBarSection>
         <S.LogNavBarSection>
@@ -243,17 +296,31 @@ const Log = () => {
           <S.DateController>{'< 11.12 >'}</S.DateController>
           <div></div>
         </S.LogNavBarSection>
-        <S.LogMainSection>
+        <S.LogMainSection ref={taskContainerRef}>
           {tagList.map((tag) => {
             return (
-              <S.TagWrap key={tag} data-tag={tag}>
+              <S.TagWrap key={tag} data-tag={tag} onClick={handleTagWrapClick}>
                 <S.TagTitle data-tag={tag}>#{tag}</S.TagTitle>
                 {dummyData
                   .filter((data: Tasks) => data.tag_name === tag)
                   .map((data) => {
                     return (
-                      <S.TagItems onMouseDown={handleMouseDown} data-idx={data.idx} data-tag={data.tag_name}>
-                        <span>{data.startedAt}</span> {data.title}
+                      <S.TagItems onMouseDown={handleMouseDown} data-idx={data.idx} data-tag={data.tag_name} data-active={data.idx === activeTag}>
+                        <div>
+                          <S.TagTime>{data.startedAt}</S.TagTime> {data.title}
+                        </div>
+                        {data.idx === activeTag && (
+                          <>
+                            <hr />
+                            <div>
+                              {data.startedAt}-{data.endedAt}
+                            </div>
+                            <div>{data.location}</div>
+                            <div>{data.importance}</div>
+                            <hr />
+                            <div>{data.content}</div>
+                          </>
+                        )}
                       </S.TagItems>
                     );
                   })}
@@ -261,6 +328,7 @@ const Log = () => {
             );
           })}
         </S.LogMainSection>
+        <S.slideObserver data-direction="right" direction="right"></S.slideObserver>
       </S.LogContainer>
     </>
   );
