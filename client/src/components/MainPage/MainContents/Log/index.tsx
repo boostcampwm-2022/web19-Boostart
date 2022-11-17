@@ -211,6 +211,9 @@ const Log = () => {
     e.target.addEventListener('mouseup', () => {
       clearTimeout(timeout);
     });
+    e.target.addEventListener('mouseleave', () => {
+      clearTimeout(timeout);
+    });
   };
 
   const calculateTime = (startedAt: string, endedAt: string) => {
@@ -225,7 +228,7 @@ const Log = () => {
     if (!(e.target instanceof HTMLDivElement)) return;
     const target = e.target;
     const activeTaskIdx = target.dataset.idx;
-    if (activeTaskIdx === undefined) {
+    if (activeTaskIdx === undefined || parseInt(activeTaskIdx) == activeTag) {
       setActiveTag(null);
       setTimeMarkerData([0, 0]);
     } else {
