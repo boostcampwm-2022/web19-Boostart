@@ -37,7 +37,7 @@ export const LoginTitle = styled.div`
   margin: 2.1rem;
 `;
 
-export const LoginForm = styled.div`
+export const LoginForm = styled.form`
   text-align: center;
 
   h3 {
