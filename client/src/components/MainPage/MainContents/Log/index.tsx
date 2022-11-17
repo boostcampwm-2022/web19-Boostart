@@ -180,7 +180,10 @@ const dummy: Tasks[] = [
 ];
 const Log = () => {
   const [selectedElement, setSelectedElement] = useState<number | null>(null);
+  const [containerScrollLeft, setContainerScrollLeft] = useState(0)
   const selectedRef = useRef<HTMLDivElement | null>(null);
+  const mouseOffsetRef = useRef<number[]>([0,0])
+  const logContainerRef = useRef<HTMLDivElement|null>(null)
   const [mousePos, setMousePos] = useState<number[]>([0, 0]);
   const dummyMap = new Map();
   const tagList = ['부스트캠프', '육아', '일상', '생존', '테스트'];
@@ -192,22 +195,32 @@ const Log = () => {
   const handleMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
     let target = e.target as HTMLDivElement;
     if (!target.dataset.idx) return;
+    mouseOffsetRef.current = [e.nativeEvent.offsetX, e.nativeEvent.offsetY]
     setSelectedElement(parseInt(target.dataset.idx));
     selectedRef.current = target;
-    selectedRef.current.style.display = 'none';
+    selectedRef.current.style.visibility = 'hidden';
   };
 
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
       if (selectedElement === null) return;
-      setMousePos([e.pageX, e.pageY]);
+      const target = e.target as HTMLElement
+      setMousePos([e.pageX-mouseOffsetRef.current[0], e.pageY-mouseOffsetRef.current[1]]);
+      if(target.dataset.direction&&logContainerRef.current){
+        console.log(target.dataset.direction)
+        if(target.dataset.direction==="left"){
+          logContainerRef.current.scrollBy(-20, 0);
+          }else{
+          logContainerRef.current.scrollBy(20, 0)
+        }
+      }
     };
     const handleMouseUp = (e: MouseEvent) => {
       if (selectedElement === null || !selectedRef.current) return;
       let target = e.target as HTMLDivElement;
       if (target.dataset.tag) dummyMap.get(selectedElement).tag_name = target.dataset.tag;
       setDummyData([...dummy]);
-      selectedRef.current.style.display = 'flex';
+      selectedRef.current.style.visibility = 'visible';
       selectedRef.current = null;
       setSelectedElement(null);
     };
@@ -217,7 +230,7 @@ const Log = () => {
       window.removeEventListener('mousemove', handleMouseMove);
       window.removeEventListener('mouseup', handleMouseUp);
     };
-  }, [selectedElement]);
+  }, [selectedElement, logContainerRef]);
 
   return (
     <>
@@ -228,6 +241,7 @@ const Log = () => {
       )}
       <S.LogTitle>LOG</S.LogTitle>
       <S.LogContainer>
+        <S.slideObserver data-direction="left" direction='left'></S.slideObserver>
         <S.TimeBarSection>
           <img src="./timebar-clock.svg" />
           <S.TimeBar>
@@ -243,7 +257,7 @@ const Log = () => {
           <S.DateController>{'< 11.12 >'}</S.DateController>
           <div></div>
         </S.LogNavBarSection>
-        <S.LogMainSection>
+        <S.LogMainSection ref={logContainerRef}>
           {tagList.map((tag) => {
             return (
               <S.TagWrap key={tag} data-tag={tag}>
@@ -261,6 +275,8 @@ const Log = () => {
             );
           })}
         </S.LogMainSection>
+        <S.slideObserver data-direction="right" direction='right'></S.slideObserver>
+
       </S.LogContainer>
     </>
   );

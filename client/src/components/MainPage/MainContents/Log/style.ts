@@ -17,6 +17,7 @@ export const LogContainer = styled.div`
   margin-top: 0rem;
   margin-bottom: 1rem;
   padding: 0.5rem;
+  position: relative;
   display: grid;
   grid-template-areas:
     'time nav'
@@ -40,7 +41,7 @@ export const TimeBarSection = styled.div`
 
 export const TimeBar = styled.div`
   width: 0.8rem;
-  height: 32rem;
+  height: 31.2rem;
   position: relative;
   margin: 0.75rem 0 0;
   border: 2px solid #e3e3e3;
@@ -95,14 +96,17 @@ export const LogMainSection = styled.div`
   width: 100%;
   height: fit-content;
   display: flex;
-  flex-wrap: wrap;
+  flex-wrap: no-wrap;
+  overflow-x: scroll;
   font-family: 'Noto Sans KR', sans-serif;
   grid-area: main;
   cursor: default;
 `;
-
+// ::-webkit-scrollbar {
+// }
 export const TagWrap = styled.div`
-  display: flex;
+height: 29rem;  
+display: flex;
   margin: 0 0.25rem;
   flex-direction: column;
   z-index: 5;
@@ -155,8 +159,19 @@ export const SelectedItem = styled.div<{
   background: white;
   border: 1px solid gray;
   border-radius: 0.25rem;
+  z-index: 4;
   & span {
     margin: 0 0.25rem 0 0;
     color: #959595;
   }
 `;
+
+export const slideObserver = styled.div<{
+  direction:string
+}>`
+width: 3rem;
+height: 100%;
+position: absolute;
+z-index: 5;
+${props=>props.direction==='right'?"right: 0;":"left: 0;"}
+`

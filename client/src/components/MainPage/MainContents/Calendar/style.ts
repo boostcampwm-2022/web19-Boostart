@@ -16,9 +16,9 @@ export const CalendarContainer = styled.div`
   display: flex;
   flex-direction: column;
   justify-content: center;
+  padding: 0.5rem;
   align-items: center;
   margin-top: 0rem;
-  margin-bottom: 1rem;
   box-shadow: 0px 0px 10px 5px rgba(175, 175, 175, 0.25);
   user-select: none;
 `;
