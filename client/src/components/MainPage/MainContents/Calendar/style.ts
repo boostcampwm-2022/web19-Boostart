@@ -18,7 +18,6 @@ export const CalendarContainer = styled.div`
   justify-content: center;
   align-items: center;
   margin-top: 0rem;
-  margin-bottom: 1rem;
   box-shadow: 0px 0px 10px 5px rgba(175, 175, 175, 0.25);
   user-select: none;
 `;
