@@ -27,7 +27,7 @@ export const SignupTitle = styled.div`
   margin-bottom: 2.1rem;
 `;
 
-export const SignupForm = styled.div`
+export const SignupForm = styled.form`
   display: flex;
   flex-direction: column;
   align-items: center;
