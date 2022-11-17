@@ -139,14 +139,14 @@ router.post('/signup', async (req, res) => {
     [user] = await executeSql('select * from user where oauth_type = ? and oauth_email = ?', [oauthType, oauthEmail]);
     if (user) {
       console.log(`이미 가입된 계정: ${oauthType}, ${oauthEmail}`);
-      return res.sendStatus(202);
+      return res.sendStatus(409);
     }
   }
 
   [user] = await executeSql('select * from user where user_id = ?', [userId]);
   if (user) {
     console.log(`ID 중복: ${userId}`);
-    return res.sendStatus(202);
+    return res.sendStatus(409);
   }
 
   const salt = generateSalt();
