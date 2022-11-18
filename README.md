@@ -1,4 +1,11 @@
 # web19-Boostart
+## 개발 환경에서의 실행 방법
+```
+cd client
+npm run dev
+cd server
+npm run dev
+```
 
 ## 의존성
 - 본인이 처음 install 할 때 `npm install` -> `dependencies` 브랜치에서 commit PR
