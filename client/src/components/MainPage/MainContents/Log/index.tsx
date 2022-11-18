@@ -62,31 +62,33 @@ const Log = () => {
     }
   };
 
-  useEffect(() => {
-    const handleMouseMove = (e: MouseEvent) => {
-      if (selectedElement === null) return;
+  const handleMouseMove = (e: MouseEvent) => {
+    if (selectedElement === null) return;
 
-      if (!(e.target instanceof HTMLDivElement)) return;
-      const target = e.target;
-      setMousePos([e.pageX - mouseOffsetRef.current[0], e.pageY - mouseOffsetRef.current[1]]);
-      if (target.dataset.direction && taskContainerRef.current) {
-        if (target.dataset.direction === 'left') {
-          taskContainerRef.current.scrollBy(-10, 0);
-        } else {
-          taskContainerRef.current.scrollBy(10, 0);
-        }
+    if (!(e.target instanceof HTMLDivElement)) return;
+    const target = e.target;
+    setMousePos([e.pageX - mouseOffsetRef.current[0], e.pageY - mouseOffsetRef.current[1]]);
+    if (target.dataset.direction && taskContainerRef.current) {
+      if (target.dataset.direction === 'left') {
+        taskContainerRef.current.scrollBy(-10, 0);
+      } else {
+        taskContainerRef.current.scrollBy(10, 0);
       }
-    };
-    const handleMouseUp = (e: MouseEvent) => {
-      if (selectedElement === null || !selectedRef.current) return;
-      let target = e.target as HTMLDivElement;
-      if (target.dataset.tag) tagMap.get(selectedElement).tag_name = target.dataset.tag;
-      setTaskList([...dummyTaskList]);
-      selectedRef.current.style.visibility = 'visible';
+    }
+  };
 
-      selectedRef.current = null;
-      setSelectedElement(null);
-    };
+  const handleMouseUp = (e: MouseEvent) => {
+    if (selectedElement === null || !selectedRef.current) return;
+    let target = e.target as HTMLDivElement;
+    if (target.dataset.tag) tagMap.get(selectedElement).tag_name = target.dataset.tag;
+    setTaskList([...dummyTaskList]);
+    selectedRef.current.style.visibility = 'visible';
+
+    selectedRef.current = null;
+    setSelectedElement(null);
+  };
+
+  useEffect(() => {
     window.addEventListener('mousemove', handleMouseMove);
     window.addEventListener('mouseup', handleMouseUp);
     return () => {
