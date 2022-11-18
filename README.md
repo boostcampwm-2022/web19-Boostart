@@ -1,11 +1,22 @@
-# web19-Boostart
+# Boostart - 당신의 하루를 시작하라
+
+## 소개
+### 놓치기 쉬운 하루의 일상을 예쁘게 기록하고 관리할 수 있어요
+- 가까운 계획을 확인할 수 있어요
+- 자신이 언제 무엇을 (+어디서 어떻게 왜) 했는지 알 수 있어요
+- 친구가 언제 무엇을 (+어디서 어떻게 왜) 했는지 알 수 있어요
+
 ## 개발 환경에서의 실행 방법
+```sh
+$ cd ./client
+$ npm ci
+$ npm run build:dev
+$ cd ../server
+$ npm ci
+$ npm run dev
 ```
-cd client
-npm run dev
-cd server
-npm run dev
-```
+
+# 컨벤션
 
 ## 의존성
 - 본인이 처음 install 할 때 `npm install` -> `dependencies` 브랜치에서 commit PR
