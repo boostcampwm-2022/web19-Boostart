@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { FriendsList } from 'GlobalType';
+import { FriendList } from 'GlobalType';
 import * as S from './style';
 
 const FriendsBar = () => {
@@ -29,7 +29,7 @@ const FriendsBar = () => {
       profileImg: 'https://ca.slack-edge.com/T03V2A4FCLA-U0408645KA5-803c24ea468e-512',
     },
   ];
-  const [friendsList, setFriendsList] = useState<FriendsList[]>(dummy);
+  const [friendsList, setFriendsList] = useState<FriendList[]>(dummy);
   const plusIcon = './plus.svg';
   return (
     <>

@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Tasks } from 'GlobalType';
+import { Task } from 'GlobalType';
 import * as S from './style';
-const dummy: Tasks[] = [
+const dummy: Task[] = [
   {
     idx: 0,
     title: '데일리어쩌구',
@@ -182,7 +182,7 @@ const dummy: Tasks[] = [
 const Log = () => {
   const [selectedElement, setSelectedElement] = useState<number | null>(null);
   const [mousePos, setMousePos] = useState<number[]>([0, 0]);
-  const [dummyData, setDummyData] = useState<Tasks[]>(dummy);
+  const [dummyData, setDummyData] = useState<Task[]>(dummy);
   const [activeTag, setActiveTag] = useState<number | null>(null);
   const [timeMarkerData, setTimeMarkerData] = useState<number[]>([0, 0]);
   const selectedRef = useRef<HTMLDivElement | null>(null);
@@ -302,7 +302,7 @@ const Log = () => {
               <S.TagWrap key={tag} data-tag={tag} onClick={handleTagWrapClick}>
                 <S.TagTitle data-tag={tag}>#{tag}</S.TagTitle>
                 {dummyData
-                  .filter((data: Tasks) => data.tag_name === tag)
+                  .filter((data: Task) => data.tag_name === tag)
                   .map((data) => {
                     return (
                       <S.TagItems onMouseDown={handleMouseDown} data-idx={data.idx} data-tag={data.tag_name} data-active={data.idx === activeTag}>

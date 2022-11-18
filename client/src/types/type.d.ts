@@ -1,5 +1,5 @@
 declare module 'GlobalType' {
-  export interface FriendsList {
+  export interface FriendList {
     idx: number;
     userId: string;
     username: string;
@@ -18,7 +18,7 @@ declare module 'GlobalType' {
     unit: string;
   }
 
-  export interface Tasks {
+  export interface Task {
     idx: number;
     title: string;
     importance: number;
