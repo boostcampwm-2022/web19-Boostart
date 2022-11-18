@@ -217,8 +217,8 @@ const Log = () => {
   };
 
   const calculateTime = (startedAt: string, endedAt: string) => {
-    const [startHour, startMin] = startedAt.split(':').map((v) => parseInt(v));
-    const [endHour, endMin] = endedAt.split(':').map((v) => parseInt(v));
+    const [startHour, startMin] = startedAt.split(':').map(parseInt);
+    const [endHour, endMin] = endedAt.split(':').map(parseInt);
     const startedTime = startHour + startMin / 60;
     const duration = endHour + endMin / 60 - startedTime;
     setTimeMarkerData([startedTime, duration]);
@@ -228,7 +228,7 @@ const Log = () => {
     if (!(e.target instanceof HTMLDivElement)) return;
     const target = e.target;
     const activeTaskIdx = target.dataset.idx;
-    if (activeTaskIdx === undefined || parseInt(activeTaskIdx) == activeTag) {
+    if (activeTaskIdx === undefined || parseInt(activeTaskIdx) === activeTag) {
       setActiveTag(null);
       setTimeMarkerData([0, 0]);
     } else {
@@ -302,23 +302,23 @@ const Log = () => {
               <S.TagWrap key={tag} data-tag={tag} onClick={handleTagWrapClick}>
                 <S.TagTitle data-tag={tag}>#{tag}</S.TagTitle>
                 {dummyData
-                  .filter((data: Task) => data.tag_name === tag)
-                  .map((data) => {
+                  .filter(({ tag_name }) => tag_name === tag)
+                  .map(({ tag_name, idx, title, startedAt, endedAt, importance, location, content }) => {
                     return (
-                      <S.TagItems onMouseDown={handleMouseDown} data-idx={data.idx} data-tag={data.tag_name} data-active={data.idx === activeTag}>
+                      <S.TagItems onMouseDown={handleMouseDown} data-idx={idx} data-tag={tag_name} data-active={idx === activeTag}>
                         <div>
-                          <S.TagTime>{data.startedAt}</S.TagTime> {data.title}
+                          <S.TagTime>{startedAt}</S.TagTime> {title}
                         </div>
-                        {data.idx === activeTag && (
+                        {idx === activeTag && (
                           <>
                             <hr />
                             <div>
-                              {data.startedAt}-{data.endedAt}
+                              {startedAt}-{endedAt}
                             </div>
-                            <div>{data.location}</div>
-                            <div>{data.importance}</div>
+                            <div>{location}</div>
+                            <div>{importance}</div>
                             <hr />
-                            <div>{data.content}</div>
+                            <div>{content}</div>
                           </>
                         )}
                       </S.TagItems>
