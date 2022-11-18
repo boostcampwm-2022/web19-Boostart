@@ -5,10 +5,6 @@ declare module 'GlobalType' {
     username: string;
     profileImg: string;
   }
-  export interface CurrentDate {
-    year: number;
-    month: number;
-  }
 
   interface LabelData {
     idx: number;

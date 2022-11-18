@@ -1,14 +1,33 @@
-import React, { useState, useEffect } from 'react';
-import useCurrentDate from '../../../../hooks/useCurrentDate';
-import { CurrentDate } from 'GlobalType';
+import React, { useState } from 'react';
 import { EngMonth, Days, WEEK_LENGTH, Menus } from '../../../../constants';
 import * as S from './style';
 
+const getLastDate = (date: Date): number => {
+  const copy = new Date(date);
+  copy.setMonth(copy.getMonth() + 1);
+  copy.setDate(0);
+  return copy.getDate();
+};
+
+const getFirstDay = (date: Date) => {
+  const copy = new Date(date);
+  copy.setDate(1);
+  return copy.getDay();
+};
+
+const createArray = (length: number) => new Array(length).fill(1);
+
 const Calendar = () => {
-  const currentYear = new Date().getFullYear();
-  const currentMonth = new Date().getMonth();
-  const [currentDate, prevMonth, nextMonth] = useCurrentDate({ year: currentYear, month: currentMonth });
+  const [date, setDate] = useState(new Date());
   const [selectedMenu, setSelectedMenu] = useState('LOG');
+
+  const handleMonthArrowClick = (direction: number) => {
+    setDate((date) => {
+      const newDate = new Date(date);
+      newDate.setMonth(date.getMonth() + direction);
+      return newDate;
+    });
+  };
 
   const handleMenuClickEvent = (e: React.MouseEvent) => {
     const target = e.target as HTMLDivElement;
@@ -16,45 +35,36 @@ const Calendar = () => {
     if (index) setSelectedMenu(index);
   };
 
-  const elementList = (count: number) => {
-    return new Array(count).fill(true);
-  };
-
-  const startDay = new Date(currentDate.year, currentDate.month, 1).getDay();
-  const lastDate = new Date(currentDate.year, currentDate.month + 1, 0).getDate();
-  //텍스트 gradation 적용을 위한 더미데이터
-  const DummyPercentage = (currentDate: CurrentDate) => {
-    const lastDate = new Date(currentDate.year, currentDate.month + 1, 0).getDate();
-    return new Array(lastDate).fill(Math.ceil(Math.random() * 100).toString());
-  };
+  const firstDay = getFirstDay(date);
+  const lastDate = getLastDate(date);
 
   return (
     <>
       <S.CalendarTitle>CAL</S.CalendarTitle>
       <S.CalendarContainer>
         <S.MonthSelector>
-          <S.CurrentYear>{currentDate.year}</S.CurrentYear>
-          <S.CurrentMonth>{EngMonth[currentDate.month]}</S.CurrentMonth>
-          <S.Arrow direction="left" onClick={prevMonth}>
+          <S.CurrentYear>{date.getFullYear()}</S.CurrentYear>
+          <S.CurrentMonth>{EngMonth[date.getMonth()]}</S.CurrentMonth>
+          <S.Arrow direction="left" onClick={() => handleMonthArrowClick(-1)}>
             {'<'}
           </S.Arrow>
-          <S.Arrow direction="right" onClick={nextMonth}>
+          <S.Arrow direction="right" onClick={() => handleMonthArrowClick(1)}>
             {'>'}
           </S.Arrow>
         </S.MonthSelector>
         <S.DaysHeader>
-          {elementList(WEEK_LENGTH).map((_, idx) => {
+          {createArray(WEEK_LENGTH).map((_, idx) => {
             return <S.DaysText key={Days[idx]}>{Days[idx]}</S.DaysText>;
           })}
         </S.DaysHeader>
         <S.DateSelector>
-          {elementList(startDay).map((_, idx) => {
+          {createArray(firstDay).map((_, idx) => {
             return <S.DateBox key={'emptyBox' + idx}></S.DateBox>;
           })}
-          {elementList(lastDate).map((_, idx) => {
+          {createArray(lastDate).map((_, idx) => {
             return (
               <S.DateBox key={'date' + (idx + 1)}>
-                <S.DateLogo percentage={DummyPercentage(currentDate)[idx]}>B</S.DateLogo>
+                <S.DateLogo percentage={Math.ceil(Math.random() * 100).toString()}>B</S.DateLogo>
                 <S.Date>{idx + 1}</S.Date>
               </S.DateBox>
             );
@@ -63,9 +73,9 @@ const Calendar = () => {
         <S.MenuSelector>
           {Menus.map((menu) => {
             return (
-              <S.MenuBtns key={menu} data-menu={menu} onClick={handleMenuClickEvent} isActivatedMenu={menu === selectedMenu}>
+              <S.MenuBtn key={menu} data-menu={menu} onClick={handleMenuClickEvent} isActivatedMenu={menu === selectedMenu}>
                 {menu}
-              </S.MenuBtns>
+              </S.MenuBtn>
             );
           })}
         </S.MenuSelector>
