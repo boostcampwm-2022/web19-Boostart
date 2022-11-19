@@ -107,7 +107,7 @@ export const Date = styled.span`
 `;
 
 export const DateLogo = styled.span<{
-  percentage: string;
+  percentage: number;
 }>`
   font-size: 2rem;
   font-family: 'Baumans', cursive;
@@ -127,7 +127,7 @@ export const MenuSelector = styled.div`
   align-items: center;
 `;
 
-export const MenuBtns = styled.div<{
+export const MenuBtn = styled.div<{
   isActivatedMenu: boolean;
 }>`
   width: 3.5rem;
