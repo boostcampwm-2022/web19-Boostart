@@ -30,4 +30,10 @@ declare module 'GlobalType' {
     done: boolean;
     labels: LabelData[];
   }
+
+  export interface Tag {
+    idx: number;
+    title: string;
+    color: string;
+  }
 }

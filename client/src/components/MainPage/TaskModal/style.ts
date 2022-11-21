@@ -3,7 +3,7 @@ import { CgClose } from 'react-icons/cg';
 
 export const Container = styled.div`
   position: absolute;
-  z-index: 999;
+  z-index: 100;
   width: 100vw;
   height: 100%;
   overflow-y: scroll;
@@ -13,7 +13,7 @@ export const Container = styled.div`
   align-items: center;
   transform: translateY(-9.5rem);
 `;
-export const CalendarContainer = styled.div`
+export const ModalContainer = styled.div`
   width: 36.4rem;
   height: 27.4rem;
   background: white;
@@ -38,27 +38,37 @@ export const TaskForm = styled.form``;
 
 export const FormTable = styled.table`
   text-align: left;
+
   td:nth-child(1) {
-    width: 4rem;
+    width: 4.5rem;
     font-size: 0.9rem;
     font-weight: 600;
     color: var(--color-gray7);
   }
   td:nth-child(2) {
-    width: 22rem;
+    width: 24rem;
     height: 2.8rem;
     display: flex;
     justify-content: space-between;
     align-items: center;
   }
+  tr:nth-child(2) {
+    z-index: 999;
+  }
 `;
 
+export const TagInput = styled.div`
+  margin: auto;
+  z-index: 500;
+`;
 export const InputBar = styled.input`
+  margin: auto;
+
   background: var(--color-gray0);
   border: 1px solid var(--color-gray3);
   border-radius: 8px;
   color: black;
-  width: 22rem;
+  width: 22.6rem;
   height: 2.18rem;
   border-radius: 8px;
   font-size: 0.8rem;
@@ -75,7 +85,6 @@ export const InputTimeBar = styled.input`
   border-radius: 8px;
   color: black;
   font-family: inherit;
-
   width: 7rem;
   height: 2.18rem;
   border-radius: 8px;

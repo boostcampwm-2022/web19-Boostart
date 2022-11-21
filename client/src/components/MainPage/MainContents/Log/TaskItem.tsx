@@ -11,7 +11,7 @@ const TaskList = ({ taskList, activeTask }: taskListProps) => {
     <>
       {taskList.map(({ tag_name, idx, title, startedAt, endedAt, importance, location, content, done, isPublic }) => {
         return (
-          <S.TaskItems key={'task' + idx} data-idx={idx} data-tag={tag_name} data-active={idx === activeTask}  done={done}>
+          <S.TaskItem key={'task' + idx} data-idx={idx} data-tag={tag_name} data-active={idx === activeTask} done={done}>
             <S.TaskMainInfos>
               <S.TaskTime>{startedAt}</S.TaskTime>
               <S.TaskTitle>{title}</S.TaskTitle>
