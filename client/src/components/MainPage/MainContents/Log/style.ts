@@ -123,7 +123,9 @@ export const TagTitle = styled.div`
   border-radius: 0.25rem;
 `;
 
-export const TaskItems = styled.div`
+export const TaskItem = styled.div<{
+  done: boolean;
+}>`
   width: 11rem;
   height: 2rem;
   margin: 0.25rem 0.25rem;
@@ -131,7 +133,7 @@ export const TaskItems = styled.div`
   display: flex;
   align-items: center;
   font-size: 0.75rem;
-  background: white;
+  background: ${(props) => (props.done === true ? '#DDE4EF' : 'white')};
   border: 1px solid gray;
   border-radius: 0.25rem;
   transition: height 0.5s;
