@@ -9,9 +9,9 @@ interface taskListProps {
 const TaskList = ({ taskList, activeTask }: taskListProps) => {
   return (
     <>
-      {taskList.map(({ tag_name, idx, title, startedAt, endedAt, importance, location, content }) => {
+      {taskList.map(({ tag_name, idx, title, startedAt, endedAt, importance, location, content, done }) => {
         return (
-          <S.TaskItems key={'task' + idx} data-idx={idx} data-tag={tag_name} data-active={idx === activeTask}>
+          <S.TaskItems key={'task' + idx} data-idx={idx} data-tag={tag_name} data-active={idx === activeTask} done={done}>
             <div>
               <S.TagTime>{startedAt}</S.TagTime> {title}
             </div>
