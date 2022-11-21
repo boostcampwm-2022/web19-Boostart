@@ -11,4 +11,11 @@ router.get('/', authenticateToken, async (req: AuthorizedRequest, res) => {
   res.json(tags);
 });
 
+router.post('/', authenticateToken, async (req: AuthorizedRequest, res) => {
+  const { userIdx } = req.user;
+  const { title, color } = req.body;
+  await executeSql('insert into tag (title, color, user_idx) values (?, ?, ?)', [title, color, userIdx]);
+  res.sendStatus(200);
+});
+
 export default router;
