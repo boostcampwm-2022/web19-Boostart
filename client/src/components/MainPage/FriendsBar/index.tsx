@@ -9,8 +9,8 @@ const FriendsBar = () => {
   return (
     <>
       <S.FriendsBarContainer>
-        {friendsList.map(({ idx, userId, username, profileImg }) => {
-          return <S.ProfileBox key={idx} data-idx={idx} data-id={userId} data-name={username} imgURL={profileImg}></S.ProfileBox>;
+        {friendsList.map(({ idx, userId, profileImg }) => {
+          return <S.ProfileBox key={userId} data-idx={idx} imgURL={profileImg}></S.ProfileBox>;
         })}
         <S.ProfileBox imgURL={plusIcon}></S.ProfileBox>
       </S.FriendsBarContainer>

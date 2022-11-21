@@ -1,13 +1,14 @@
 import React, { useState, useEffect, useRef } from 'react';
+import TaskList from './TaskItem';
 import { Task } from 'GlobalType';
 import { dummyTaskList } from '../../../common/dummy';
 import * as S from './style';
 
 const Log = () => {
   const [selectedElement, setSelectedElement] = useState<number | null>(null);
-  const [mousePos, setMousePos] = useState<number[]>([0, 0]);
+  const [mousePosition, setMousePosition] = useState<number[]>([0, 0]);
   const [taskList, setTaskList] = useState<Task[]>(dummyTaskList);
-  const [activeTag, setActiveTag] = useState<number | null>(null);
+  const [activeTask, setActiveTag] = useState<number | null>(null);
   const [timeMarkerData, setTimeMarkerData] = useState<number[]>([0, 0]);
   const selectedRef = useRef<HTMLDivElement | null>(null);
   const mouseOffsetRef = useRef<number[]>([0, 0]);
@@ -23,12 +24,14 @@ const Log = () => {
     return taskList.filter(({ tag_name }) => tag_name === tag);
   };
 
+  const filteredTasks = (tag: string): Task[] => getFilteredTaskListbyTagName(tag);
+
   const handleMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
     if (!(e.target instanceof HTMLDivElement)) return;
     const target = e.target;
     if (!target.dataset.idx) return;
     mouseOffsetRef.current = [e.nativeEvent.offsetX, e.nativeEvent.offsetY];
-    setMousePos([e.pageX - mouseOffsetRef.current[0], e.pageY - mouseOffsetRef.current[1]]);
+    setMousePosition([e.pageX - mouseOffsetRef.current[0], e.pageY - mouseOffsetRef.current[1]]);
     const timeout = setTimeout(() => {
       if (target.dataset.idx) {
         setSelectedElement(parseInt(target.dataset.idx));
@@ -56,13 +59,15 @@ const Log = () => {
     if (!(e.target instanceof HTMLDivElement)) return;
     const target = e.target;
     const activeTaskIdx = target.dataset.idx;
-    if (activeTaskIdx === undefined || parseInt(activeTaskIdx) === activeTag) {
+    if (activeTaskIdx === undefined || parseInt(activeTaskIdx) === activeTask) {
       setActiveTag(null);
       setTimeMarkerData([0, 0]);
     } else {
       const activeIdx = parseInt(activeTaskIdx);
+      const startedTime = TaskMap.get(activeIdx).startedAt;
+      const endedTime = TaskMap.get(activeIdx).endedAt;
       setActiveTag(activeIdx);
-      calculateTime(TaskMap.get(activeIdx).startedAt, TaskMap.get(activeIdx).endedAt);
+      calculateTime(startedTime, endedTime);
     }
   };
 
@@ -71,7 +76,7 @@ const Log = () => {
 
     if (!(e.target instanceof HTMLDivElement)) return;
     const target = e.target;
-    setMousePos([e.pageX - mouseOffsetRef.current[0], e.pageY - mouseOffsetRef.current[1]]);
+    setMousePosition([e.pageX - mouseOffsetRef.current[0], e.pageY - mouseOffsetRef.current[1]]);
     if (target.dataset.direction && taskContainerRef.current) {
       if (target.dataset.direction === 'left') {
         taskContainerRef.current.scrollBy(-10, 0);
@@ -103,7 +108,7 @@ const Log = () => {
   return (
     <>
       {selectedElement !== null && (
-        <S.SelectedItem x={mousePos[0]} y={mousePos[1]}>
+        <S.SelectedItem x={mousePosition[0]} y={mousePosition[1]}>
           <span>{TaskMap.get(selectedElement).startedAt}</span> {TaskMap.get(selectedElement).title}
         </S.SelectedItem>
       )}
@@ -111,7 +116,7 @@ const Log = () => {
       <S.LogContainer>
         <S.slideObserver data-direction="left" direction="left"></S.slideObserver>
         <S.TimeBarSection>
-          <img src="./timebar-clock.svg" alt="" />
+          <img src="./timebar-clock.svg" alt="TimeBar" />
           <S.TimeBar>
             <S.TimeMarker startedAt={timeMarkerData[0]} duration={timeMarkerData[1]}></S.TimeMarker>
           </S.TimeBar>
@@ -128,30 +133,12 @@ const Log = () => {
         <S.LogMainSection ref={taskContainerRef}>
           {tagList.map((tag) => {
             return (
-              <S.TagWrap key={tag} data-tag={tag} onClick={handleTagWrapClick}>
-                <S.TagTitle data-tag={tag}>#{tag}</S.TagTitle>
-                {getFilteredTaskListbyTagName(tag).map(({ tag_name, idx, title, startedAt, endedAt, importance, location, content }) => {
-                  return (
-                    <S.TaskItems key={'task' + idx} onMouseDown={handleMouseDown} data-idx={idx} data-tag={tag_name} data-active={idx === activeTag}>
-                      <div>
-                        <S.TagTime>{startedAt}</S.TagTime> {title}
-                      </div>
-                      {idx === activeTag && (
-                        <>
-                          <hr />
-                          <div>
-                            {startedAt}-{endedAt}
-                          </div>
-                          <div>{location}</div>
-                          <div>{importance}</div>
-                          <hr />
-                          <div>{content}</div>
-                        </>
-                      )}
-                    </S.TaskItems>
-                  );
-                })}
-              </S.TagWrap>
+              <>
+                <S.TagWrap key={tag} data-tag={tag} onClick={handleTagWrapClick} onMouseDown={handleMouseDown}>
+                  <S.TagTitle data-tag={tag}>#{tag}</S.TagTitle>
+                  <TaskList taskList={filteredTasks(tag)} activeTask={activeTask} />
+                </S.TagWrap>
+              </>
             );
           })}
         </S.LogMainSection>

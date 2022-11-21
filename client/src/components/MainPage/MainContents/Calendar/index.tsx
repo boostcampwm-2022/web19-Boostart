@@ -3,18 +3,12 @@ import useCurrentDate from '../../../../hooks/useCurrentDate';
 import { EngMonth, Days, WEEK_LENGTH, Menus } from '../../../../constants';
 import * as S from './style';
 
-const getFirstDay = (date: Date) => {
-  return new Date(date.getFullYear(), date.getMonth(), 1).getDay();
-};
-const getLastDate = (date: Date) => {
-  return new Date(date.getFullYear(), date.getMonth() + 1, 0).getDate();
-};
 const createArray = (count: number) => {
   return new Array(count).fill(true);
 };
 
 const Calendar = () => {
-  const [currentDate, getPrevMonth, getNextMonth] = useCurrentDate(new Date());
+  const [currentDate, getPrevMonth, getNextMonth, getFirstDay, getLastDate] = useCurrentDate(new Date());
   const [selectedMenu, setSelectedMenu] = useState('LOG');
 
   const handleMenuClickEvent = (e: React.MouseEvent) => {
@@ -25,6 +19,9 @@ const Calendar = () => {
 
   const firstDay = getFirstDay(currentDate);
   const lastDate = getLastDate(currentDate);
+  const weekDays = createArray(WEEK_LENGTH);
+  const daysBeforeFirstDay = createArray(firstDay);
+  const monthDays = createArray(lastDate);
 
   return (
     <>
@@ -41,15 +38,15 @@ const Calendar = () => {
           </S.Arrow>
         </S.MonthSelector>
         <S.DaysHeader>
-          {createArray(WEEK_LENGTH).map((_, idx) => {
+          {weekDays.map((_, idx) => {
             return <S.DaysText key={Days[idx]}>{Days[idx]}</S.DaysText>;
           })}
         </S.DaysHeader>
         <S.DateSelector>
-          {createArray(firstDay).map((_, idx) => {
+          {daysBeforeFirstDay.map((_, idx) => {
             return <S.DateBox key={'emptyBox' + idx}></S.DateBox>;
           })}
-          {createArray(lastDate).map((_, idx) => {
+          {monthDays.map((_, idx) => {
             return (
               <S.DateBox key={'date' + (idx + 1)}>
                 <S.DateLogo percentage={Math.ceil(Math.random() * 100)}>B</S.DateLogo>
@@ -61,9 +58,9 @@ const Calendar = () => {
         <S.MenuSelector>
           {Menus.map((menu) => {
             return (
-              <S.MenuBtn key={menu} data-menu={menu} onClick={handleMenuClickEvent} isActivatedMenu={menu === selectedMenu}>
+              <S.MenuButton key={menu} data-menu={menu} onClick={handleMenuClickEvent} isActivatedMenu={menu === selectedMenu}>
                 {menu}
-              </S.MenuBtn>
+              </S.MenuButton>
             );
           })}
         </S.MenuSelector>

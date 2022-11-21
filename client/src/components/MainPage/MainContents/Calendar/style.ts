@@ -127,7 +127,7 @@ export const MenuSelector = styled.div`
   align-items: center;
 `;
 
-export const MenuBtn = styled.div<{
+export const MenuButton = styled.div<{
   isActivatedMenu: boolean;
 }>`
   width: 3.5rem;
