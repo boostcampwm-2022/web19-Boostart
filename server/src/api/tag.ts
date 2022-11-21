@@ -15,7 +15,8 @@ router.post('/', authenticateToken, async (req: AuthorizedRequest, res) => {
   const { userIdx } = req.user;
   const { title, color } = req.body;
   await executeSql('insert into tag (title, color, user_idx) values (?, ?, ?)', [title, color, userIdx]);
-  res.sendStatus(200);
+  const newIdx = await executeSql('select last_insert_id()');
+  res.status(200).send({ idx: newIdx[0]['last_insert_id()'] });
 });
 
 export default router;
