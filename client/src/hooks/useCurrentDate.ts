@@ -1,23 +1,27 @@
-import React, { useEffect, useState, MouseEvent } from 'react';
-import { CurrentDate } from 'GlobalType';
+import { useState, MouseEvent } from 'react';
 
 type onClickType = (e: MouseEvent<HTMLElement>) => void;
 
-const useCurrentDate = (initDate: CurrentDate) => {
-  const [currentDate, setCurrentDate] = useState<CurrentDate>(initDate);
+const useCurrentDate = (initDate: Date) => {
+  const [currentDate, setCurrentDate] = useState<Date>(initDate);
 
-  const nextMonth = () => {
-    const currentTime = new Date(currentDate.year, currentDate.month, 1);
-    currentTime.setMonth(currentTime.getMonth() + 1);
-    setCurrentDate({ year: currentTime.getFullYear(), month: currentTime.getMonth() });
+  const getNextMonth = () => {
+    currentDate.setMonth(currentDate.getMonth() + 1);
+    setCurrentDate(new Date(currentDate));
   };
 
-  const prevMonth = () => {
-    const currentTime = new Date(currentDate.year, currentDate.month, 1);
-    currentTime.setMonth(currentTime.getMonth() - 1);
-    setCurrentDate({ year: currentTime.getFullYear(), month: currentTime.getMonth() });
+  const getPrevMonth = () => {
+    currentDate.setMonth(currentDate.getMonth() - 1);
+    setCurrentDate(new Date(currentDate));
   };
 
-  return [currentDate, prevMonth, nextMonth] as [CurrentDate, onClickType, onClickType];
+  const getFirstDay = () => {
+    return new Date(currentDate.getFullYear(), currentDate.getMonth(), 1).getDay();
+  };
+  const getLastDate = () => {
+    return new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0).getDate();
+  };
+
+  return [currentDate, getPrevMonth, getNextMonth, getFirstDay, getLastDate] as [Date, onClickType, onClickType, Function, Function];
 };
 export default useCurrentDate;

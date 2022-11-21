@@ -1,213 +1,44 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Tasks } from 'GlobalType';
+import TaskList from './TaskItem';
+import { Task } from 'GlobalType';
+import { dummyTaskList } from '../../../common/dummy';
 import * as S from './style';
-const dummy: Tasks[] = [
-  {
-    idx: 0,
-    title: '데일리어쩌구',
-    importance: 1,
-    startedAt: '10:00',
-    endedAt: '11:30',
-    lat: 123,
-    lng: 123,
-    location: '압구정역',
-    public: true,
-    tag_idx: 0,
-    tag_name: '부스트캠프',
-    content: '아 어렵다',
-    done: true,
-    labels: [
-      {
-        idx: 0,
-        color: 'red',
-        title: '고통',
-        amount: 10,
-        unit: 'Kg',
-      },
-    ],
-  },
-  {
-    idx: 1,
-    title: '육아',
-    importance: 5,
-    startedAt: '00:00',
-    endedAt: '23:59',
-    lat: 123,
-    lng: 123,
-    location: '집',
-    public: true,
-    tag_idx: 1,
-    tag_name: '육아',
-    content: '아 힘들다',
-    done: false,
-    labels: [
-      {
-        idx: 1,
-        color: 'yellow',
-        title: '귀여움',
-        amount: 20,
-        unit: 'Kg',
-      },
-    ],
-  },
-  {
-    idx: 2,
-    title: '페어저쩌구',
-    importance: 3,
-    startedAt: '13:00',
-    endedAt: '16:30',
-    lat: 123,
-    lng: 123,
-    location: '줌',
-    public: true,
-    tag_idx: 0,
-    tag_name: '부스트캠프',
-    content: '아 재미있다',
-    done: false,
-    labels: [
-      {
-        idx: 3,
-        color: 'blue',
-        title: '공부',
-        amount: 120,
-        unit: '분',
-      },
-    ],
-  },
-  {
-    idx: 3,
-    title: '분유먹이기',
-    importance: 4,
-    startedAt: '12:00',
-    endedAt: '12:30',
-    lat: 123,
-    lng: 123,
-    location: '집',
-    public: true,
-    tag_idx: 1,
-    tag_name: '육아',
-    content: '맛있을까?',
-    done: true,
-    labels: [
-      {
-        idx: 1,
-        color: 'yellow',
-        title: '귀여움',
-        amount: 20,
-        unit: 'Kg',
-      },
-      {
-        idx: 2,
-        color: 'green',
-        title: '분유',
-        amount: 200,
-        unit: 'ml',
-      },
-    ],
-  },
-  {
-    idx: 4,
-    title: '넷플릭스보기',
-    importance: 2,
-    startedAt: '20:00',
-    endedAt: '21:30',
-    lat: 123,
-    lng: 123,
-    location: '집',
-    public: true,
-    tag_idx: 2,
-    tag_name: '일상',
-    content: '요즘은 뭐가 재미있지?',
-    done: false,
-    labels: [
-      {
-        idx: 4,
-        color: 'pink',
-        title: '휴식',
-        amount: 900,
-        unit: '분',
-      },
-    ],
-  },
-  {
-    idx: 5,
-    title: '다섯번째',
-    importance: 2,
-    startedAt: '20:00',
-    endedAt: '21:30',
-    lat: 123,
-    lng: 123,
-    location: '집',
-    public: true,
-    tag_idx: 3,
-    tag_name: '생존',
-    content: '요즘은 뭐가 재미있지?',
-    done: false,
-    labels: [
-      {
-        idx: 4,
-        color: 'pink',
-        title: '휴식',
-        amount: 900,
-        unit: '분',
-      },
-    ],
-  },
-  {
-    idx: 6,
-    title: '여섯번째',
-    importance: 2,
-    startedAt: '20:00',
-    endedAt: '21:30',
-    lat: 123,
-    lng: 123,
-    location: '집',
-    public: true,
-    tag_idx: 0,
-    tag_name: '부스트캠프',
-    content: '요즘은 뭐가 재미있지?',
-    done: false,
-    labels: [
-      {
-        idx: 4,
-        color: 'pink',
-        title: '휴식',
-        amount: 900,
-        unit: '분',
-      },
-    ],
-  },
-];
 
 const Log = () => {
   const [selectedElement, setSelectedElement] = useState<number | null>(null);
-  const [mousePos, setMousePos] = useState<number[]>([0, 0]);
-  const [dummyData, setDummyData] = useState<Tasks[]>(dummy);
-  const [activeTag, setActiveTag] = useState<number | null>(null);
+  const [mousePosition, setMousePosition] = useState<number[]>([0, 0]);
+  const [taskList, setTaskList] = useState<Task[]>(dummyTaskList);
+  const [activeTask, setActiveTag] = useState<number | null>(null);
   const [timeMarkerData, setTimeMarkerData] = useState<number[]>([0, 0]);
   const selectedRef = useRef<HTMLDivElement | null>(null);
   const mouseOffsetRef = useRef<number[]>([0, 0]);
   const taskContainerRef = useRef<HTMLDivElement | null>(null);
 
-  const dummyMap = new Map();
+  const TaskMap = new Map();
   const tagList = ['부스트캠프', '육아', '일상', '생존', '테스트'];
-  dummy.forEach((data) => {
-    dummyMap.set(data.idx, data);
+  taskList.forEach((task: Task) => {
+    TaskMap.set(task.idx, task);
   });
+
+  const getFilteredTaskListbyTagName = (tag: string): Task[] => {
+    return taskList.filter(({ tag_name }) => tag_name === tag);
+  };
+
+  const filteredTasks = (tag: string): Task[] => getFilteredTaskListbyTagName(tag);
 
   const handleMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
     if (!(e.target instanceof HTMLDivElement)) return;
     const target = e.target;
     if (!target.dataset.idx) return;
     mouseOffsetRef.current = [e.nativeEvent.offsetX, e.nativeEvent.offsetY];
-    setMousePos([e.pageX - mouseOffsetRef.current[0], e.pageY - mouseOffsetRef.current[1]]);
+    setMousePosition([e.pageX - mouseOffsetRef.current[0], e.pageY - mouseOffsetRef.current[1]]);
     const timeout = setTimeout(() => {
       if (target.dataset.idx) {
         setSelectedElement(parseInt(target.dataset.idx));
         selectedRef.current = target;
         selectedRef.current.style.visibility = 'hidden';
       }
-    }, 700);
+    }, 300);
     e.target.addEventListener('mouseup', () => {
       clearTimeout(timeout);
     });
@@ -228,61 +59,64 @@ const Log = () => {
     if (!(e.target instanceof HTMLDivElement)) return;
     const target = e.target;
     const activeTaskIdx = target.dataset.idx;
-    if (activeTaskIdx === undefined || parseInt(activeTaskIdx) == activeTag) {
+    if (activeTaskIdx === undefined || parseInt(activeTaskIdx) === activeTask) {
       setActiveTag(null);
       setTimeMarkerData([0, 0]);
     } else {
       const activeIdx = parseInt(activeTaskIdx);
+      const startedTime = TaskMap.get(activeIdx).startedAt;
+      const endedTime = TaskMap.get(activeIdx).endedAt;
       setActiveTag(activeIdx);
-      calculateTime(dummyMap.get(activeIdx).startedAt, dummyMap.get(activeIdx).endedAt);
+      calculateTime(startedTime, endedTime);
     }
   };
 
-  useEffect(() => {
-    const handleMouseMove = (e: MouseEvent) => {
-      if (selectedElement === null) return;
+  const handleMouseMove = (e: MouseEvent) => {
+    if (selectedElement === null) return;
 
-      if (!(e.target instanceof HTMLDivElement)) return;
-      const target = e.target;
-      setMousePos([e.pageX - mouseOffsetRef.current[0], e.pageY - mouseOffsetRef.current[1]]);
-      if (target.dataset.direction && taskContainerRef.current) {
-        if (target.dataset.direction === 'left') {
-          taskContainerRef.current.scrollBy(-10, 0);
-        } else {
-          taskContainerRef.current.scrollBy(10, 0);
-        }
+    if (!(e.target instanceof HTMLDivElement)) return;
+    const target = e.target;
+    setMousePosition([e.pageX - mouseOffsetRef.current[0], e.pageY - mouseOffsetRef.current[1]]);
+    if (target.dataset.direction && taskContainerRef.current) {
+      if (target.dataset.direction === 'left') {
+        taskContainerRef.current.scrollBy(-10, 0);
+      } else {
+        taskContainerRef.current.scrollBy(10, 0);
       }
-    };
-    const handleMouseUp = (e: MouseEvent) => {
-      if (selectedElement === null || !selectedRef.current) return;
-      let target = e.target as HTMLDivElement;
-      if (target.dataset.tag) dummyMap.get(selectedElement).tag_name = target.dataset.tag;
-      setDummyData([...dummy]);
-      selectedRef.current.style.visibility = 'visible';
+    }
+  };
+  const handleMouseUp = (e: MouseEvent) => {
+    if (selectedElement === null || !selectedRef.current) return;
+    let target = e.target as HTMLDivElement;
+    if (target.dataset.tag) TaskMap.get(selectedElement).tag_name = target.dataset.tag;
+    setTaskList([...dummyTaskList]);
+    selectedRef.current.style.visibility = 'visible';
 
-      selectedRef.current = null;
-      setSelectedElement(null);
-    };
+    selectedRef.current = null;
+    setSelectedElement(null);
+  };
+
+  useEffect(() => {
     window.addEventListener('mousemove', handleMouseMove);
     window.addEventListener('mouseup', handleMouseUp);
     return () => {
       window.removeEventListener('mousemove', handleMouseMove);
       window.removeEventListener('mouseup', handleMouseUp);
     };
-  }, [selectedElement]);
+  });
 
   return (
     <>
       {selectedElement !== null && (
-        <S.SelectedItem x={mousePos[0]} y={mousePos[1]}>
-          <span>{dummyMap.get(selectedElement).startedAt}</span> {dummyMap.get(selectedElement).title}
+        <S.SelectedItem x={mousePosition[0]} y={mousePosition[1]}>
+          <span>{TaskMap.get(selectedElement).startedAt}</span> {TaskMap.get(selectedElement).title}
         </S.SelectedItem>
       )}
       <S.LogTitle>LOG</S.LogTitle>
       <S.LogContainer>
         <S.slideObserver data-direction="left" direction="left"></S.slideObserver>
         <S.TimeBarSection>
-          <img src="./timebar-clock.svg" />
+          <img src="./timebar-clock.svg" alt="TimeBar" />
           <S.TimeBar>
             <S.TimeMarker startedAt={timeMarkerData[0]} duration={timeMarkerData[1]}></S.TimeMarker>
           </S.TimeBar>
@@ -299,32 +133,12 @@ const Log = () => {
         <S.LogMainSection ref={taskContainerRef}>
           {tagList.map((tag) => {
             return (
-              <S.TagWrap key={tag} data-tag={tag} onClick={handleTagWrapClick}>
-                <S.TagTitle data-tag={tag}>#{tag}</S.TagTitle>
-                {dummyData
-                  .filter((data: Tasks) => data.tag_name === tag)
-                  .map((data) => {
-                    return (
-                      <S.TagItems onMouseDown={handleMouseDown} data-idx={data.idx} data-tag={data.tag_name} data-active={data.idx === activeTag}>
-                        <div>
-                          <S.TagTime>{data.startedAt}</S.TagTime> {data.title}
-                        </div>
-                        {data.idx === activeTag && (
-                          <>
-                            <hr />
-                            <div>
-                              {data.startedAt}-{data.endedAt}
-                            </div>
-                            <div>{data.location}</div>
-                            <div>{data.importance}</div>
-                            <hr />
-                            <div>{data.content}</div>
-                          </>
-                        )}
-                      </S.TagItems>
-                    );
-                  })}
-              </S.TagWrap>
+              <>
+                <S.TagWrap key={tag} data-tag={tag} onClick={handleTagWrapClick} onMouseDown={handleMouseDown}>
+                  <S.TagTitle data-tag={tag}>#{tag}</S.TagTitle>
+                  <TaskList taskList={filteredTasks(tag)} activeTask={activeTask} />
+                </S.TagWrap>
+              </>
             );
           })}
         </S.LogMainSection>
