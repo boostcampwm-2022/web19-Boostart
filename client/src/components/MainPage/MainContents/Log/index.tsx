@@ -114,7 +114,7 @@ const Log = () => {
       )}
       <S.LogTitle>LOG</S.LogTitle>
       <S.LogContainer>
-        <S.slideObserver data-direction="left" direction="left"></S.slideObserver>
+        <S.SlideObserver data-direction="left" direction="left"></S.SlideObserver>
         <S.TimeBarSection>
           <img src="./timebar-clock.svg" alt="TimeBar" />
           <S.TimeBar>
@@ -142,7 +142,7 @@ const Log = () => {
             );
           })}
         </S.LogMainSection>
-        <S.slideObserver data-direction="right" direction="right"></S.slideObserver>
+        <S.SlideObserver data-direction="right" direction="right"></S.SlideObserver>
       </S.LogContainer>
     </>
   );

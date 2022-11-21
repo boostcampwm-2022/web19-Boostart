@@ -23,7 +23,7 @@ declare module 'GlobalType' {
     lat: number;
     lng: number;
     location: string;
-    public: boolean;
+    isPublic: boolean;
     tag_idx: number;
     tag_name: string;
     content: string;
