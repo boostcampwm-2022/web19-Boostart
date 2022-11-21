@@ -7,7 +7,7 @@ const router = Router();
 
 router.get('/', authenticateToken, async (req: AuthorizedRequest, res) => {
   const { userIdx } = req.user;
-  const labels = await executeSql('select * from label where user_idx = ?', [userIdx.toString()]);
+  const labels = await executeSql('select idx, title, color, unit from label where user_idx = ?', [userIdx.toString()]);
   res.json(labels);
 });
 
