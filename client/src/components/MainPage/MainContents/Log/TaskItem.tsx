@@ -9,14 +9,15 @@ interface taskListProps {
 const TaskList = ({ taskList, activeTask }: taskListProps) => {
   return (
     <>
-      {taskList.map(({ tag_name, idx, title, startedAt, endedAt, importance, location, content, isPublic }) => {
+      {taskList.map(({ tag_name, idx, title, startedAt, endedAt, importance, location, content, done, isPublic }) => {
         return (
-          <S.TaskItems key={'task' + idx} data-idx={idx} data-tag={tag_name} data-active={idx === activeTask}>
+          <S.TaskItems key={'task' + idx} data-idx={idx} data-tag={tag_name} data-active={idx === activeTask}  done={done}>
             <S.TaskMainInfos>
               <S.TaskTime>{startedAt}</S.TaskTime>
               <S.TaskTitle>{title}</S.TaskTitle>
               {!isPublic && <S.LockerImage src="./lock.svg" />}
             </S.TaskMainInfos>
+
             {idx === activeTask && (
               <>
                 <hr />
@@ -29,7 +30,7 @@ const TaskList = ({ taskList, activeTask }: taskListProps) => {
                 <div>{content}</div>
               </>
             )}
-          </S.TaskItems>
+          </S.TaskItem>
         );
       })}
     </>
