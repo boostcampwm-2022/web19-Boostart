@@ -48,7 +48,8 @@ const SignupMenu = () => {
     if (response.ok) {
       navigate('/');
     } else {
-      setErr('이미 존재하는 아이디인 것 같아요');
+      const { msg } = await response.json();
+      setErr(msg);
     }
   };
 
