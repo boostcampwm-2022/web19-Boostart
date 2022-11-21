@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import * as S from './style';
 import { Link, useNavigate } from 'react-router-dom';
 import { DEFAULT_PROFILE_IMG_URL, HOST } from '../../../constants';
@@ -20,11 +20,13 @@ const httpPostSignup = async ({ userId, password, username }: any) => {
 
 const SignupMenu = () => {
   const [profileImg, setProfileImg] = useState<File>();
-  const [err, setErr] = useState('');
+  const [messageFromServer, setMessageFromServer] = useState('');
 
   const schema = yup.object().shape({
-    userId: yup.string().required('id is required.'),
-    password: yup.string().min(8).max(15).required('password must be 8 - 15 characters.'),
+    userId: yup.string().required('아이디를 입력해주세요.').min(3, '아이디는 3자 이상 20자 이하여야 해요.').max(20, '아이디는 3자 이상 20자 이하여야 해요.'),
+    password: yup.string().required('비밀번호를 입력해주세요.').min(8, '비밀번호는 8자 이상 20자 이하여야 해요.').max(20, '비밀번호는 8자 이상 20자 이하여야 해요.'),
+    confirmPassword: yup.string().oneOf([yup.ref('password'), null], '입력한 비밀번호와 일치하지 않아요.'),
+    username: yup.string().required('닉네임을 입력해주세요.').min(2, '닉네임은 2자 이상 8자 이하여야 해요.').max(8, '닉네임은 2자 이상 8자 이하여야 해요.'),
   });
 
   const {
@@ -32,6 +34,7 @@ const SignupMenu = () => {
     handleSubmit,
     formState: { errors },
   } = useForm({
+    mode: 'onTouched',
     resolver: yupResolver(schema),
   });
 
@@ -48,13 +51,10 @@ const SignupMenu = () => {
     if (response.ok) {
       navigate('/');
     } else {
-      setErr('이미 존재하는 아이디인 것 같아요');
+      const { msg } = await response.json();
+      setMessageFromServer(msg);
     }
   };
-
-  useEffect(() => {
-    setErr(Object.keys(errors).length !== 0 ? '회원가입 양식이 틀렸어요' : '');
-  }, [errors]);
 
   return (
     <S.Container>
@@ -69,9 +69,15 @@ const SignupMenu = () => {
             </S.EditRound>
           </S.ProfileImage>
           <S.InputBar {...register('userId')} placeholder="ID" />
+          <h3>{errors.userId?.message as string}</h3>
           <S.InputBar {...register('password')} placeholder="PASSWORD" type="password" />
+          <h3>{errors.password?.message as string}</h3>
+          <S.InputBar {...register('confirmPassword')} placeholder="PASSWORD" type="password" />
+          <h3>{errors.confirmPassword?.message as string}</h3>
           <S.InputBar {...register('username')} placeholder="NICKNAME" />
-          <h3>{err}</h3>
+          <h3>{errors.username?.message as string}</h3>
+
+          <h3>{messageFromServer}</h3>
           <S.SignupButton>SIGN UP</S.SignupButton>
           <Link to={'/'} style={{ color: 'inherit', textDecoration: 'inherit' }}>
             <S.LoginButton type="button">LOGIN PAGE</S.LoginButton>
