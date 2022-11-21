@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import TaskList from './TaskItem';
-import { Task } from 'GlobalType';
+import { Task, CompletionCheckBoxStatus } from 'GlobalType';
 import { dummyTaskList } from '../../../common/dummy';
 import * as S from './style';
 
@@ -10,6 +10,7 @@ const Log = () => {
   const [taskList, setTaskList] = useState<Task[]>(dummyTaskList);
   const [activeTask, setActiveTag] = useState<number | null>(null);
   const [timeMarkerData, setTimeMarkerData] = useState<number[]>([0, 0]);
+  const [completionCheckBoxStatus, setCompletionCheckBoxStatus] = useState<CompletionCheckBoxStatus>({ complete: true, incomplete: true });
   const selectedRef = useRef<HTMLDivElement | null>(null);
   const mouseOffsetRef = useRef<number[]>([0, 0]);
   const taskContainerRef = useRef<HTMLDivElement | null>(null);
@@ -96,6 +97,14 @@ const Log = () => {
     setSelectedElement(null);
   };
 
+  const handleCheckBoxChange = (e: React.ChangeEvent, type: string) => {
+    if (!(e.target instanceof HTMLInputElement)) return;
+    const isCompleteCheckBox = type === 'complete';
+    const isChecked = e.target.checked;
+    if (isCompleteCheckBox) setCompletionCheckBoxStatus({ ...completionCheckBoxStatus, complete: isChecked });
+    else setCompletionCheckBoxStatus({ ...completionCheckBoxStatus, incomplete: isChecked });
+  };
+
   useEffect(() => {
     window.addEventListener('mousemove', handleMouseMove);
     window.addEventListener('mouseup', handleMouseUp);
@@ -114,7 +123,6 @@ const Log = () => {
       )}
       <S.LogTitle>LOG</S.LogTitle>
       <S.LogContainer>
-        <S.SlideObserver data-direction="left" direction="left"></S.SlideObserver>
         <S.TimeBarSection>
           <img src="./timebar-clock.svg" alt="TimeBar" />
           <S.TimeBar>
@@ -128,21 +136,27 @@ const Log = () => {
             <option value="importance">중요도순</option>
           </S.SortOptionSelect>
           <S.DateController>{'< 11.12 >'}</S.DateController>
-          <div></div>
+          <S.CheckBoxContainer>
+            <S.CheckBoxLabel htmlFor="complete">완료</S.CheckBoxLabel>
+            <S.Test type="checkbox" id="complete" defaultChecked={completionCheckBoxStatus.complete} onChange={(e) => handleCheckBoxChange(e, 'complete')} />
+            <S.CheckBoxLabel htmlFor="incomplete">미완료</S.CheckBoxLabel>
+            <S.Test type="checkbox" id="incomplete" defaultChecked={completionCheckBoxStatus.incomplete} onChange={(e) => handleCheckBoxChange(e, 'incomplete')} />
+          </S.CheckBoxContainer>
         </S.LogNavBarSection>
         <S.LogMainSection ref={taskContainerRef}>
+          <S.SlideObserver data-direction="left" direction="left"></S.SlideObserver>
           {tagList.map((tag) => {
             return (
               <>
                 <S.TagWrap key={tag} data-tag={tag} onClick={handleTagWrapClick} onMouseDown={handleMouseDown}>
                   <S.TagTitle data-tag={tag}>#{tag}</S.TagTitle>
-                  <TaskList taskList={filteredTasks(tag)} activeTask={activeTask} />
+                  <TaskList taskList={filteredTasks(tag)} activeTask={activeTask} completionFilter={completionCheckBoxStatus} />
                 </S.TagWrap>
               </>
             );
           })}
+          <S.SlideObserver data-direction="right" direction="right"></S.SlideObserver>
         </S.LogMainSection>
-        <S.SlideObserver data-direction="right" direction="right"></S.SlideObserver>
       </S.LogContainer>
     </>
   );
