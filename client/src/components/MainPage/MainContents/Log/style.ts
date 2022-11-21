@@ -123,7 +123,7 @@ export const TagTitle = styled.div`
   border-radius: 0.25rem;
 `;
 
-export const TagItems = styled.div`
+export const TaskItems = styled.div`
   width: 11rem;
   height: 2rem;
   margin: 0.25rem 0.25rem;
@@ -134,7 +134,7 @@ export const TagItems = styled.div`
   background: white;
   border: 1px solid gray;
   border-radius: 0.25rem;
-  transition: height 1s;
+  transition: height 0.5s;
   &[data-active='true'] {
     height: 10rem;
     padding: 0.5rem 0.75rem;
