@@ -126,22 +126,22 @@ export const TagTitle = styled.div`
 export const TaskItem = styled.div<{
   done: boolean;
 }>`
-  width: 11rem;
+  width: 12.5rem;
   height: 2rem;
   margin: 0.25rem 0.25rem;
-  padding: 0 0.75rem;
+  padding: 0.375rem 0.75rem;
   display: flex;
-  align-items: center;
+  align-items: flex-start;
+  justify-content: flex-start;
   font-size: 0.75rem;
   background: ${(props) => (props.done === true ? '#DDE4EF' : 'white')};
   border: 1px solid gray;
   border-radius: 0.25rem;
   transition: height 0.5s;
+  box-sizing: border-box;
   &[data-active='true'] {
     height: 10rem;
-    padding: 0.5rem 0.75rem;
     flex-direction: column;
-    align-items: flex-start;
     overflow: hidden;
   }
   & hr {
@@ -152,7 +152,7 @@ export const TaskItem = styled.div<{
   }
 `;
 
-export const TagTime = styled.span`
+export const TaskTime = styled.span`
   margin: 0 0.25rem 0 0;
   color: #959595;
 `;
@@ -183,7 +183,7 @@ export const SelectedItem = styled.div<{
   }
 `;
 
-export const slideObserver = styled.div<{
+export const SlideObserver = styled.div<{
   direction: string;
 }>`
   width: 3rem;
@@ -191,4 +191,21 @@ export const slideObserver = styled.div<{
   position: absolute;
   z-index: 7;
   ${(props) => (props.direction === 'right' ? 'right: 0;' : 'left: 0;')}
+`;
+
+export const TaskTitle = styled.div`
+  width: 8rem;
+  display: inline-block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+`;
+
+export const LockerImage = styled.img`
+  width: 0.625rem;
+`;
+
+export const TaskMainInfos = styled.div`
+  display: flex;
+  align-items: center;
 `;
