@@ -123,7 +123,7 @@ export const TagTitle = styled.div`
   border-radius: 0.25rem;
 `;
 
-export const TaskItems = styled.div<{
+export const TaskItem = styled.div<{
   done: boolean;
 }>`
   width: 11rem;

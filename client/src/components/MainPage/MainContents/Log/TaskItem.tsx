@@ -11,7 +11,7 @@ const TaskList = ({ taskList, activeTask }: taskListProps) => {
     <>
       {taskList.map(({ tag_name, idx, title, startedAt, endedAt, importance, location, content, done }) => {
         return (
-          <S.TaskItems key={'task' + idx} data-idx={idx} data-tag={tag_name} data-active={idx === activeTask} done={done}>
+          <S.TaskItem key={'task' + idx} data-idx={idx} data-tag={tag_name} data-active={idx === activeTask} done={done}>
             <div>
               <S.TagTime>{startedAt}</S.TagTime> {title}
             </div>
@@ -27,7 +27,7 @@ const TaskList = ({ taskList, activeTask }: taskListProps) => {
                 <div>{content}</div>
               </>
             )}
-          </S.TaskItems>
+          </S.TaskItem>
         );
       })}
     </>
