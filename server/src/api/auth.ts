@@ -145,7 +145,7 @@ router.post('/signup', async (req, res) => {
   [user] = await executeSql('select * from user where user_id = ?', [userId]);
   if (user) {
     console.log(`ID 중복: ${userId}`);
-    return res.status(409).json({ msg: '이미 존재하는 아이디에요.' });
+    return res.status(409).json({ msg: '이미 존재하는 아이디예요.' });
   }
 
   const salt = generateSalt();
