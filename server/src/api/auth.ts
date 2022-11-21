@@ -78,11 +78,11 @@ router.post('/login', async (req, res) => {
   if (!(userId && password)) return res.sendStatus(400);
   let user;
   [user] = await executeSql('select * from user where user_id = ?', [userId]);
-  if (!user) return res.sendStatus(401);
+  if (!user) return res.status(401).json({ msg: '아이디 또는 비밀번호가 틀렸어요.' });
 
   const encrypted = encrypt(password, user.salt);
   [user] = await executeSql('select * from user where user_id = ? and password = ?', [userId, encrypted]);
-  if (!user) return res.sendStatus(401);
+  if (!user) return res.status(401).json({ msg: '아이디 또는 비밀번호가 틀렸어요.' });
 
   const token = generateAccessToken({ userIdx: user.idx });
   res.cookie('token', token, {
