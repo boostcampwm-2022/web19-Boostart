@@ -78,11 +78,11 @@ router.post('/login', async (req, res) => {
   if (!(userId && password)) return res.sendStatus(400);
   let user;
   [user] = await executeSql('select * from user where user_id = ?', [userId]);
-  if (!user) return res.sendStatus(401);
+  if (!user) return res.status(401).json({ msg: '아이디 또는 비밀번호가 틀렸어요.' });
 
   const encrypted = encrypt(password, user.salt);
   [user] = await executeSql('select * from user where user_id = ? and password = ?', [userId, encrypted]);
-  if (!user) return res.sendStatus(401);
+  if (!user) return res.status(401).json({ msg: '아이디 또는 비밀번호가 틀렸어요.' });
 
   const token = generateAccessToken({ userIdx: user.idx });
   res.cookie('token', token, {
@@ -133,20 +133,19 @@ router.post('/signup', async (req, res) => {
   let oauthEmail: string;
   if (token) {
     ({ oauthType, oauthEmail } = jwt.verify(token, TOKEN_SECRET));
-    if (!(oauthType && oauthEmail)) return res.sendStatus(401);
-    if (!validateOAuthType(oauthType)) return res.sendStatus(401);
+    if (!(oauthType && oauthEmail)) return res.status(401).send({ msg: '잘못된 토큰이에요.' });
+    if (!validateOAuthType(oauthType)) return res.status(401).send({ msg: '잘못된 토큰이에요.' });
 
     [user] = await executeSql('select * from user where oauth_type = ? and oauth_email = ?', [oauthType, oauthEmail]);
     if (user) {
-      console.log(`이미 가입된 계정: ${oauthType}, ${oauthEmail}`);
-      return res.sendStatus(409);
+      return res.status(409).json({ msg: '해당 이메일은 이미 가입되어 있어요.' });
     }
   }
 
   [user] = await executeSql('select * from user where user_id = ?', [userId]);
   if (user) {
     console.log(`ID 중복: ${userId}`);
-    return res.sendStatus(409);
+    return res.status(409).json({ msg: '이미 존재하는 아이디예요.' });
   }
 
   const salt = generateSalt();

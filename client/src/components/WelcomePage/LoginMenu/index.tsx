@@ -40,7 +40,10 @@ const LoginMenu = () => {
   const loginFormSubmit = async (d: any) => {
     const response = await httpPostLogin(d);
     if (response.ok) navigate('/main');
-    else setErr('아이디 또는 비밀번호가 틀렸어요');
+    else {
+      const { msg } = await response.json();
+      setErr(msg);
+    }
   };
 
   useEffect(() => {

@@ -35,5 +35,11 @@ declare module 'GlobalType' {
     idx: number;
     title: string;
     color: string;
+    
+    }
+
+  export interface CompletionCheckBoxStatus {
+    complete: boolean;
+    incomplete: boolean;
   }
 }

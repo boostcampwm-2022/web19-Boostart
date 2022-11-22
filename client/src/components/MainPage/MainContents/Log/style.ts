@@ -62,6 +62,7 @@ export const LogNavBarSection = styled.div`
   width: 100%;
   height: 100%;
   padding-bottom: 0.5rem;
+  padding-right: 1rem;
   display: flex;
   justify-content: space-between;
   align-items: flex-end;
@@ -71,12 +72,13 @@ export const LogNavBarSection = styled.div`
 `;
 
 export const SortOptionSelect = styled.select`
+  margin-right: 1.25rem;
   border-radius: 0.5rem;
   margin-left: 1rem;
   color: #616161;
   font-size: 0.825rem;
-  font-family: 'Noto Sans KR', sans-serif;
   text-align: center;
+  font-family: 'Noto Sans KR', sans-serif;
   option {
     color: #616161;
     font-size: 0.625rem;
@@ -208,4 +210,22 @@ export const LockerImage = styled.img`
 export const TaskMainInfos = styled.div`
   display: flex;
   align-items: center;
+`;
+
+export const CheckBoxContainer = styled.div`
+  display: flex;
+  align-items: center;
+`;
+
+export const CheckBoxLabel = styled.label`
+  color: #616161;
+  font-family: 'Noto Sans KR', sans-serif;
+  font-size: 0.75rem;
+`;
+
+export const CheckBox = styled.input`
+  width: 0.625rem;
+  margin-right: 0.25rem;
+  border-radius: 0.5rem;
+  accent-color: #7991db;
 `;
