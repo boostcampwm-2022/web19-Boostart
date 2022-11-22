@@ -1,15 +1,22 @@
 import { dummyNotifications, dummyReceivedFriendRequests } from '../common/dummy';
-import { DrawerContainer, ProfileSectionContainer, ReceivedFriendRequestSectionContainer } from './Drawer.style';
+import { Dimmed, DrawerContainer, ProfileSectionContainer, ReceivedFriendRequestSectionContainer } from './Drawer.style';
 
-const Drawer = () => {
+interface DrawerProps {
+  handleDimmedClick: React.MouseEventHandler;
+}
+
+const Drawer = ({ handleDimmedClick }: DrawerProps) => {
   return (
-    <DrawerContainer>
-      <ProfileSection />
-      <hr />
-      <ReceivedFriendRequestSection />
-      <hr />
-      <NotificationSection />
-    </DrawerContainer>
+    <>
+      <DrawerContainer>
+        <ProfileSection />
+        <hr />
+        <ReceivedFriendRequestSection />
+        <hr />
+        <NotificationSection />
+      </DrawerContainer>
+      <Dimmed onClick={handleDimmedClick} />
+    </>
   );
 };
 

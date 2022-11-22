@@ -7,7 +7,7 @@ import GNB from '../components/TopBar/TopBar';
 const MainPage = () => {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const handleMenuClick = () => {
-    setIsDrawerOpen((showDrawer) => !showDrawer);
+    setIsDrawerOpen(true);
   };
 
   return (
@@ -15,7 +15,7 @@ const MainPage = () => {
       <GNB handleMenuClick={handleMenuClick} />
       <FriendsBar />
       <MainContents />
-      {isDrawerOpen && <Drawer />}
+      {isDrawerOpen && <Drawer handleDimmedClick={() => setIsDrawerOpen(false)} />}
     </>
   );
 };
