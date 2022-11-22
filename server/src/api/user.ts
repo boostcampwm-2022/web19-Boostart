@@ -1,6 +1,5 @@
 import { Router } from 'express';
 import { executeSql } from '../db';
-import { AuthorizedRequest } from '../types';
 import { authenticateToken } from '../utils/auth';
 
 const router = Router();
