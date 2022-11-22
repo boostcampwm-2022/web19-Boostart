@@ -28,3 +28,9 @@ export const Dimmed = styled.div`
   opacity: 0.3;
   background-color: black;
 `;
+
+export const LogoutButton = styled.button`
+  position: absolute;
+  bottom: 0;
+  right: 0;
+`;

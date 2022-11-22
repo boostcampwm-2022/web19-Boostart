@@ -1,11 +1,15 @@
 import { dummyNotifications, dummyReceivedFriendRequests } from '../common/dummy';
-import { Dimmed, DrawerContainer, ProfileSectionContainer, ReceivedFriendRequestSectionContainer } from './Drawer.style';
+import { Dimmed, DrawerContainer, LogoutButton, ProfileSectionContainer, ReceivedFriendRequestSectionContainer } from './Drawer.style';
 
 interface DrawerProps {
   handleDimmedClick: React.MouseEventHandler;
 }
 
 const Drawer = ({ handleDimmedClick }: DrawerProps) => {
+  const handleLogoutButtonClick = () => {
+    alert('서버에 로그아웃하겠다고 알릴게요');
+  };
+
   return (
     <>
       <DrawerContainer>
@@ -14,6 +18,7 @@ const Drawer = ({ handleDimmedClick }: DrawerProps) => {
         <ReceivedFriendRequestSection />
         <hr />
         <NotificationSection />
+        <LogoutButton onClick={handleLogoutButtonClick}>로그아웃</LogoutButton>
       </DrawerContainer>
       <Dimmed onClick={handleDimmedClick} />
     </>
