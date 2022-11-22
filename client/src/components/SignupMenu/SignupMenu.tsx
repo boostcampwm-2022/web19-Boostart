@@ -6,26 +6,26 @@ import { FieldValues, useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
 
-const httpPostSignup = async ({ userId, password, username, profileImg }: SignupFormSubmit) => {
-  const formData = new FormData();
-  formData.append('userId', userId);
-  formData.append('password', password);
-  formData.append('username', username);
-  formData.append('profileImg', profileImg[0]);
-  const response = await fetch(`${HOST}/api/v1/auth/signup`, {
-    method: 'post',
-    credentials: 'include',
-    body: formData,
-  });
-  return response;
-};
-
-interface SignupFormSubmit {
+interface SignupData {
   userId: string;
   password: string;
   username: string;
   profileImg: FileList;
 }
+
+const httpPostSignup = async ({ userId, password, username, profileImg }: SignupData) => {
+  const signupFormData = new FormData();
+  signupFormData.append('userId', userId);
+  signupFormData.append('password', password);
+  signupFormData.append('username', username);
+  signupFormData.append('profileImg', profileImg[0]);
+  const response = await fetch(`${HOST}/api/v1/auth/signup`, {
+    method: 'post',
+    credentials: 'include',
+    body: signupFormData,
+  });
+  return response;
+};
 
 const SignupMenu = () => {
   const [profileImg, setProfileImg] = useState<File>();
