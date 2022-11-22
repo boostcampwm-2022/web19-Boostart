@@ -1,7 +1,7 @@
 import React from 'react';
-import FriendsBar from '../components/MainPage/FriendsBar';
-import MainContents from '../components/MainPage/MainContents';
-import GNB from '../components/MainPage/TopBar';
+import FriendsBar from '../components/FriendsBar/FriendsBar';
+import MainContents from '../components/MainContainer/MainContainer';
+import GNB from '../components/TopBar/TopBar';
 
 const MainPage = () => {
   return (

@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import * as S from './style';
+import * as S from './TaskModal.style';
 import ImportanceInput from './ImportanceInput';
 import TagInput from './TagInput';
-import useInput from '../../../hooks/useInput';
+import useInput from '../../hooks/useInput';
+
 interface Props {
   setIsModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }

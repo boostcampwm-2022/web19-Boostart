@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { FriendsList } from 'GlobalType';
-import { dummyFriendList } from '../../common/dummy';
-import * as S from './style';
+import { dummyFriendList } from '../common/dummy';
+import * as S from './FriendsBar.style';
 
 const FriendsBar = () => {
   const [friendsList, setFriendsList] = useState<FriendsList[]>(dummyFriendList);

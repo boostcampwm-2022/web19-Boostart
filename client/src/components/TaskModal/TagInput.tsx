@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
-import { HOST } from '../../../constants';
+import { HOST } from '../../constants';
 import styled from 'styled-components';
-import useInput from '../../../hooks/useInput';
+import useInput from '../../hooks/useInput';
 import { RiCloseLine } from 'react-icons/ri';
 import { Tag } from 'GlobalType';
 

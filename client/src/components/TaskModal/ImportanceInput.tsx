@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import * as S from './style';
+import * as S from './ImportanceInput.style';
 
 const ImportanceInput = () => {
   const [importance, setImportance] = useState(1);

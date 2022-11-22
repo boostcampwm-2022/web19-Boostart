@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import * as S from './style';
+import * as S from './SignupMenu.style';
 import { Link, useNavigate } from 'react-router-dom';
-import { DEFAULT_PROFILE_IMG_URL, HOST } from '../../../constants';
+import { DEFAULT_PROFILE_IMG_URL, HOST } from '../../constants';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';

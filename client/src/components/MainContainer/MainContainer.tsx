@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import TaskModal from '../TaskModal';
+import TaskModal from '../TaskModal/TaskModal';
 import Calendar from './Calendar';
 import Log from './Log';
-import * as S from './style';
+import * as S from './MainContainer.style';
 
 const MainContents = () => {
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);

@@ -1,8 +1,8 @@
 import React from 'react';
-import Clock from './Clock';
-import * as S from './style';
+import Clock from './Clock/Clock';
+import * as S from './TopBar.style';
 
-const GNB = () => {
+const TopBar = () => {
   return (
     <>
       <S.TopBarContainer>
@@ -14,4 +14,4 @@ const GNB = () => {
   );
 };
 
-export default GNB;
+export default TopBar;

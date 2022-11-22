@@ -1,5 +1,5 @@
 import { Task, CompletionCheckBoxStatus } from 'GlobalType';
-import * as S from './style';
+import * as S from './Log.style';
 
 interface taskListProps {
   taskList: Task[];
@@ -16,7 +16,7 @@ const TaskList = ({ taskList, activeTask, completionFilter }: taskListProps) => 
   return (
     <>
       {taskList.map(({ tag_name, idx, title, startedAt, endedAt, importance, location, content, done, isPublic }) => {
-        return ( 
+        return (
           !isTaskFiltered(done) && (
             <S.TaskItem key={'task' + idx} data-idx={idx} data-tag={tag_name} data-active={idx === activeTask} done={done}>
               <S.TaskMainInfos>
