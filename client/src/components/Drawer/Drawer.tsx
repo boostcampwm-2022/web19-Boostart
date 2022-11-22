@@ -36,15 +36,33 @@ const ReceivedFriendRequestSection = () => {
   return (
     <ReceivedFriendRequestSectionContainer>
       {dummyReceivedFriendRequests.map(({ userId, username, profileImg }) => (
-        <>
-          <img src={profileImg} />
-          <div>
-            <div>{username}</div>
-            <div>@{userId}</div>
-          </div>
-        </>
+        <ReceivedFriendRequest userId={userId} username={username} profileImg={profileImg} />
       ))}
     </ReceivedFriendRequestSectionContainer>
+  );
+};
+
+const ReceivedFriendRequest = ({ userId, username, profileImg }: { userId: string; username: string; profileImg: string }) => {
+  const handleAcceptButtonClick = () => {
+    alert(`${userId} 님의 친구 요청을 수락하겠다고 서버에 알릴게요.`);
+  };
+
+  const handleRejectButtonClick = () => {
+    alert(`${userId} 님의 친구 요청을 거절하겠다고 서버에 알릴게요.`);
+  };
+
+  return (
+    <>
+      <img src={profileImg} />
+      <div>
+        <div>{username}</div>
+        <div>@{userId}</div>
+      </div>
+      <div>
+        <button onClick={handleAcceptButtonClick}>수락</button>
+        <button onClick={handleRejectButtonClick}>거절</button>
+      </div>
+    </>
   );
 };
 
