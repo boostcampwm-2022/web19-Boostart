@@ -1,9 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import * as S from './style';
+import * as S from './LoginMenu.style';
 import { Link, useNavigate } from 'react-router-dom';
-import kakaoIcon from '../../../assets/kakao_icon.svg';
-import githubIcon from '../../../assets/github_icon.png';
-import { HOST } from '../../../constants';
+import { HOST } from '../../constants';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
@@ -66,10 +64,10 @@ const LoginMenu = () => {
         </S.LoginForm>
         <S.SocialLogin>
           <a href={`${HOST}/api/v1/auth/login/kakao`}>
-            <S.Icon src={kakaoIcon} />
+            <S.Icon src="./kakao_icon.svg" />
           </a>
           <a href={`${HOST}/api/v1/auth/login/github`}>
-            <S.Icon src={githubIcon} />
+            <S.Icon src="./github_icon.png" />
           </a>
         </S.SocialLogin>
       </S.LoginContainer>

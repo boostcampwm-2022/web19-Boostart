@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import TaskList from './TaskItem';
 import { Task } from 'GlobalType';
-import { dummyTaskList } from '../../../common/dummy';
-import * as S from './style';
+import { dummyTaskList } from '../common/dummy';
+import * as S from './Log.style';
 
 const Log = () => {
   const [selectedElement, setSelectedElement] = useState<number | null>(null);

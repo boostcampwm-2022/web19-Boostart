@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import useCurrentDate from '../../../../hooks/useCurrentDate';
-import { EngMonth, Days, WEEK_LENGTH, Menus } from '../../../../constants';
-import * as S from './style';
+import useCurrentDate from '../../hooks/useCurrentDate';
+import { EngMonth, Days, WEEK_LENGTH, Menus } from '../../constants';
+import * as S from './Calendar.style';
 
 const createArray = (count: number) => {
   return new Array(count).fill(true);
