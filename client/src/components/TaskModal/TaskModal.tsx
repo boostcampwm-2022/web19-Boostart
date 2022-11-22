@@ -3,6 +3,8 @@ import * as S from './TaskModal.style';
 import ImportanceInput from './ImportanceInput';
 import TagInput from './TagInput';
 import useInput from '../../hooks/useInput';
+import LocationInput from './LocationInput';
+import { Location } from 'GlobalType';
 
 interface Props {
   setIsModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
@@ -67,7 +69,7 @@ const TaskModal = (props: Props) => {
                 <tr>
                   <td>위치</td>
                   <td>
-                    <S.InputBar />
+                    <LocationInput locationObject={locationObject} setLocationObject={setLocationObject} />
                   </td>
                 </tr>
                 <tr>
