@@ -16,7 +16,7 @@ const TaskList = ({ taskList, activeTask, completionFilter }: taskListProps) => 
   return (
     <>
       {taskList.map(({ tag_name, idx, title, startedAt, endedAt, importance, location, content, done, isPublic }) => {
-        return (
+        return ( 
           !isTaskFiltered(done) && (
             <S.TaskItem key={'task' + idx} data-idx={idx} data-tag={tag_name} data-active={idx === activeTask} done={done}>
               <S.TaskMainInfos>
@@ -24,7 +24,6 @@ const TaskList = ({ taskList, activeTask, completionFilter }: taskListProps) => 
                 <S.TaskTitle>{title}</S.TaskTitle>
                 {!isPublic && <S.LockerImage src="./lock.svg" />}
               </S.TaskMainInfos>
-
               {idx === activeTask && (
                 <>
                   <hr />

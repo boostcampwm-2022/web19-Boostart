@@ -1,13 +1,19 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import * as S from './style';
 import ImportanceInput from './ImportanceInput';
+import TagInput from './TagInput';
+import useInput from '../../../hooks/useInput';
 interface Props {
   setIsModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }
 const TaskModal = (props: Props) => {
+  const [tagidx, setTagIdx] = useState<number | null>(null);
+
+  useEffect(() => console.log(tagidx), [tagidx]); // 선택된 tag idx로 변경되는지 test 확인 용 코드
+
   return (
     <S.Container>
-      <S.CalendarContainer>
+      <S.ModalContainer>
         {' '}
         <S.CloseButton onClick={(e) => props.setIsModalOpen(false)} />
         <S.Date>{'• 11.12 •'}</S.Date>
@@ -23,7 +29,7 @@ const TaskModal = (props: Props) => {
               <tr>
                 <td>태그</td>
                 <td>
-                  <S.InputBar />
+                  <TagInput setTagIdx={setTagIdx} />
                 </td>
               </tr>
               <tr>
@@ -52,7 +58,7 @@ const TaskModal = (props: Props) => {
         <S.Border>
           <h4>{'더보기  ▼'}</h4>
         </S.Border>
-      </S.CalendarContainer>
+      </S.ModalContainer>
     </S.Container>
   );
 };
