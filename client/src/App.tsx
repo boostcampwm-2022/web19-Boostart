@@ -7,6 +7,7 @@ import { GlobalStyle } from './components/common/GlobalStyle';
 import WelcomePage from './pages/WelcomePage';
 import SignupPage from './pages/SignupPage';
 import MainPage from './pages/MainPage';
+import Drawer from './components/Drawer/Drawer';
 
 function App() {
   return (
