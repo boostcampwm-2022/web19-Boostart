@@ -2,9 +2,7 @@ import React, { useEffect, useState } from 'react';
 import * as S from './TaskModal.style';
 import ImportanceInput from './ImportanceInput';
 import TagInput from './TagInput';
-import LocationInput from './LocationInput';
 import useInput from '../../hooks/useInput';
-//import { Location } from 'GlobalType';
 
 interface Props {
   setIsModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
@@ -14,11 +12,6 @@ const TaskModal = (props: Props) => {
   const [locationObject, setLocationObject] = useState<Location | null>(null); // { location, lng, lat }
 
   const [isDetailOpen, setIsDetailOpen] = useState(false);
-
-  // useEffect(() => {
-  //   console.log(tagidx);
-  //   console.log(locationObject);
-  // }, [tagidx, locationObject]); // 입력된 요소로 변경되는지 test 확인 용 코드
 
   return (
     <S.Container>
