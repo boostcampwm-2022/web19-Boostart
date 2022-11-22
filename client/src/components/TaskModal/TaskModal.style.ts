@@ -13,13 +13,15 @@ export const Container = styled.div`
   align-items: center;
   transform: translateY(-9.5rem);
 `;
-export const ModalContainer = styled.div`
+export const ModalContainer = styled.div<{ isDetailOpen: boolean }>`
+  position: relative; // button 위치고정을 위해
   width: 36.4rem;
-  height: 27.4rem;
+  height: 30.4rem;
+  ${(props) => props.isDetailOpen && 'height : 44rem;'};
+  transition: height 0.3s;
   background: white;
   border-radius: 1rem;
   box-shadow: 0px 0px 10px 5px rgba(175, 175, 175, 0.25);
-
   display: flex;
   flex-direction: column;
   justify-content: top;
@@ -79,6 +81,24 @@ export const InputBar = styled.input`
   }
 `;
 
+export const InputArea = styled.textarea`
+  margin: auto;
+
+  background: var(--color-gray0);
+  border: 1px solid var(--color-gray3);
+  border-radius: 8px;
+  color: black;
+  width: 22.6rem;
+  height: 2.66rem;
+  border-radius: 8px;
+  font-size: 0.8rem;
+  padding: 0.5rem 1rem 0.5rem 1rem;
+  ::placeholder {
+    font-size: 0.8rem;
+    color: var(--color-gray2);
+  }
+`;
+
 export const InputTimeBar = styled.input`
   background: var(--color-gray0);
   border: 1px solid var(--color-gray3);
@@ -104,11 +124,16 @@ export const InputTimeBar = styled.input`
     color: #a3a3a3;
   }
 `;
+
+export const DetailButton = styled.div`
+  cursor: pointer;
+`;
 export const Border = styled.div`
   width: 28rem;
   h4 {
-    color: var(--color-gray7);
-    margin: 0.8rem;
+    color: var(--color-gray6);
+    margin-top: 0.5rem;
+    margin-bottom: 1.1rem;
     overflow: hidden;
     text-align: center;
     font-weight: 600;
@@ -142,5 +167,20 @@ export const CloseButton = styled(CgClose)`
   top: 1.1rem;
   color: var(--color-gray6);
   margin: 3px;
+  cursor: pointer;
+`;
+
+export const SubmitButton = styled.button`
+  background: var(--color-main);
+  position: absolute;
+  bottom: 1.6rem;
+  font-family: 'Press Start 2P', cursive;
+  height: 2.3rem;
+  border: 0px;
+  border-radius: 3rem;
+  color: white;
+  width: 24rem;
+  margin: 2rem;
+  font-size: 0.8rem;
   cursor: pointer;
 `;

@@ -2,19 +2,27 @@ import React, { useEffect, useState } from 'react';
 import * as S from './TaskModal.style';
 import ImportanceInput from './ImportanceInput';
 import TagInput from './TagInput';
+import LocationInput from './LocationInput';
 import useInput from '../../hooks/useInput';
+//import { Location } from 'GlobalType';
 
 interface Props {
   setIsModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }
 const TaskModal = (props: Props) => {
   const [tagidx, setTagIdx] = useState<number | null>(null);
+  const [locationObject, setLocationObject] = useState<Location | null>(null); // { location, lng, lat }
 
-  useEffect(() => console.log(tagidx), [tagidx]); // 선택된 tag idx로 변경되는지 test 확인 용 코드
+  const [isDetailOpen, setIsDetailOpen] = useState(false);
+
+  // useEffect(() => {
+  //   console.log(tagidx);
+  //   console.log(locationObject);
+  // }, [tagidx, locationObject]); // 입력된 요소로 변경되는지 test 확인 용 코드
 
   return (
     <S.Container>
-      <S.ModalContainer>
+      <S.ModalContainer isDetailOpen={isDetailOpen}>
         {' '}
         <S.CloseButton onClick={(e) => props.setIsModalOpen(false)} />
         <S.Date>{'• 11.12 •'}</S.Date>
@@ -55,10 +63,35 @@ const TaskModal = (props: Props) => {
               </tr>
             </tbody>
           </S.FormTable>
+          <S.DetailButton onClick={() => setIsDetailOpen(!isDetailOpen)}>
+            <S.Border>
+              <h4>{isDetailOpen ? '닫기 ▲' : '더보기  ▼'}</h4>
+            </S.Border>
+          </S.DetailButton>
+          {isDetailOpen && (
+            <S.FormTable>
+              <tbody>
+                <tr>
+                  <td>위치</td>
+                  <td>
+                    <S.InputBar />
+                  </td>
+                </tr>
+                <tr>
+                  <td>라벨</td>
+                  <td></td>
+                </tr>
+                <tr>
+                  <td>메모</td>
+                  <td>
+                    <S.InputArea />
+                  </td>
+                </tr>
+              </tbody>
+            </S.FormTable>
+          )}
         </S.TaskForm>
-        <S.Border>
-          <h4>{'더보기  ▼'}</h4>
-        </S.Border>
+        <S.SubmitButton>NEW TASK!</S.SubmitButton>
       </S.ModalContainer>
     </S.Container>
   );
