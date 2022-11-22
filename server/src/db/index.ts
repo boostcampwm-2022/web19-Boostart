@@ -14,7 +14,7 @@ const executeSql = async (sql: string, values?: string[]) => {
     const [rows] = await pool.execute(sql, values);
     return rows;
   } catch (err) {
-    return err;
+    throw err;
   }
 };
 

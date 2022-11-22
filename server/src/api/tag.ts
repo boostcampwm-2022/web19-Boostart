@@ -1,4 +1,5 @@
 import { Router } from 'express';
+import { OkPacket } from 'mysql2';
 import { executeSql } from '../db';
 import { AuthorizedRequest } from '../types';
 import { authenticateToken } from '../utils/auth';
@@ -14,8 +15,12 @@ router.get('/', authenticateToken, async (req: AuthorizedRequest, res) => {
 router.post('/', authenticateToken, async (req: AuthorizedRequest, res) => {
   const { userIdx } = req.user;
   const { title, color } = req.body;
-  const result = await executeSql('insert into tag (title, color, user_idx) values (?, ?, ?)', [title, color, userIdx]);
-  res.status(200).send({ idx: result.insertId });
+  try {
+    const result = (await executeSql('insert into tag (title, color, user_idx) values (?, ?, ?)', [title, color, userIdx])) as OkPacket;
+    res.status(200).send({ idx: result.insertId });
+  } catch {
+    res.sendStatus(409);
+  }
 });
 
 export default router;

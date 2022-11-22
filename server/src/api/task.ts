@@ -1,4 +1,5 @@
 import { Router } from 'express';
+import { OkPacket } from 'mysql2';
 import { executeSql } from '../db';
 import { AuthorizedRequest } from '../types';
 import { authenticateToken } from '../utils/auth';
@@ -31,7 +32,7 @@ router.post('/', authenticateToken, async (req: AuthorizedRequest, res) => {
   if (!validateLongitude(lng)) res.sendStatus(400);
 
   try {
-    const result = await executeSql('insert into task (title, importance, date, started_at, ended_at, lat, lng, content, done, public, tag_idx, user_idx) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', [
+    const result = (await executeSql('insert into task (title, importance, date, started_at, ended_at, lat, lng, content, done, public, tag_idx, user_idx) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', [
       title,
       importance,
       date,
@@ -44,7 +45,7 @@ router.post('/', authenticateToken, async (req: AuthorizedRequest, res) => {
       isPublic,
       tagIdx,
       userIdx,
-    ]);
+    ])) as OkPacket;
 
     const taskIdx = result.insertId;
     await Promise.all(
