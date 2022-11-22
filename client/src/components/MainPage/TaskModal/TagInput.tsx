@@ -8,16 +8,16 @@ import { Tag } from 'GlobalType';
 
 axios.defaults.withCredentials = true; // withCredentials 전역 설정
 
-interface Props {
-  setTagIdx: React.Dispatch<React.SetStateAction<number | undefined>>;
+interface TagInputProps {
+  setTagIdx: React.Dispatch<React.SetStateAction<number | null>>;
 }
 
-const TagInput = (props: Props) => {
+const TagInput = ({ setTagIdx }: TagInputProps) => {
   const [tagList, setTagList] = useState<Tag[]>([]);
   const [tagInput, onTagInputChange, setTagInput] = useInput('');
-  const [isTagFocus, setIsTagFocus] = useState<Boolean>(false); // Input창이 Focus될 때만 List 표시
-  const [selectedTag, setSelectedTag] = useState<Tag>(); // 선택된 하나의 태그
-  const [randomColor, setRandomColor] = useState(''); // 새로운 Tag 추가 시 색깔 랜덤 배정
+  const [selectedTag, setSelectedTag] = useState<Tag | null>(); // 선택된 하나의 태그
+  const [isTagInputFocused, setIsTagInputFocused] = useState<Boolean>(false); // Input창이 Focus될 때만 List 표시
+  const [newTagColor, setNewTagColor] = useState(''); // 새로운 Tag 추가 시 색깔 랜덤 배정
 
   //TAG GET
   useEffect(() => {
@@ -38,14 +38,14 @@ const TagInput = (props: Props) => {
   //하나의 태그 선택
   const setTagItem = (e: React.MouseEvent<HTMLDivElement>) => {
     setSelectedTag(filteredTagList.find((item) => item.idx.toString() === e.currentTarget!.dataset.idx));
-    props.setTagIdx(Number(e.currentTarget.dataset.idx));
+    setTagIdx(Number(e.currentTarget.dataset.idx));
   };
 
   //태그 선택 해제
   const unSetTagItem = () => {
-    setSelectedTag(undefined);
-    props.setTagIdx(undefined);
-    setIsTagFocus(true);
+    setSelectedTag(null);
+    setTagIdx(null);
+    setIsTagInputFocused(true);
     setTagInput('');
   };
 
@@ -54,13 +54,13 @@ const TagInput = (props: Props) => {
     try {
       const newTagData = {
         title: tagInput,
-        color: randomColor,
+        color: newTagColor,
       } as Tag;
       const result = await axios.post(`${HOST}/api/v1/tag`, newTagData);
 
       if (result.status === 200) {
         setSelectedTag(newTagData); // 표시되는 데이터 갱신
-        props.setTagIdx(result.data.idx); // tagIdx(form에서 사용되는 값)를 추가된 Tag의 idx로 갱신
+        setTagIdx(result.data.idx); // tagIdx(form에서 사용되는 값)를 추가된 Tag의 idx로 갱신
       }
     } catch (error) {
       alert('Tag 생성에 실패했습니다.');
@@ -70,45 +70,45 @@ const TagInput = (props: Props) => {
   };
 
   useEffect(() => {
-    setRandomColor(`${Math.round(Math.random() * 0xffff).toString(16)}`);
+    setNewTagColor(`#${Math.round(Math.random() * 0xffff).toString(16)}`);
   }, []);
 
-  // 하나의 태그가 선택되었을 때
-  if (selectedTag !== undefined)
+  if (selectedTag === null || selectedTag == undefined)
+    // 태그 선택 전
     return (
       <TagContainer>
-        <Bar>
-          <SelectedTag color={'#' + selectedTag.color}>
-            {selectedTag.title} <CloseButton onClick={unSetTagItem} />
-          </SelectedTag>
-        </Bar>
+        <InputBar onChange={onTagInputChange} onFocus={(e) => setIsTagInputFocused(true)} onBlur={(e) => setIsTagInputFocused(false)} />
+        {isTagInputFocused ? (
+          <TagList>
+            {filteredTagList.map((item) => {
+              return (
+                <TagListItem key={item.idx} data-idx={item.idx} onMouseDown={setTagItem}>
+                  <TagTitle color={item.color}>
+                    <a>{item.title}</a>
+                  </TagTitle>
+                </TagListItem>
+              );
+            })}
+            {tagInput != '' ? (
+              <TagListItem onMouseDown={postNewTag}>
+                <TagTitle color={newTagColor}>
+                  생성 : <a>{tagInput}</a>
+                </TagTitle>
+              </TagListItem>
+            ) : null}
+          </TagList>
+        ) : null}
       </TagContainer>
     );
 
-  // 태그 선택 전
+  // 하나의 태그가 선택되었을 때
   return (
     <TagContainer>
-      <InputBar onChange={onTagInputChange} onFocus={(e) => setIsTagFocus(true)} onBlur={(e) => setIsTagFocus(false)}></InputBar>
-      {isTagFocus ? (
-        <TagList>
-          {filteredTagList.map((item) => {
-            return (
-              <TagListItem key={item.idx} data-idx={item.idx} onMouseDown={setTagItem}>
-                <TagTitle color={'#' + item.color}>
-                  <a>{item.title}</a>
-                </TagTitle>
-              </TagListItem>
-            );
-          })}
-          {tagInput != '' ? (
-            <TagListItem onMouseDown={postNewTag}>
-              <TagTitle color={'#' + randomColor}>
-                생성 : <a>{tagInput}</a>
-              </TagTitle>
-            </TagListItem>
-          ) : null}
-        </TagList>
-      ) : null}
+      <Bar>
+        <SelectedTag color={selectedTag?.color}>
+          {selectedTag!.title} <CloseButton onClick={unSetTagItem} />
+        </SelectedTag>
+      </Bar>
     </TagContainer>
   );
 };

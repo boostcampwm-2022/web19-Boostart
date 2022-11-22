@@ -7,7 +7,7 @@ interface Props {
   setIsModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }
 const TaskModal = (props: Props) => {
-  const [tagidx, setTagIdx] = useState<number | undefined>();
+  const [tagidx, setTagIdx] = useState<number | null>(null);
 
   useEffect(() => console.log(tagidx), [tagidx]); // 선택된 tag idx로 변경되는지 test 확인 용 코드
 
@@ -29,7 +29,7 @@ const TaskModal = (props: Props) => {
               <tr>
                 <td>태그</td>
                 <td>
-                  <TagInput setTagIdx={setTagIdx}></TagInput>
+                  <TagInput setTagIdx={setTagIdx} />
                 </td>
               </tr>
               <tr>
