@@ -8,8 +8,15 @@ import { executeSql } from '../db';
 import jwt from 'jsonwebtoken';
 import { AuthorizedRequest } from '../types';
 import crypto from 'crypto';
+import fileUpload from 'express-fileupload';
 
 const router = express.Router();
+
+router.use(
+  fileUpload({
+    createParentPath: true,
+  })
+);
 
 const generateSalt = () => {
   return crypto.randomBytes(64).toString('hex');
@@ -118,12 +125,16 @@ router.get('/login/:oauth_type/callback', async (req, res) => {
   res.redirect(`${CLIENT}/${user ? 'main' : 'signup'}`);
 });
 
-router.post('/signup', async (req, res) => {
+router.post('/signup', async (req: any, res) => {
   const { userId, password, username } = req.body;
-  const profileImg = 'profile'; // TODO: multer
-  // req.file.filename;
+  let profileImgFilename = '';
+  if (req.files) {
+    const { profileImg } = req.files;
+    profileImgFilename = profileImg.name; // TODO: 해시하기
+    profileImg.mv('./uploads/' + profileImgFilename);
+  }
 
-  if (!(userId && password && username && profileImg)) return res.sendStatus(400);
+  if (!(userId && password && username)) return res.sendStatus(400);
   // TODO: 유효성 검증
 
   const token = req.cookies.token;
@@ -151,8 +162,8 @@ router.post('/signup', async (req, res) => {
   const salt = generateSalt();
   const encrypted = encrypt(password, salt);
   await (oauthType
-    ? executeSql('insert into `user` (user_id, password, username, oauth_type, oauth_email, salt) values (?, ?, ?, ?, ?, ?)', [userId, encrypted, username, oauthType, oauthEmail, salt])
-    : executeSql('insert into `user` (user_id, password, username, salt) values (?, ?, ?, ?)', [userId, encrypted, username, salt]));
+    ? executeSql('insert into `user` (user_id, password, username, profile_img, oauth_type, oauth_email, salt) values (?, ?, ?, ?, ?, ?, ?)', [userId, encrypted, username, profileImgFilename, oauthType, oauthEmail, salt])
+    : executeSql('insert into `user` (user_id, password, username, profile_img, salt) values (?, ?, ?, ?, ?)', [userId, encrypted, username, profileImgFilename, salt]));
   console.log(`회원가입 성공: ${userId}, ${username}`);
   res.sendStatus(201);
 });
