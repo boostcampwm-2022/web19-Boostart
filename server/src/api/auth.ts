@@ -6,7 +6,7 @@ import { authenticateToken, generateAccessToken } from '../utils/auth';
 import { generateUnionTypeChecker } from '../utils/validate';
 import { executeSql } from '../db';
 import jwt from 'jsonwebtoken';
-import { AuthorizedRequest } from '../types';
+import { AuthorizedRequest, SignupRequest } from '../types';
 import crypto from 'crypto';
 import fileUpload from 'express-fileupload';
 
@@ -125,7 +125,7 @@ router.get('/login/:oauth_type/callback', async (req, res) => {
   res.redirect(`${CLIENT}/${user ? 'main' : 'signup'}`);
 });
 
-router.post('/signup', async (req: any, res) => {
+router.post('/signup', async (req: SignupRequest, res) => {
   const { userId, password, username } = req.body;
   let profileImgFilename = '';
   if (req.files) {
