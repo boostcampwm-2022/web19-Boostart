@@ -223,7 +223,7 @@ export const CheckBoxLabel = styled.label`
   font-size: 0.75rem;
 `;
 
-export const Test = styled.input`
+export const CheckBox = styled.input`
   width: 0.625rem;
   margin-right: 0.25rem;
   border-radius: 0.5rem;

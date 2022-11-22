@@ -99,10 +99,8 @@ const Log = () => {
 
   const handleCheckBoxChange = (e: React.ChangeEvent, type: string) => {
     if (!(e.target instanceof HTMLInputElement)) return;
-    const isCompleteCheckBox = type === 'complete';
     const isChecked = e.target.checked;
-    if (isCompleteCheckBox) setCompletionCheckBoxStatus({ ...completionCheckBoxStatus, complete: isChecked });
-    else setCompletionCheckBoxStatus({ ...completionCheckBoxStatus, incomplete: isChecked });
+    setCompletionCheckBoxStatus({ ...completionCheckBoxStatus, [type]: isChecked });
   };
 
   useEffect(() => {
@@ -138,9 +136,9 @@ const Log = () => {
           <S.DateController>{'< 11.12 >'}</S.DateController>
           <S.CheckBoxContainer>
             <S.CheckBoxLabel htmlFor="complete">완료</S.CheckBoxLabel>
-            <S.Test type="checkbox" id="complete" defaultChecked={completionCheckBoxStatus.complete} onChange={(e) => handleCheckBoxChange(e, 'complete')} />
+            <S.CheckBox type="checkbox" id="complete" defaultChecked={completionCheckBoxStatus.complete} onChange={(e) => handleCheckBoxChange(e, 'complete')} />
             <S.CheckBoxLabel htmlFor="incomplete">미완료</S.CheckBoxLabel>
-            <S.Test type="checkbox" id="incomplete" defaultChecked={completionCheckBoxStatus.incomplete} onChange={(e) => handleCheckBoxChange(e, 'incomplete')} />
+            <S.CheckBox type="checkbox" id="incomplete" defaultChecked={completionCheckBoxStatus.incomplete} onChange={(e) => handleCheckBoxChange(e, 'incomplete')} />
           </S.CheckBoxContainer>
         </S.LogNavBarSection>
         <S.LogMainSection ref={taskContainerRef}>
