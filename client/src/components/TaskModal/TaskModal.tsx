@@ -1,6 +1,6 @@
 import React from 'react';
 import * as S from './TaskModal.style';
-import ImportanceInput from './ImportanceInput/ImportanceInput';
+import ImportanceInput from './ImportanceInput';
 interface Props {
   setIsModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }
