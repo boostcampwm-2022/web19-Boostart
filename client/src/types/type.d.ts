@@ -30,4 +30,16 @@ declare module 'GlobalType' {
     done: boolean;
     labels: LabelData[];
   }
+
+  export interface Tag {
+    idx: number;
+    title: string;
+    color: string;
+    
+    }
+
+  export interface CompletionCheckBoxStatus {
+    complete: boolean;
+    incomplete: boolean;
+  }
 }

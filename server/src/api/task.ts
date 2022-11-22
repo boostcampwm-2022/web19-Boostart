@@ -11,11 +11,51 @@ router.get('/', authenticateToken, async (req: AuthorizedRequest, res) => {
   res.json(rows);
 });
 
+const MAX_IMPORTANCE = 5;
+const validateImportance = (importance: number) => {
+  return importance <= MAX_IMPORTANCE;
+};
+const validateLatitude = (lat: number) => {
+  return lat >= -90 && lat <= 90;
+};
+const validateLongitude = (lng: number) => {
+  return lng >= -180 && lng <= 180;
+};
+
 router.post('/', authenticateToken, async (req: AuthorizedRequest, res) => {
   const { userIdx } = req.user;
-  const { title, importance, startedAt, endedAt, location, isPublic, tagIdx, labels } = req.body;
-  const result = await executeSql('insert into task (title, importance, public, user_idx) values (?, ?, ?, ?)', [title, importance, isPublic, userIdx]);
-  res.send(200);
+  const { title, importance, startedAt, endedAt, lat, lng, isPublic, tagIdx, content, done, date, labels } = req.body;
+
+  if (!validateImportance(importance)) res.sendStatus(400);
+  if (!validateLatitude(lat)) res.sendStatus(400);
+  if (!validateLongitude(lng)) res.sendStatus(400);
+
+  try {
+    const result = await executeSql('insert into task (title, importance, date, started_at, ended_at, lat, lng, content, done, public, tag_idx, user_idx) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', [
+      title,
+      importance,
+      date,
+      startedAt,
+      endedAt,
+      lat,
+      lng,
+      content,
+      done,
+      isPublic,
+      tagIdx,
+      userIdx,
+    ]);
+
+    const taskIdx = result.insertId;
+    await Promise.all(
+      labels.map(({ labelIdx, amount }) => {
+        executeSql('insert into task_label (task_idx, label_idx, amount) value (?, ?, ?)', [taskIdx, labelIdx, amount]);
+      })
+    );
+    res.sendStatus(200);
+  } catch (error) {
+    res.sendStatus(400);
+  }
 });
 
 export default router;
