@@ -1,5 +1,5 @@
 declare module 'GlobalType' {
-  export interface FriendsList {
+  interface FriendsList {
     idx: number;
     userId: string;
     username: string;
@@ -14,7 +14,7 @@ declare module 'GlobalType' {
     unit: string;
   }
 
-  export interface Task {
+  interface Task {
     idx: number;
     title: string;
     importance: number;
@@ -31,14 +31,13 @@ declare module 'GlobalType' {
     labels: LabelData[];
   }
 
-  export interface Tag {
+  interface Tag {
     idx: number;
     title: string;
     color: string;
-    
-    }
+  }
 
-  export interface CompletionCheckBoxStatus {
+  interface CompletionCheckBoxStatus {
     complete: boolean;
     incomplete: boolean;
   }
