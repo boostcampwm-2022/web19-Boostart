@@ -72,7 +72,7 @@ const Calendar = () => {
             return <div key={'emptyBox' + idx}></div>;
           })}
           {monthDays.map((_, idx) => {
-            return <DateContiner key={'date' + (idx + 1)} calendarYear={calendarDate.getFullYear()} calendarDate={idx + 1} calendarMonth={calendarDate.getMonth()}></DateContiner>;
+            return <DateContainer key={'date' + (idx + 1)} calendarYear={calendarDate.getFullYear()} calendarDate={idx + 1} calendarMonth={calendarDate.getMonth()}></DateContainer>;
           })}
         </S.DateSelector>
         <S.MenuSelector>
@@ -89,7 +89,7 @@ const Calendar = () => {
   );
 };
 
-const DateContiner = ({ calendarYear, calendarMonth, calendarDate }: DateContainerProps) => {
+const DateContainer = ({ calendarYear, calendarMonth, calendarDate }: DateContainerProps) => {
   const { getNewDate, getYear, getMonth, getDate } = useCurrentDate();
   const isToday = calendarYear === getYear() && calendarMonth === getMonth() && calendarDate === getDate();
   const selectCurrentDate = () => {

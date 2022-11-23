@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import * as S from './Log.style';
 
 interface DateSelectArrowProps {
-  direction: string;
+  direction: 'prev' | 'next';
 }
 
 export const DateController = styled.span`
