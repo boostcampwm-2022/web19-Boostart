@@ -1,18 +1,9 @@
 import { useState } from 'react';
+import styled from 'styled-components';
 import { dummyNotifications, dummyReceivedFriendRequests } from '../common/dummy';
-import {
-  DrawerContainer,
-  LogoutButton,
-  ProfileEditButton,
-  ProfileEditForm,
-  ProfileSectionContainer,
-  PROFILE_EDIT_FORM_Z_INDEX,
-  PROFILE_EDIT_FORM_TOP,
-  PROFILE_EDIT_FORM_LEFT,
-  PROFILE_EDIT_FORM_TRANFORM,
-  ReceivedFriendRequestSectionContainer,
-} from './Drawer.style';
+import { PROFILE_EDIT_FORM_Z_INDEX, PROFILE_EDIT_FORM_TOP, PROFILE_EDIT_FORM_LEFT, PROFILE_EDIT_FORM_TRANFORM } from './Drawer.style';
 import Modal from './Modal';
+import * as S from './Drawer.style';
 
 const Drawer = ({ open }: { open: boolean }) => {
   const [isProfileEditModalOpen, setIsProfileEditModalOpen] = useState(false);
@@ -27,18 +18,22 @@ const Drawer = ({ open }: { open: boolean }) => {
 
   return (
     <>
-      <DrawerContainer open={open}>
-        <ProfileEditButton onClick={handleProfileEditButtonClick}>프로필 수정</ProfileEditButton>
+      <S.Drawer open={open}>
+        <S.ProfileEditButton onClick={handleProfileEditButtonClick} href="#">
+          프로필 수정
+        </S.ProfileEditButton>
         <ProfileSection />
-        <hr />
+        <S.HorizontalRule />
         <ReceivedFriendRequestSection />
-        <hr />
+        <S.HorizontalRule />
         <NotificationSection />
-        <LogoutButton onClick={handleLogoutButtonClick}>로그아웃</LogoutButton>
-      </DrawerContainer>
+        <S.LogoutButton onClick={handleLogoutButtonClick} href="#">
+          로그아웃
+        </S.LogoutButton>
+      </S.Drawer>
       {isProfileEditModalOpen && (
         <Modal
-          component={<ProfileEditForm>프로필 수정 모달</ProfileEditForm>}
+          component={<S.ProfileEditForm>프로필 수정 모달</S.ProfileEditForm>}
           top={PROFILE_EDIT_FORM_TOP}
           left={PROFILE_EDIT_FORM_LEFT}
           transform={PROFILE_EDIT_FORM_TRANFORM}
@@ -52,23 +47,28 @@ const Drawer = ({ open }: { open: boolean }) => {
 
 const ProfileSection = () => {
   return (
-    <ProfileSectionContainer>
-      <img src="https://avatars.githubusercontent.com/u/55306894?s=80&u=aedb7854f1fd10d8eb6dc1272f1583dbb255f5b8&v=4" width="60" />
-      <div>
-        <div>모작 님 반갑습니다</div>
-        <div>@mojac</div>
-      </div>
-    </ProfileSectionContainer>
+    <S.ProfileSection>
+      <S.MyProfileImage src="https://avatars.githubusercontent.com/u/55306894?s=80&u=aedb7854f1fd10d8eb6dc1272f1583dbb255f5b8&v=4" />
+      <S.ProfileInfo>
+        <S.Greeting>
+          <S.Username>모작</S.Username> 님 반갑습니다
+        </S.Greeting>
+        <S.UserId>@mojac</S.UserId>
+      </S.ProfileInfo>
+    </S.ProfileSection>
   );
 };
 
 const ReceivedFriendRequestSection = () => {
   return (
-    <ReceivedFriendRequestSectionContainer>
-      {dummyReceivedFriendRequests.map(({ userId, username, profileImg }) => (
-        <ReceivedFriendRequest userId={userId} username={username} profileImg={profileImg} />
-      ))}
-    </ReceivedFriendRequestSectionContainer>
+    <S.ReceivedFriendRequestSection>
+      <S.SectionHeader>나에게 온 친구 요청</S.SectionHeader>
+      <div>
+        {dummyReceivedFriendRequests.map(({ userId, username, profileImg }) => (
+          <ReceivedFriendRequest userId={userId} username={username} profileImg={profileImg} />
+        ))}
+      </div>
+    </S.ReceivedFriendRequestSection>
   );
 };
 
@@ -82,27 +82,30 @@ const ReceivedFriendRequest = ({ userId, username, profileImg }: { userId: strin
   };
 
   return (
-    <>
-      <img src={profileImg} />
-      <div>
-        <div>{username}</div>
-        <div>@{userId}</div>
-      </div>
-      <div>
-        <button onClick={handleAcceptButtonClick}>수락</button>
-        <button onClick={handleRejectButtonClick}>거절</button>
-      </div>
-    </>
+    <S.ReceivedFriendRequest>
+      <S.ReceivedFriendProfileImage src={profileImg} />
+      <S.ReceivedFriendRequestInfo>
+        <S.Username>{username}</S.Username>
+        <S.UserId>@{userId}</S.UserId>
+      </S.ReceivedFriendRequestInfo>
+      <S.ReceivedFriendRequestHandlingButtonSection>
+        <S.RecievedFriendRequestRejectButton onClick={handleRejectButtonClick} />
+        <S.RecievedFriendRequestAcceptButton onClick={handleAcceptButtonClick} />
+      </S.ReceivedFriendRequestHandlingButtonSection>
+    </S.ReceivedFriendRequest>
   );
 };
 
 const NotificationSection = () => {
   return (
-    <>
-      {dummyNotifications.map(({ idx, content }) => (
-        <div>{content}</div>
-      ))}
-    </>
+    <S.NotificationSection>
+      <S.SectionHeader>알림</S.SectionHeader>
+      <div>
+        {dummyNotifications.map(({ idx, content }) => (
+          <S.Notification>{content}</S.Notification>
+        ))}
+      </div>
+    </S.NotificationSection>
   );
 };
 
