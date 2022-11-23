@@ -12,6 +12,7 @@
     "jsonwebtoken": "^8.5.1",
     "mysql2": "^2.3.3",
     "qs": "^6.11.0",
+    "socket.io": "^4.5.4",
     "swagger-cli": "^4.0.4",
     "swagger-ui-express": "^4.6.0",
     "yamljs": "^0.3.0"
