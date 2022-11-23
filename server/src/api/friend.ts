@@ -48,4 +48,32 @@ router.delete('/:user_idx', authenticateToken, async (req: AuthorizedRequest, re
   }
 });
 
+router.put('/request/:user_idx', authenticateToken, async (req: AuthorizedRequest, res) => {
+  const { userIdx } = req.user;
+  const friendIdx = req.params.user_idx;
+  try {
+    const friendRequest = (await executeSql('select * from friendship where (sender_idx = ? and receiver_idx = ?) or (sender_idx = ? and receiver_idx = ?)', [
+      userIdx.toString(),
+      friendIdx.toString(),
+      friendIdx.toString(),
+      userIdx.toString(),
+    ])) as RowDataPacket;
+
+    if (friendRequest.length === 0) {
+      await executeSql('insert into friendship (sender_idx, receiver_idx, accepted) values (?, ?, false)', [userIdx.toString(), friendIdx.toString()]);
+      return res.sendStatus(200);
+    }
+
+    const { sender_idx: senderIdx, accepted } = friendRequest[0];
+
+    if (accepted) return res.status(404).json({ msg: '이미 친구예요.' });
+    if (senderIdx === userIdx) return res.status(404).json({ msg: '이미 친구 요청을 보냈어요.' });
+
+    await executeSql('update friendship set accepted = true where sender_idx = ? and receiver_idx = ?;', [friendIdx.toString(), userIdx.toString()]);
+    return res.status(200).json({ msg: '이미 나에게 친구 요청을 보낸 사용자예요. 자동으로 친구가 되었어요.' });
+  } catch {
+    res.sendStatus(500);
+  }
+});
+
 export default router;
