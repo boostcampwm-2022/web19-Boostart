@@ -1,8 +1,26 @@
 import { useState } from 'react';
 import { dummyNotifications, dummyReceivedFriendRequests } from '../common/dummy';
-import { DrawerContainer, LogoutButton, ProfileSectionContainer, ReceivedFriendRequestSectionContainer } from './Drawer.style';
+import {
+  DrawerContainer,
+  LogoutButton,
+  ProfileEditButton,
+  ProfileEditForm,
+  ProfileSectionContainer,
+  PROFILE_EDIT_FORM_Z_INDEX,
+  PROFILE_EDIT_FORM_TOP,
+  PROFILE_EDIT_FORM_LEFT,
+  PROFILE_EDIT_FORM_TRANFORM,
+  ReceivedFriendRequestSectionContainer,
+} from './Drawer.style';
+import Modal from './Modal';
 
 const Drawer = () => {
+  const [isProfileEditModalOpen, setIsProfileEditModalOpen] = useState(false);
+
+  const handleProfileEditButtonClick = () => {
+    setIsProfileEditModalOpen(true);
+  };
+
   const handleLogoutButtonClick = () => {
     alert('서버에 로그아웃하겠다고 알릴게요');
   };
@@ -10,6 +28,7 @@ const Drawer = () => {
   return (
     <>
       <DrawerContainer>
+        <ProfileEditButton onClick={handleProfileEditButtonClick}>프로필 수정</ProfileEditButton>
         <ProfileSection />
         <hr />
         <ReceivedFriendRequestSection />
@@ -17,6 +36,16 @@ const Drawer = () => {
         <NotificationSection />
         <LogoutButton onClick={handleLogoutButtonClick}>로그아웃</LogoutButton>
       </DrawerContainer>
+      {isProfileEditModalOpen && (
+        <Modal
+          component={<ProfileEditForm>프로필 수정 모달</ProfileEditForm>}
+          top={PROFILE_EDIT_FORM_TOP}
+          left={PROFILE_EDIT_FORM_LEFT}
+          transform={PROFILE_EDIT_FORM_TRANFORM}
+          zIndex={PROFILE_EDIT_FORM_Z_INDEX}
+          handleDimmedClick={() => setIsProfileEditModalOpen(false)}
+        />
+      )}
     </>
   );
 };
