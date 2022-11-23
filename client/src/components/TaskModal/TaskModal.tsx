@@ -3,13 +3,13 @@ import * as S from './TaskModal.style';
 import ImportanceInput from './ImportanceInput';
 import TagInput from './TagInput';
 import useInput from '../../hooks/useInput';
+import { Tag } from 'GlobalType';
 
 interface Props {
   setIsModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }
 const TaskModal = (props: Props) => {
-  const [tagidx, setTagIdx] = useState<number | null>(null);
-  const [locationObject, setLocationObject] = useState<Location | null>(null); // { location, lng, lat }
+  const [tagObject, setTagObject] = useState<Tag | null>(null);
 
   const [isDetailOpen, setIsDetailOpen] = useState(false);
 
@@ -31,7 +31,7 @@ const TaskModal = (props: Props) => {
               <tr>
                 <td>태그</td>
                 <td>
-                  <TagInput setTagIdx={setTagIdx} />
+                  <TagInput tagObject={tagObject} setTagObject={setTagObject} />
                 </td>
               </tr>
               <tr>

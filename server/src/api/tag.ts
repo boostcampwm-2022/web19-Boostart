@@ -28,8 +28,8 @@ router.post('/color/:tag_idx', authenticateToken, async (req: AuthorizedRequest,
   const tagIdx = req.params.tag_idx;
   const { color } = req.body;
   try {
-    const result = await executeSql('update tag set color = ? where idx = ? and user_idx = ?', [color, tagIdx, userIdx]);
-    res.status(200);
+    await executeSql('update tag set color = ? where idx = ? and user_idx = ?', [color, tagIdx, userIdx]);
+    res.sendStatus(200);
   } catch {
     res.sendStatus(403);
   }
