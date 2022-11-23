@@ -29,7 +29,7 @@ const TagInput = ({ tagObject, setTagObject }: TagInputProps) => {
 
   //TAG GET
   useEffect(() => {
-    const fetchData = async () => {
+    const getTagList = async () => {
       try {
         const result = await axios.get(`${HOST}/api/v1/tag`);
         const list = result.data.sort((a: Tag, b: Tag) => b.count - a.count);
@@ -38,7 +38,7 @@ const TagInput = ({ tagObject, setTagObject }: TagInputProps) => {
         console.log(error);
       }
     };
-    fetchData();
+    getTagList();
   }, [reload]);
 
   //검색된 Tag
@@ -114,9 +114,9 @@ const TagInput = ({ tagObject, setTagObject }: TagInputProps) => {
               <TagTitle color={color} create={false}>
                 <span>{title}</span>
                 {count === 0 && (
-                  <DelIcon data-idx={idx} onMouseDown={deleteTag}>
+                  <DeleteIcon data-idx={idx} onMouseDown={deleteTag}>
                     삭제
-                  </DelIcon>
+                  </DeleteIcon>
                 )}
               </TagTitle>
             </TagListItem>
@@ -197,7 +197,7 @@ const TagTitle = styled.div<{ color: string; create: boolean }>`
   }
 `;
 
-const DelIcon = styled.div`
+const DeleteIcon = styled.div`
   text-align: right;
   cursor: pointer;
   color: var(--color-gray6);
