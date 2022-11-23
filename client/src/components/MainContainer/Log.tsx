@@ -123,7 +123,7 @@ const Log = () => {
       <S.LogTitle>LOG</S.LogTitle>
       <S.LogContainer>
         <S.TimeBarSection>
-          <img src="./timebar-clock.svg" alt="TimeBar" />
+          <img src="/timebar-clock.svg" alt="TimeBar" />
           <S.TimeBar>
             <S.TimeMarker startedAt={timeMarkerData[0]} duration={timeMarkerData[1]}></S.TimeMarker>
           </S.TimeBar>

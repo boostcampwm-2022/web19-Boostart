@@ -11,5 +11,5 @@ export default function RestrictedRoute({ component: RouteComponent }: Props): R
   const isAuthenticated = useAuthorization();
 
   if (isAuthenticated === undefined) return <></>;
-  return isAuthenticated === true ? <Navigate to="/main" /> : <RouteComponent />;
+  return isAuthenticated === true ? <Navigate to="/main/log" /> : <RouteComponent />;
 }

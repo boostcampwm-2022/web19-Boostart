@@ -37,7 +37,7 @@ const LoginMenu = () => {
 
   const loginFormSubmit = async (d: any) => {
     const response = await httpPostLogin(d);
-    if (response.ok) navigate('/main');
+    if (response.ok) navigate('/main/log');
     else {
       const { msg } = await response.json();
       setErr(msg);

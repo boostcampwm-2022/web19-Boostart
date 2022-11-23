@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import useCurrentDate from '../../hooks/useCurrentDate';
 import { EngMonth, Days, WEEK_LENGTH, Menus } from '../../constants';
 import * as S from './Calendar.style';
@@ -43,7 +44,6 @@ const Calendar = () => {
   };
 
   useEffect(() => {
-    //전역 date state 가 변경되면 달력 state도 함께 변경
     setCalendarDate(new Date(currentDate));
   }, [currentDate]);
 
@@ -54,7 +54,6 @@ const Calendar = () => {
         <S.MonthSelector>
           <S.CurrentYear>{calendarDate.getFullYear()}</S.CurrentYear>
           <S.CurrentMonth>{EngMonth[calendarDate.getMonth()]}</S.CurrentMonth>
-          {/* 달력 변경시에는 달력만 변경되도록 전역 state가 아닌 별도 state로 관리 */}
           <S.Arrow direction="left" onClick={handlePrevMonthClick}>
             {'<'}
           </S.Arrow>
@@ -78,9 +77,11 @@ const Calendar = () => {
         <S.MenuSelector>
           {Menus.map((menu) => {
             return (
-              <S.MenuButton key={menu} data-menu={menu} onClick={handleMenuClick} isActivatedMenu={menu === selectedMenu}>
-                {menu}
-              </S.MenuButton>
+              <Link key={menu} style={{ textDecoration: 'none' }} to={menu.toLowerCase()}>
+                <S.MenuButton data-menu={menu} onClick={handleMenuClick} isActivatedMenu={menu === selectedMenu}>
+                  {menu}
+                </S.MenuButton>
+              </Link>
             );
           })}
         </S.MenuSelector>

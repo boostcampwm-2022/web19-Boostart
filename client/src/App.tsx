@@ -7,6 +7,7 @@ import { GlobalStyle } from './components/common/GlobalStyle';
 import WelcomePage from './pages/WelcomePage';
 import SignupPage from './pages/SignupPage';
 import MainPage from './pages/MainPage';
+import Calendar from './components/MainContainer/Calendar';
 
 function App() {
   return (
@@ -15,7 +16,7 @@ function App() {
       <Routes>
         <Route path="/" element={<RestrictedRoute component={WelcomePage} />} />
         <Route path="/signup" element={<SignupPage />} />
-        <Route path="/main" element={<PrivateRoute component={MainPage} />} />
+        <Route path="/main/*" element={<PrivateRoute component={MainPage} />} />
       </Routes>
     </Router>
   );

@@ -22,7 +22,7 @@ const TaskList = ({ taskList, activeTask, completionFilter }: taskListProps) => 
               <S.TaskMainInfos>
                 <S.TaskTime>{startedAt}</S.TaskTime>
                 <S.TaskTitle>{title}</S.TaskTitle>
-                {!isPublic && <S.LockerImage src="./lock.svg" />}
+                {!isPublic && <S.LockerImage src="/lock.svg" />}
               </S.TaskMainInfos>
               {idx === activeTask && (
                 <>
