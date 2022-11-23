@@ -23,4 +23,16 @@ router.post('/', authenticateToken, async (req: AuthorizedRequest, res) => {
   }
 });
 
+router.delete('/:tag_idx', authenticateToken, async (req: AuthorizedRequest, res) => {
+  const { userIdx } = req.user;
+  const tagIdx = req.params.tag_idx;
+
+  try {
+    await executeSql('delete from tag where user_idx = ? and idx = ?', [userIdx.toString(), tagIdx]);
+    res.sendStatus(200);
+  } catch (error) {
+    res.sendStatus(403);
+  }
+});
+
 export default router;
