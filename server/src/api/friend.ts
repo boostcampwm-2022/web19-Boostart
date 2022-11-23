@@ -94,4 +94,16 @@ router.patch('/accept/:user_idx', authenticateToken, async (req: AuthorizedReque
   }
 });
 
+router.delete('/accept/:user_idx', authenticateToken, async (req: AuthorizedRequest, res) => {
+  const { userIdx } = req.user;
+  const friendIdx = req.params.user_idx;
+  try {
+    const { affectedRows } = (await executeSql('delete from friendship where receiver_idx = ? and sender_idx = ? and accepted = false', [userIdx.toString(), friendIdx.toString()])) as RowDataPacket;
+    if (affectedRows === 0) return res.status(404).json({ msg: '존재하지 않는 친구 요청이에요.' });
+    res.sendStatus(200);
+  } catch {
+    res.sendStatus(500);
+  }
+});
+
 export default router;
