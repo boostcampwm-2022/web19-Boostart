@@ -7,10 +7,16 @@ export const DRAWER_Z_INDEX = 999;
 export const DRAWER_TOP = '0';
 export const DRAWER_RIGHT = '0';
 
-export const DrawerContainer = styled.div`
+export const DrawerContainer = styled.div<{ open: boolean }>`
+  position: fixed;
+  z-index: ${DRAWER_Z_INDEX};
+  top: 0;
+  right: -25rem;
   width: ${DRAWER_WIDTH};
   height: ${DRAWER_HEIGHT};
   background-color: whitesmoke;
+  transition: all ease 1s;
+  ${(props) => props.open && 'transform: translateX(-25rem);'}
 `;
 
 export const ProfileSectionContainer = styled.div`

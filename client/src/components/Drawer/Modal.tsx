@@ -21,7 +21,7 @@ const ModalContent = styled.div<{ zIndex: number; top?: string; bottom?: string;
   ${(props) => props.transform && `transform: ${props.transform};`}
 `;
 
-const Dimmed = styled.div<{ zIndex: number }>`
+export const Dimmed = styled.div<{ zIndex: number }>`
   position: fixed;
   z-index: ${(props) => props.zIndex};
   top: 0;

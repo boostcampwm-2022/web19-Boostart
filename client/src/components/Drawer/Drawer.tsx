@@ -14,7 +14,7 @@ import {
 } from './Drawer.style';
 import Modal from './Modal';
 
-const Drawer = () => {
+const Drawer = ({ open }: { open: boolean }) => {
   const [isProfileEditModalOpen, setIsProfileEditModalOpen] = useState(false);
 
   const handleProfileEditButtonClick = () => {
@@ -27,7 +27,7 @@ const Drawer = () => {
 
   return (
     <>
-      <DrawerContainer>
+      <DrawerContainer open={open}>
         <ProfileEditButton onClick={handleProfileEditButtonClick}>프로필 수정</ProfileEditButton>
         <ProfileSection />
         <hr />
