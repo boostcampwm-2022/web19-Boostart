@@ -69,7 +69,7 @@ router.put('/request/:user_idx', authenticateToken, async (req: AuthorizedReques
     if (accepted) return res.status(404).json({ msg: '이미 친구예요.' });
     if (senderIdx === userIdx) return res.status(404).json({ msg: '이미 친구 요청을 보냈어요.' });
 
-    await executeSql('update friendship set accepted = true where sender_idx = ? and receiver_idx = ?;', [friendIdx.toString(), userIdx.toString()]);
+    await executeSql('update friendship set accepted = true where sender_idx = ? and receiver_idx = ?', [friendIdx.toString(), userIdx.toString()]);
     return res.status(200).json({ msg: '이미 나에게 친구 요청을 보낸 사용자예요. 자동으로 친구가 되었어요.' });
   } catch {
     res.sendStatus(500);
