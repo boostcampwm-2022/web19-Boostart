@@ -2,18 +2,27 @@ import React, { useState } from 'react';
 import * as S from './SignupMenu.style';
 import { Link, useNavigate } from 'react-router-dom';
 import { DEFAULT_PROFILE_IMG_URL, HOST } from '../../constants';
-import { useForm } from 'react-hook-form';
+import { FieldValues, useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
 
-const httpPostSignup = async ({ userId, password, username }: any) => {
+interface SignupData {
+  userId: string;
+  password: string;
+  username: string;
+  profileImg: FileList;
+}
+
+const httpPostSignup = async ({ userId, password, username, profileImg }: SignupData) => {
+  const signupFormData = new FormData();
+  signupFormData.append('userId', userId);
+  signupFormData.append('password', password);
+  signupFormData.append('username', username);
+  signupFormData.append('profileImg', profileImg[0]);
   const response = await fetch(`${HOST}/api/v1/auth/signup`, {
     method: 'post',
     credentials: 'include',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({ userId, password, username }),
+    body: signupFormData,
   });
   return response;
 };
@@ -46,8 +55,8 @@ const SignupMenu = () => {
     }
   };
 
-  const signupFormSubmit = async (d: any) => {
-    const response = await httpPostSignup(d);
+  const signupFormSubmit = async ({ userId, password, username, profileImg }: FieldValues) => {
+    const response = await httpPostSignup({ userId, password, username, profileImg });
     if (response.ok) {
       navigate('/');
     } else {
@@ -64,7 +73,7 @@ const SignupMenu = () => {
           <S.ProfileImage>
             <img src={profileImg ? URL.createObjectURL(profileImg) : DEFAULT_PROFILE_IMG_URL} alt="profile-img" />
             <S.EditRound>
-              <input type="file" onChange={handleProfileImageChange} />
+              <input {...register('profileImg')} type="file" onChange={handleProfileImageChange} />
               <S.EditIcon />
             </S.EditRound>
           </S.ProfileImage>
