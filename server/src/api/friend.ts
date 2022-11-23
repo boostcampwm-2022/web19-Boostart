@@ -51,6 +51,10 @@ router.delete('/:user_idx', authenticateToken, async (req: AuthorizedRequest, re
 router.put('/request/:user_idx', authenticateToken, async (req: AuthorizedRequest, res) => {
   const { userIdx } = req.user;
   const friendIdx = req.params.user_idx;
+
+  const notExistUser = ((await executeSql('select idx from user where idx = ?', [friendIdx.toString()])) as RowDataPacket).length === 0;
+  if (notExistUser) return res.status(404).json({ msg: '존재하지 않는 사용자예요.' });
+
   try {
     const friendRequest = (await executeSql('select * from friendship where (sender_idx = ? and receiver_idx = ?) or (sender_idx = ? and receiver_idx = ?)', [
       userIdx.toString(),
