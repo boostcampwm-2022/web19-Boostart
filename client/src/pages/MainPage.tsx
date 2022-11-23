@@ -1,4 +1,5 @@
 import React from 'react';
+import { RecoilRoot } from 'recoil';
 import FriendsBar from '../components/FriendsBar/FriendsBar';
 import MainContents from '../components/MainContainer/MainContainer';
 import GNB from '../components/TopBar/TopBar';
@@ -6,9 +7,11 @@ import GNB from '../components/TopBar/TopBar';
 const MainPage = () => {
   return (
     <>
-      <GNB />
-      <FriendsBar />
-      <MainContents />
+      <RecoilRoot>
+        <GNB />
+        <FriendsBar />
+        <MainContents />
+      </RecoilRoot>
     </>
   );
 };

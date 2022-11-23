@@ -9,6 +9,7 @@ import jwt from 'jsonwebtoken';
 import { AuthorizedRequest, SignupRequest } from '../types';
 import crypto from 'crypto';
 import fileUpload from 'express-fileupload';
+import { RowDataPacket } from 'mysql2';
 
 const router = express.Router();
 
@@ -84,11 +85,11 @@ router.post('/login', async (req, res) => {
   const { userId, password } = req.body;
   if (!(userId && password)) return res.sendStatus(400);
   let user;
-  [user] = await executeSql('select * from user where user_id = ?', [userId]);
+  [user] = (await executeSql('select * from user where user_id = ?', [userId])) as RowDataPacket[];
   if (!user) return res.status(401).json({ msg: '아이디 또는 비밀번호가 틀렸어요.' });
 
   const encrypted = encrypt(password, user.salt);
-  [user] = await executeSql('select * from user where user_id = ? and password = ?', [userId, encrypted]);
+  [user] = (await executeSql('select * from user where user_id = ? and password = ?', [userId, encrypted])) as RowDataPacket[];
   if (!user) return res.status(401).json({ msg: '아이디 또는 비밀번호가 틀렸어요.' });
 
   const token = generateAccessToken({ userIdx: user.idx });
@@ -115,7 +116,7 @@ router.get('/login/:oauth_type/callback', async (req, res) => {
   const accessToken = await httpGetAccessToken(oauthType, code);
   const oauthEmail = await httpGetOAuthUserIdentifier(oauthType, accessToken); // 변수 이름. (카카오에서는 이메일 얻기 위해 검수 필요)
 
-  const [user] = await executeSql('select * from user where oauth_type = ? and oauth_email = ?', [oauthType, oauthEmail]);
+  const [user] = (await executeSql('select * from user where oauth_type = ? and oauth_email = ?', [oauthType, oauthEmail])) as RowDataPacket[];
   const token = generateAccessToken(user ? { userIdx: user.idx } : { oauthType, oauthEmail });
 
   res.cookie('token', token, {
@@ -147,13 +148,13 @@ router.post('/signup', async (req: SignupRequest, res) => {
     if (!(oauthType && oauthEmail)) return res.status(401).send({ msg: '잘못된 토큰이에요.' });
     if (!validateOAuthType(oauthType)) return res.status(401).send({ msg: '잘못된 토큰이에요.' });
 
-    [user] = await executeSql('select * from user where oauth_type = ? and oauth_email = ?', [oauthType, oauthEmail]);
+    [user] = (await executeSql('select * from user where oauth_type = ? and oauth_email = ?', [oauthType, oauthEmail])) as RowDataPacket[];
     if (user) {
       return res.status(409).json({ msg: '해당 이메일은 이미 가입되어 있어요.' });
     }
   }
 
-  [user] = await executeSql('select * from user where user_id = ?', [userId]);
+  [user] = (await executeSql('select * from user where user_id = ?', [userId])) as RowDataPacket[];
   if (user) {
     console.log(`ID 중복: ${userId}`);
     return res.status(409).json({ msg: '이미 존재하는 아이디예요.' });
