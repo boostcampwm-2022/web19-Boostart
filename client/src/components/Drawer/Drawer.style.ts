@@ -1,12 +1,15 @@
 import styled from 'styled-components';
 
+export const DRAWER_WIDTH = '25rem';
+export const DRAWER_HEIGHT = '100vh';
+
+export const DRAWER_Z_INDEX = 999;
+export const DRAWER_TOP = '0';
+export const DRAWER_RIGHT = '0';
+
 export const DrawerContainer = styled.div`
-  width: 25rem;
-  z-index: 1000;
-  height: 100%;
-  position: absolute;
-  top: 0px;
-  right: 0px;
+  width: ${DRAWER_WIDTH};
+  height: ${DRAWER_HEIGHT};
   background-color: whitesmoke;
 `;
 
@@ -16,17 +19,6 @@ export const ProfileSectionContainer = styled.div`
 
 export const ReceivedFriendRequestSectionContainer = styled.div`
   display: flex;
-`;
-
-export const Dimmed = styled.div`
-  z-index: 999;
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  opacity: 0.3;
-  background-color: black;
 `;
 
 export const LogoutButton = styled.button`

@@ -35,11 +35,21 @@ declare module 'GlobalType' {
     idx: number;
     title: string;
     color: string;
-    
-    }
+  }
 
   export interface CompletionCheckBoxStatus {
     complete: boolean;
     incomplete: boolean;
   }
+}
+
+interface ModalProps {
+  component: JSX.Element;
+  zIndex: number;
+  top?: string;
+  bottom?: string;
+  left?: string;
+  right?: string;
+  transform?: string;
+  handleDimmedClick: React.MouseEventHandler;
 }
