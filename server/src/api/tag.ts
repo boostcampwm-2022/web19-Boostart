@@ -23,6 +23,18 @@ router.post('/', authenticateToken, async (req: AuthorizedRequest, res) => {
   }
 });
 
+router.post('/color/:tag_idx', authenticateToken, async (req: AuthorizedRequest, res) => {
+  const { userIdx } = req.user;
+  const tagIdx = req.params.tag_idx;
+  const { color } = req.body;
+  try {
+    const result = await executeSql('update tag set color = ? where idx = ? and user_idx = ?', [color, tagIdx, userIdx]);
+    res.status(200);
+  } catch {
+    res.sendStatus(403);
+  }
+});
+
 router.delete('/:tag_idx', authenticateToken, async (req: AuthorizedRequest, res) => {
   const { userIdx } = req.user;
   const tagIdx = req.params.tag_idx;
