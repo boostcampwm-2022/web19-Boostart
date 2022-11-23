@@ -19,4 +19,14 @@ router.get('/', authenticateToken, async (req: AuthorizedRequest, res) => {
   }
 });
 
+router.get('/request', authenticateToken, async (req: AuthorizedRequest, res) => {
+  const { userIdx } = req.user;
+  try {
+    const users = await executeSql('select idx, user_id, username, profile_img from user inner join friendship on idx = sender_idx where receiver_idx = ? and accepted = false', [userIdx.toString()]);
+    res.json(users);
+  } catch {
+    res.sendStatus(500);
+  }
+});
+
 export default router;
