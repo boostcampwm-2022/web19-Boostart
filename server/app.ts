@@ -35,10 +35,21 @@ app.get('*', (req, res) => {
 const diaryObjects = {};
 
 io.on('connection', (socket) => {
-  socket.on('sendShape', (shape) => {
+  socket.on('sendCreatedShape', (shape, senderId) => {
+    console.log(shape);
     const objectId = shape.id;
     diaryObjects[objectId] = shape;
-    io.emit('dispatchShape', shape);
+    socket.broadcast.emit('dispatchCreatedShape', shape, senderId);
+  });
+  socket.on('sendCreatedText', (textData, senderId) => {
+    const objectId = textData.id;
+    diaryObjects[objectId] = textData;
+    socket.broadcast.emit('dispatchCreatedText', textData, senderId);
+  });
+  socket.on('sendCreatedLine', (lineData, senderId) => {
+    const objectId = lineData.id;
+    diaryObjects[objectId] = lineData;
+    socket.broadcast.emit('dispatchCreatedLine', lineData, senderId);
   });
 
   socket.on('disconnect', () => {});

@@ -55,5 +55,36 @@ declare module 'GlobalType' {
     angle: number;
     scaleX: number;
     scaleY: number;
+    id: string;
+  }
+  interface FabricText {
+    type: string;
+    content: string;
+    left: number;
+    top: number;
+    fontSize: number;
+    fill: string;
+    angle: number;
+    scaleX: number;
+    scaleY: number;
+    id: string;
+  }
+  interface FabricLine {
+    type: string;
+    path: Point[];
+    left: number;
+    top: number;
+    fill: string | Pattern | undefined;
+    stroke: string;
+    strokeWidth: number;
+    angle: number;
+    zoomX: number;
+    zoomY: number;
+    strokeLineCap: string;
+    strokeLineJoin: string;
+    id: string;
+  }
+  interface DiaryObjects {
+    [key: string]: fabric.Rect | fabric.Triangle | fabric.Ellipse | fabric.IText | fabric.Path;
   }
 }

@@ -8,7 +8,7 @@ const TopBar = () => {
       <S.TopBarContainer>
         <Clock />
         <S.MainTitle>Boostart</S.MainTitle>
-        <S.MenuIcon src="./menu.svg" />
+        <S.MenuIcon src="/menu.svg" />
       </S.TopBarContainer>
     </>
   );

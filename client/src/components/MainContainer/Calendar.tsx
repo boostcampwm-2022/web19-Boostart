@@ -73,7 +73,7 @@ const Calendar = () => {
         </S.DateSelector>
         <S.MenuSelector>
           {Menus.map((menu) => {
-            return <MenuLinkButton menu={menu} />;
+            return <MenuLinkButton key={menu} menu={menu} />;
           })}
         </S.MenuSelector>
       </S.CalendarContainer>

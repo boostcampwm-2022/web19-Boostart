@@ -1,10 +1,10 @@
 import { useEffect, useRef, useState } from 'react';
 import globalSocket from '../common/Socket';
+import { Shape, FabricText, FabricLine } from 'GlobalType';
 import { fabric } from 'fabric';
-import { Socket } from 'socket.io-client/build/esm/socket';
+import { v4 } from 'uuid';
 
 const Canvas = () => {
-  const [socket, setSocket] = useState<Socket | null>(null);
   const canvasRef = useRef<fabric.Canvas | null>(null);
   const colorRef = useRef<HTMLInputElement | null>(null);
   const canvasBackground = '/canvasBackground.png';
@@ -14,25 +14,32 @@ const Canvas = () => {
       height: 400,
       width: 680,
       backgroundImage: canvasBackground,
+      selection: false,
     });
     return canvas;
   };
 
-  const createShapeOnCanvas = (type: string) => {
+  const createNewShape = (type: string) => {
     if (!colorRef.current) return;
     const shapeData = {
       type: type,
-      [type === 'circle' ? 'ry' : 'height']: 100,
-      [type === 'circle' ? 'rx' : 'width']: 100,
+      [type === 'circle' ? 'ry' : 'height']: type === 'circle' ? 50 : 100,
+      [type === 'circle' ? 'rx' : 'width']: type === 'circle' ? 50 : 100,
       top: 10,
       left: 10,
       fill: colorRef.current.value,
       angle: 0,
       scaleX: 1,
       scaleY: 1,
-      id: 'asef',
+      id: v4(),
     };
+    sendShape(shapeData);
+    drawShapeOnCanvas(shapeData);
+  };
+
+  const drawShapeOnCanvas = (shapeData: Shape) => {
     let shape: fabric.Object | undefined;
+    const type = shapeData.type;
 
     if (type === 'rect') {
       shape = new fabric.Rect(shapeData);
@@ -41,20 +48,33 @@ const Canvas = () => {
     } else if (type === 'circle') {
       shape = new fabric.Ellipse(shapeData);
     }
-    if (!shape || !canvasRef.current) return;
 
+    if (!shape || !canvasRef.current) return;
     canvasRef.current.add(shape);
     canvasRef.current.renderAll();
+    console.log(canvasRef.current.getObjects());
   };
 
-  const createTextOnCanvas = () => {
+  const createNewText = () => {
     if (!colorRef.current) return;
-    const text = new fabric.IText('텍스트를 입력하세요', {
+    const textData = {
+      type: 'text',
+      content: '텍스트를 입력하세요',
       left: 10,
       top: 10,
       fontSize: 24,
       fill: colorRef.current.value,
-    });
+      angle: 0,
+      scaleX: 1,
+      scaleY: 1,
+      id: v4(),
+    };
+    sendText(textData);
+    drawTextOnCanvas(textData);
+  };
+  const drawTextOnCanvas = (textData: FabricText) => {
+    console.log('draw');
+    const text = new fabric.IText(textData.content, textData);
     if (!text || !canvasRef.current) return;
     canvasRef.current.add(text);
     canvasRef.current.setActiveObject(text);
@@ -73,42 +93,74 @@ const Canvas = () => {
     if (e.key !== 'Delete' || !canvasRef.current) return;
     canvasRef.current.remove(canvasRef.current.getActiveObject());
   };
-  const leaveDrawingMode = () => {
+  const leaveDrawingMode = (e: any) => {
+    console.log(e);
     if (!canvasRef.current) return;
     canvasRef.current.isDrawingMode = false;
   };
 
-  const sendShape = (e: any) => {
-    const shape = e.target;
-    console.log(e);
-    globalSocket.emit('sendShape', shape);
+  const dispatchCreatedLine = (e: any) => {
+    const { path, left, top, stroke, fill, strokeWidth, angle, strokeLineCap, strokeLineJoin, zoomX, zoomY } = e.path;
+    const lineData = {
+      type: 'path',
+      path,
+      left,
+      top,
+      stroke,
+      strokeWidth,
+      angle,
+      fill,
+      zoomX,
+      zoomY,
+      strokeLineCap,
+      strokeLineJoin,
+      id: v4(),
+    };
+    sendLine(lineData);
   };
 
+  const drawLineOnCanvas = (lineData: FabricLine) => {
+    const text = new fabric.Path(lineData.path, lineData);
+    console.log(text);
+    if (!text || !canvasRef.current) return;
+    canvasRef.current.add(text);
+    canvasRef.current.renderAll();
+  };
+
+  const sendShape = (shape: Shape) => {
+    globalSocket.emit('sendCreatedShape', shape, globalSocket.id);
+  };
+  const sendText = (textData: FabricText) => {
+    globalSocket.emit('sendCreatedText', textData, globalSocket.id);
+  };
+  const sendLine = (lineData: FabricLine) => {
+    globalSocket.emit('sendCreatedLine', lineData, globalSocket.id);
+  };
+
+  globalSocket.on('dispatchCreatedShape', (shape, senderId) => {
+    if (senderId !== globalSocket.id) drawShapeOnCanvas(shape);
+  });
+  globalSocket.on('dispatchCreatedText', (textData, senderId) => {
+    if (senderId !== globalSocket.id) drawTextOnCanvas(textData);
+  });
+  globalSocket.on('dispatchCreatedLine', (lineData, senderId) => {
+    if (senderId !== globalSocket.id) drawLineOnCanvas(lineData);
+  });
+
   useEffect(() => {
-    setSocket(globalSocket);
     if (!canvasRef.current) canvasRef.current = initCanvas();
-    canvasRef.current.on('object:added', leaveDrawingMode);
-    canvasRef.current.on('object:modified', sendShape);
+    canvasRef.current.on('path:created', leaveDrawingMode);
+    canvasRef.current.on('path:created', dispatchCreatedLine);
+    canvasRef.current.on('object:modified', (e: any) => console.log(e.target?.id));
     window.addEventListener('keydown', eraseSelectedObject);
 
     return () => {
       if (!canvasRef.current) return;
-      canvasRef.current.off('object:added', leaveDrawingMode);
-      canvasRef.current.off('object:modified', sendShape);
+      canvasRef.current.off('path:created', leaveDrawingMode);
+      canvasRef.current.off('path:created', dispatchCreatedLine);
       window.removeEventListener('keydown', eraseSelectedObject);
     };
   }, []);
-
-  useEffect(() => {
-    if (socket) {
-      socket.on('dispatchShape', (shape) => {
-        console.log(shape);
-      });
-    }
-    return () => {
-      if (socket) socket.disconnect();
-    };
-  });
 
   return (
     <>
@@ -116,10 +168,10 @@ const Canvas = () => {
       <span onClick={() => enterDrawingMode(3)}>연필</span>
       <span onClick={() => enterDrawingMode(10)}>형광펜</span>
       <span onClick={() => enterDrawingMode(20)}>브러쉬</span>
-      <img src="/rect.svg" onClick={() => createShapeOnCanvas('rect')} />
-      <img src="/triangle.svg" onClick={() => createShapeOnCanvas('triangle')} />
-      <img src="/circle.svg" onClick={() => createShapeOnCanvas('circle')} />
-      <img src="/textIcon.svg" onClick={() => createTextOnCanvas()} />
+      <img src="/rect.svg" onClick={() => createNewShape('rect')} />
+      <img src="/triangle.svg" onClick={() => createNewShape('triangle')} />
+      <img src="/circle.svg" onClick={() => createNewShape('circle')} />
+      <img src="/textIcon.svg" onClick={() => createNewText()} />
       <input type="color" ref={colorRef} />
     </>
   );

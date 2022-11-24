@@ -1,12 +1,17 @@
+import { FabricText, Shape, FabricLine } from 'GlobalType';
 import { io, Socket } from 'socket.io-client';
 import { HOST } from '../../constants/index';
 
 interface ServerToClientEvents {
-  dispatchShape: (shape: any) => void;
+  dispatchCreatedShape: (shape: Shape, senderId: string) => void;
+  dispatchCreatedText: (textData: FabricText, senderId: string) => void;
+  dispatchCreatedLine: (lineData: FabricLine, senderId: string) => void;
 }
 
 interface ClientToServerEvents {
-  sendShape: (shape: any) => void;
+  sendCreatedShape: (shape: Shape, senderId: string) => void;
+  sendCreatedText: (textData: FabricText, senderId: string) => void;
+  sendCreatedLine: (lineData: FabricLine, senderId: string) => void;
 }
 
 class GlobalSocket {
