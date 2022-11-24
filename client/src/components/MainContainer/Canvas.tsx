@@ -186,6 +186,7 @@ const Canvas = () => {
   const dispatchCreatedLine = (e: any) => {
     const newId = v4();
     e.path.id = newId;
+    diaryObjects.set(newId, e.path);
     const { path, left, top, stroke, fill, strokeWidth, angle, strokeLineCap, strokeLineJoin, scaleX, scaleY } = e.path;
     const lineData = {
       type: 'path',
