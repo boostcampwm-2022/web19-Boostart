@@ -7,7 +7,7 @@ import LocationSearchInput from './LocationSearchInput';
 import { Location } from 'GlobalType';
 import useCurrentDate from '../../hooks/useCurrentDate';
 import { Tag } from 'GlobalType';
- 
+
 interface Props {
   setIsModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }
@@ -25,6 +25,10 @@ const TaskModal = (props: Props) => {
     readMore: '더보기  ▼',
   };
 
+  useEffect(() => {
+    console.log(tagObject);
+    console.log(locationObject);
+  }, [tagObject, locationObject]);
   type ColumnTitle = '제목' | '태그' | '시간' | '라벨' | '중요도' | '공개' | '위치' | '메모';
 
   const Row = ({ title, content }: { title: ColumnTitle; content: JSX.Element }) => {
@@ -43,20 +47,27 @@ const TaskModal = (props: Props) => {
         <S.Date>{`• ${getMonth() + 1}.${getDate()} •`}</S.Date>
         <S.TaskForm>
           <S.FormTable>
-            <Row title="제목" content={<S.InputBar />} />
-            <Row title="태그" content={<TagInput tagObject={tagObject} setTagObject={setTagObject} />} />
-            <Row
-              title="시간"
-              content={
-                <>
-                  <S.InputTimeBar type="time" />
-                  {' ~ '}
-                  <S.InputTimeBar type="time" />
-                </>
-              }
-            />
-            <Row title="중요도" content={<ImportanceInput />} />
-            <Row title="공개" content={<input type="checkbox" />} />
+            <tbody>
+              <Row title="제목" content={<S.InputBar />} />
+              <tr>
+                <td>태그</td>
+                <td>
+                  <TagInput tagObject={tagObject} setTagObject={setTagObject} />
+                </td>
+              </tr>
+              <Row
+                title="시간"
+                content={
+                  <>
+                    <S.InputTimeBar type="time" />
+                    {' ~ '}
+                    <S.InputTimeBar type="time" />
+                  </>
+                }
+              />
+              <Row title="중요도" content={<ImportanceInput />} />
+              <Row title="공개" content={<input type="checkbox" />} />
+            </tbody>
           </S.FormTable>
           <S.DetailButton onClick={() => setIsDetailOpen(!isDetailOpen)}>
             <S.Border>
@@ -65,9 +76,11 @@ const TaskModal = (props: Props) => {
           </S.DetailButton>
           {isDetailOpen && (
             <S.FormTable>
-              <Row title="위치" content={<LocationSearchInput locationObject={locationObject} setLocationObject={setLocationObject} />} />
-              <Row title="라벨" content={<></>} />
-              <Row title="메모" content={<S.InputArea />} />
+              <tbody>
+                <Row title="위치" content={<LocationSearchInput locationObject={locationObject} setLocationObject={setLocationObject} />} />
+                <Row title="라벨" content={<></>} />
+                <Row title="메모" content={<S.InputArea />} />
+              </tbody>
             </S.FormTable>
           )}
         </S.TaskForm>

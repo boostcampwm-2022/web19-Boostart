@@ -23,7 +23,7 @@ export const Rating = styled.div`
   }
 `;
 
-export const Star = styled(FaStar)<{ clicked: boolean }>`
+export const Star = styled(FaStar)<{ $isclicked: boolean }>`
   color: var(--color-gray4);
-  ${(props) => props.clicked && 'color : #d4a400'};
+  ${(props) => props.$isclicked && 'color : #d4a400'};
 `;
