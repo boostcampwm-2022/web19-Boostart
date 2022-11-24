@@ -1,7 +1,10 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import globalSocket from '../common/Socket';
 import { fabric } from 'fabric';
+import { Socket } from 'socket.io-client/build/esm/socket';
 
 const Canvas = () => {
+  const [socket, setSocket] = useState<Socket | null>(null);
   const canvasRef = useRef<fabric.Canvas | null>(null);
   const colorRef = useRef<HTMLInputElement | null>(null);
   const canvasBackground = '/canvasBackground.png';
@@ -75,17 +78,37 @@ const Canvas = () => {
     canvasRef.current.isDrawingMode = false;
   };
 
+  const sendShape = (e: any) => {
+    const shape = e.target;
+    console.log(e);
+    globalSocket.emit('sendShape', shape);
+  };
+
   useEffect(() => {
+    setSocket(globalSocket);
     if (!canvasRef.current) canvasRef.current = initCanvas();
     canvasRef.current.on('object:added', leaveDrawingMode);
+    canvasRef.current.on('object:modified', sendShape);
     window.addEventListener('keydown', eraseSelectedObject);
 
     return () => {
       if (!canvasRef.current) return;
       canvasRef.current.off('object:added', leaveDrawingMode);
+      canvasRef.current.off('object:modified', sendShape);
       window.removeEventListener('keydown', eraseSelectedObject);
     };
   }, []);
+
+  useEffect(() => {
+    if (socket) {
+      socket.on('dispatchShape', (shape) => {
+        console.log(shape);
+      });
+    }
+    return () => {
+      if (socket) socket.disconnect();
+    };
+  });
 
   return (
     <>
