@@ -1,5 +1,6 @@
 import { ReactElement } from 'react';
 import { Navigate } from 'react-router-dom';
+import { RoutePath } from '../constants';
 import { useAuthorization } from '../hooks/useAuthorization';
 
 interface Props {
@@ -11,5 +12,5 @@ export default function PrivateRoute({ component: RouteComponent }: Props): Reac
   const isAuthenticated = useAuthorization();
 
   if (isAuthenticated === undefined) return <></>;
-  return isAuthenticated === false ? <Navigate to="/" /> : <RouteComponent />;
+  return isAuthenticated === false ? <Navigate to={RoutePath.ROOT} /> : <RouteComponent />;
 }

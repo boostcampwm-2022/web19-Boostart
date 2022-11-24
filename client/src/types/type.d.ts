@@ -47,6 +47,8 @@ declare module 'GlobalType' {
     height?: number;
     width?: number;
     radius?: number;
+    rx?: number;
+    ry?: number;
     fill: string;
     top: number;
     left: number;

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import * as S from './LoginMenu.style';
 import { Link, useNavigate } from 'react-router-dom';
-import { HOST } from '../../constants';
+import { HOST, RoutePath } from '../../constants';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
@@ -37,7 +37,7 @@ const LoginMenu = () => {
 
   const loginFormSubmit = async (d: any) => {
     const response = await httpPostLogin(d);
-    if (response.ok) navigate('/main/log');
+    if (response.ok) navigate(RoutePath.LOG);
     else {
       const { msg } = await response.json();
       setErr(msg);
@@ -58,7 +58,7 @@ const LoginMenu = () => {
           <S.InputBar {...register('password')} placeholder="PASSWORD" type="password" />
           <h3>{err}</h3>
           <S.LoginButton type="submit">LOGIN</S.LoginButton>
-          <Link to={'/signup'} style={{ color: 'inherit', textDecoration: 'inherit' }}>
+          <Link to={RoutePath.SIGNUP} style={{ color: 'inherit', textDecoration: 'inherit' }}>
             <S.SignupButton>SIGN UP</S.SignupButton>
           </Link>
         </S.LoginForm>
