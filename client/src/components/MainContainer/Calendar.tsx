@@ -1,12 +1,16 @@
 import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import useCurrentDate from '../../hooks/useCurrentDate';
-import { EngMonth, Days, WEEK_LENGTH, Menus } from '../../constants';
+import { EngMonth, Days, WEEK_LENGTH, Menus, RoutePath } from '../../constants';
 import * as S from './Calendar.style';
 
 interface DateContainerProps {
   calendarYear: number;
   calendarMonth: number;
   calendarDate: number;
+}
+interface MenuLinkButtonProps {
+  menu: string;
 }
 
 const createArray = (count: number) => {
@@ -17,7 +21,6 @@ const Calendar = () => {
   //States
   const { currentDate, getFirstDay, getLastDate } = useCurrentDate();
   const [calendarDate, setCalendarDate] = useState(currentDate);
-  const [selectedMenu, setSelectedMenu] = useState('LOG');
   //Vars
   const firstDay = getFirstDay(calendarDate);
   const lastDate = getLastDate(calendarDate);
@@ -25,11 +28,6 @@ const Calendar = () => {
   const daysBeforeFirstDay = createArray(firstDay);
   const monthDays = createArray(lastDate);
   //Functions
-  const handleMenuClick = (e: React.MouseEvent) => {
-    const target = e.target as HTMLDivElement;
-    const index = target.dataset.menu;
-    if (index) setSelectedMenu(index);
-  };
 
   const handlePrevMonthClick = () => {
     calendarDate.setMonth(calendarDate.getMonth() - 1);
@@ -43,7 +41,6 @@ const Calendar = () => {
   };
 
   useEffect(() => {
-    //전역 date state 가 변경되면 달력 state도 함께 변경
     setCalendarDate(new Date(currentDate));
   }, [currentDate]);
 
@@ -54,7 +51,6 @@ const Calendar = () => {
         <S.MonthSelector>
           <S.CurrentYear>{calendarDate.getFullYear()}</S.CurrentYear>
           <S.CurrentMonth>{EngMonth[calendarDate.getMonth()]}</S.CurrentMonth>
-          {/* 달력 변경시에는 달력만 변경되도록 전역 state가 아닌 별도 state로 관리 */}
           <S.Arrow direction="left" onClick={handlePrevMonthClick}>
             {'<'}
           </S.Arrow>
@@ -77,11 +73,7 @@ const Calendar = () => {
         </S.DateSelector>
         <S.MenuSelector>
           {Menus.map((menu) => {
-            return (
-              <S.MenuButton key={menu} data-menu={menu} onClick={handleMenuClick} isActivatedMenu={menu === selectedMenu}>
-                {menu}
-              </S.MenuButton>
-            );
+            return <MenuLinkButton menu={menu} />;
           })}
         </S.MenuSelector>
       </S.CalendarContainer>
@@ -108,3 +100,23 @@ const DateContainer = ({ calendarYear, calendarMonth, calendarDate }: DateContai
 };
 
 export default Calendar;
+
+const MenuLinkButton = ({ menu }: MenuLinkButtonProps) => {
+  const [selectedMenu, setSelectedMenu] = useState('LOG');
+  const navigate = useNavigate();
+  const handleMenuClick = (e: React.MouseEvent) => {
+    const target = e.target;
+    if (!(target instanceof HTMLDivElement)) return;
+    const selectedMenu = target.dataset.menu;
+    if (selectedMenu) {
+      setSelectedMenu(selectedMenu);
+      navigate(RoutePath[selectedMenu]);
+    }
+  };
+
+  return (
+    <S.MenuButton key={menu} data-menu={menu} onClick={handleMenuClick} isActivatedMenu={menu === selectedMenu}>
+      {menu}
+    </S.MenuButton>
+  );
+};

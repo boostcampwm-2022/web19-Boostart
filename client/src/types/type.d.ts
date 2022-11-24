@@ -43,6 +43,21 @@ declare module 'GlobalType' {
     incomplete: boolean;
   }
 
+  interface Shape {
+    type: string;
+    height?: number;
+    width?: number;
+    radius?: number;
+    rx?: number;
+    ry?: number;
+    fill: string;
+    top: number;
+    left: number;
+    angle: number;
+    scaleX: number;
+    scaleY: number;
+ }
+ 
   interface Location {
     location: string;
     lat: number;

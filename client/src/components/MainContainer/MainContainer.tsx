@@ -1,6 +1,8 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
+import { Route, Routes } from 'react-router-dom';
 import TaskModal from '../TaskModal/TaskModal';
 import Calendar from './Calendar';
+import Diary from './Diary';
 import Log from './Log';
 import * as S from './MainContainer.style';
 
@@ -15,8 +17,18 @@ const MainContents = () => {
           <Calendar></Calendar>
         </S.LeftSection>
         <S.RightSection>
-          <Log></Log>
-          <S.NewTaskButton onClick={(e) => setIsModalOpen(true)}>+</S.NewTaskButton>
+          <Routes>
+            <Route
+              path="log/"
+              element={
+                <>
+                  <Log />
+                  <S.NewTaskButton onClick={() => setIsModalOpen(true)}>+</S.NewTaskButton>
+                </>
+              }
+            />
+            <Route path="diary/" element={<Diary />} />
+          </Routes>
         </S.RightSection>
       </S.MainContentContainer>
     </S.Container>

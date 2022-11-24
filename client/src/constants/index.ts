@@ -26,3 +26,14 @@ export enum Days {
 export const Menus = ['LOG', 'DIARY', 'PLAN', 'MAP'];
 
 export const WEEK_LENGTH = Object.keys(Days).length / 2;
+interface RoutePathType {
+  [key: string]: string;
+}
+export const RoutePath: RoutePathType = {
+  ROOT: '/',
+  SIGNUP: '/signup',
+  LOGIN: '/login',
+  MAIN: '/main/*',
+  LOG: '/main/log',
+  DIARY: '/main/diary',
+};
