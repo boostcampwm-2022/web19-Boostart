@@ -30,8 +30,14 @@ const Canvas = () => {
 
   const eraseSelectedObject = (e: KeyboardEvent) => {
     if (e.key !== 'Delete' || !canvasRef.current) return;
-    canvasRef.current.remove(canvasRef.current.getActiveObject());
+    const currentTarget = canvasRef.current.getActiveObject();
+    if (!currentTarget) return;
+    if (currentTarget instanceof fabric.IText) {
+      if (currentTarget.isEditing) return;
+    }
+    canvasRef.current.remove(currentTarget);
   };
+
   const leaveDrawingMode = () => {
     if (!canvasRef.current) return;
     canvasRef.current.isDrawingMode = false;
