@@ -36,7 +36,6 @@ const diaryObjects = {};
 
 io.on('connection', (socket) => {
   socket.on('sendCreatedShape', (shape, senderId) => {
-    console.log(shape);
     const objectId = shape.id;
     diaryObjects[objectId] = shape;
     socket.broadcast.emit('dispatchCreatedShape', shape, senderId);
@@ -50,6 +49,21 @@ io.on('connection', (socket) => {
     const objectId = lineData.id;
     diaryObjects[objectId] = lineData;
     socket.broadcast.emit('dispatchCreatedLine', lineData, senderId);
+  });
+  socket.on('sendModifiedLine', (lineData, senderId) => {
+    const objectId = lineData.id;
+    diaryObjects[objectId] = lineData;
+    socket.broadcast.emit('updateModifiedLine', lineData, senderId);
+  });
+  socket.on('sendModifiedText', (textData, senderId) => {
+    const objectId = textData.id;
+    diaryObjects[objectId] = textData;
+    socket.broadcast.emit('updateModifiedText', textData, senderId);
+  });
+  socket.on('sendModifiedShape', (ShapeData, senderId) => {
+    const objectId = ShapeData.id;
+    diaryObjects[objectId] = ShapeData;
+    socket.broadcast.emit('updateModifiedShape', ShapeData, senderId);
   });
 
   socket.on('disconnect', () => {});

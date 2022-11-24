@@ -59,7 +59,7 @@ declare module 'GlobalType' {
   }
   interface FabricText {
     type: string;
-    content: string;
+    text: string;
     left: number;
     top: number;
     fontSize: number;
@@ -71,17 +71,17 @@ declare module 'GlobalType' {
   }
   interface FabricLine {
     type: string;
-    path: Point[];
-    left: number;
-    top: number;
+    path: Point[] | undefined;
+    left: number | undefined;
+    top: number | undefined;
     fill: string | Pattern | undefined;
-    stroke: string;
-    strokeWidth: number;
-    angle: number;
-    zoomX: number;
-    zoomY: number;
-    strokeLineCap: string;
-    strokeLineJoin: string;
+    stroke: string | undefined;
+    strokeWidth: number | undefined;
+    angle: number | undefined;
+    scaleX: number | undefined;
+    scaleY: number | undefined;
+    strokeLineCap: string | undefined;
+    strokeLineJoin: string | undefined;
     id: string;
   }
   interface DiaryObjects {

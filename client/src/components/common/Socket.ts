@@ -3,15 +3,21 @@ import { io, Socket } from 'socket.io-client';
 import { HOST } from '../../constants/index';
 
 interface ServerToClientEvents {
-  dispatchCreatedShape: (shape: Shape, senderId: string) => void;
+  dispatchCreatedShape: (shapeData: Shape, senderId: string) => void;
   dispatchCreatedText: (textData: FabricText, senderId: string) => void;
   dispatchCreatedLine: (lineData: FabricLine, senderId: string) => void;
+  updateModifiedLine: (lineData: FabricLine, senderId: string) => void;
+  updateModifiedText: (textData: FabricText, senderId: string) => void;
+  updateModifiedShape: (shapeData: Shape, senderId: string) => void;
 }
 
 interface ClientToServerEvents {
   sendCreatedShape: (shape: Shape, senderId: string) => void;
   sendCreatedText: (textData: FabricText, senderId: string) => void;
   sendCreatedLine: (lineData: FabricLine, senderId: string) => void;
+  sendModifiedLine: (lineData: FabricLine, senderId: string) => void;
+  sendModifiedText: (textData: FabricText, senderId: string) => void;
+  sendModifiedShape: (shapeData: Shape, senderId: string) => void;
 }
 
 class GlobalSocket {
