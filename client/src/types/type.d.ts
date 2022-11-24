@@ -35,6 +35,7 @@ declare module 'GlobalType' {
     idx: number;
     title: string;
     color: string;
+    count: number;
   }
 
   interface CompletionCheckBoxStatus {
@@ -55,5 +56,11 @@ declare module 'GlobalType' {
     angle: number;
     scaleX: number;
     scaleY: number;
+ }
+ 
+  interface Location {
+    location: string;
+    lat: number;
+    lng: number;
   }
 }
