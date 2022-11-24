@@ -52,7 +52,7 @@ export const SectionHeader = styled.h3`
 
 export const Username = styled.span`
   font-weight: bold;
-  margin-right: 0.3rem;
+  margin-right: 0.5rem;
 `;
 
 export const UserId = styled.span`
@@ -60,8 +60,20 @@ export const UserId = styled.span`
   font-size: 0.9rem;
 `;
 
-const ProfileImage = styled.img`
+export const SizedText = styled.span<{ fontSize: string }>`
+  font-size: ${(props) => props.fontSize};
+`;
+
+export const ProfileImage = styled.img<{ size?: string; padding?: string }>`
   border-radius: 50%;
+  ${(props) => props.size && `width: ${props.size}; height: ${props.size};`}
+  ${(props) => props.padding && `padding: ${props.padding};`}
+`;
+
+export const PencilIcon = styled.img`
+  content: url(https://cdn-icons-png.flaticon.com/512/116/116996.png);
+  width: 1rem;
+  margin-left: 0.5rem;
 `;
 
 // 프로필 수정
@@ -79,18 +91,36 @@ export const PROFILE_EDIT_FORM_TOP = '50%';
 export const PROFILE_EDIT_FORM_LEFT = '50%';
 export const PROFILE_EDIT_FORM_TRANFORM = 'translate(-50%, -50%)';
 export const ProfileEditForm = styled.div`
+  display: flex;
+  flex-direction: column;
   background-color: white;
   width: ${PROFILE_EDIT_FORM_WIDTH};
   height: ${PROFILE_EDIT_FORM_HEIGHT};
   border-radius: 20px;
 `;
 
+export const ProfileMessageSection = styled.div`
+  background-color: #f8f8f8;
+  border-radius: 20px;
+  height: 10rem;
+  padding: 2rem;
+  margin: 0 3rem;
+`;
+
+export const ProfileEditApplyButton = styled.div`
+  margin-top: auto;
+  margin-left: auto;
+  padding: 2rem;
+  padding-right: 3rem;
+  color: #bbbbbb;
+`;
+
 // 프로필 영역
-export const ProfileSection = styled.div`
+export const ProfileSection = styled.div<{ horizonPadding?: string }>`
   display: flex;
   justify-content: center;
   flex-direction: column;
-  padding: 1.1rem 0;
+  padding: 1.1rem ${(props) => props.horizonPadding ?? '0'};
 `;
 
 export const Profile = styled.div`
@@ -98,16 +128,13 @@ export const Profile = styled.div`
   align-items: center;
 `;
 
-export const ProfileInfo = styled.div`
+export const ProfileInfo = styled.div<{ height?: string; marginTop?: string }>`
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+  ${(props) => props.marginTop && `margin-top: ${props.marginTop};`}
   width: 15rem;
-  height: 3rem;
-`;
-
-export const Greeting = styled.span`
-  font-size: 1.1rem;
+  height: ${(props) => props.height ?? '3rem'};
 `;
 
 export const MyProfileImage = styled(ProfileImage)`

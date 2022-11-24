@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import styled from 'styled-components';
 import { dummyNotifications, dummyReceivedFriendRequests } from '../common/dummy';
 import { PROFILE_EDIT_FORM_Z_INDEX, PROFILE_EDIT_FORM_TOP, PROFILE_EDIT_FORM_LEFT, PROFILE_EDIT_FORM_TRANFORM } from './Drawer.style';
 import Modal from './Modal';
@@ -29,16 +28,30 @@ const Drawer = ({ open }: { open: boolean }) => {
         </S.LogoutButton>
       </S.Drawer>
       {isProfileEditModalOpen && (
-        <Modal
-          component={<S.ProfileEditForm>프로필 수정 모달</S.ProfileEditForm>}
-          top={PROFILE_EDIT_FORM_TOP}
-          left={PROFILE_EDIT_FORM_LEFT}
-          transform={PROFILE_EDIT_FORM_TRANFORM}
-          zIndex={PROFILE_EDIT_FORM_Z_INDEX}
-          handleDimmedClick={() => setIsProfileEditModalOpen(false)}
-        />
+        <Modal component={<ProfileEditForm />} top={PROFILE_EDIT_FORM_TOP} left={PROFILE_EDIT_FORM_LEFT} transform={PROFILE_EDIT_FORM_TRANFORM} zIndex={PROFILE_EDIT_FORM_Z_INDEX} handleDimmedClick={() => setIsProfileEditModalOpen(false)} />
       )}
     </>
+  );
+};
+
+const ProfileEditForm = () => {
+  return (
+    <S.ProfileEditForm>
+      <S.ProfileSection horizonPadding="2rem">
+        <S.Profile>
+          <S.ProfileImage padding="2rem" size="10rem" src="https://avatars.githubusercontent.com/u/55306894?s=80&u=aedb7854f1fd10d8eb6dc1272f1583dbb255f5b8&v=4" />
+          <S.ProfileInfo height="3.5rem" marginTop="-2rem">
+            <S.SizedText fontSize="1.5rem">
+              <S.Username>모작</S.Username>님
+              <S.PencilIcon />
+            </S.SizedText>
+            <S.UserId>@mojac</S.UserId>
+          </S.ProfileInfo>
+        </S.Profile>
+      </S.ProfileSection>
+      <S.ProfileMessageSection>안녕하세요</S.ProfileMessageSection>
+      <S.ProfileEditApplyButton>적용</S.ProfileEditApplyButton>
+    </S.ProfileEditForm>
   );
 };
 
@@ -55,9 +68,9 @@ const ProfileSection = ({ handleProfileEditButtonClick }: ProfileSectionProps) =
       <S.Profile>
         <S.MyProfileImage src="https://avatars.githubusercontent.com/u/55306894?s=80&u=aedb7854f1fd10d8eb6dc1272f1583dbb255f5b8&v=4" />
         <S.ProfileInfo>
-          <S.Greeting>
-            <S.Username>모작</S.Username> 님 반갑습니다
-          </S.Greeting>
+          <S.SizedText fontSize="1.1rem">
+            <S.Username>모작</S.Username>님 반갑습니다
+          </S.SizedText>
           <S.UserId>@mojac</S.UserId>
         </S.ProfileInfo>
       </S.Profile>
