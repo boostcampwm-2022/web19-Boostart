@@ -14,10 +14,9 @@ export const Container = styled.div`
   transform: translateY(-9.5rem);
 `;
 export const ModalContainer = styled.div<{ isDetailOpen: boolean }>`
-  position: relative; // button 위치고정을 위해
+  position: relative;
   width: 36.4rem;
-  height: 30.4rem;
-  ${(props) => props.isDetailOpen && 'height : 44rem;'};
+  height: ${(props) => (props.isDetailOpen ? '44rem' : '30.4rem')};
   transition: height 0.3s;
   background: white;
   border-radius: 1rem;
@@ -33,7 +32,7 @@ export const Date = styled.div`
   font-size: 1rem;
   height: 2rem;
   margin: 0.5rem;
-  font-family: 'Press Start 2P', cursive;
+  font-family: var(--font-title);
 `;
 
 export const TaskForm = styled.form``;
@@ -174,7 +173,7 @@ export const SubmitButton = styled.button`
   background: var(--color-main);
   position: absolute;
   bottom: 1.6rem;
-  font-family: 'Press Start 2P', cursive;
+  font-family: var(--font-title);
   height: 2.3rem;
   border: 0px;
   border-radius: 3rem;

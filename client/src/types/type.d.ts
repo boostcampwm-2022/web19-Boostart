@@ -42,4 +42,10 @@ declare module 'GlobalType' {
     complete: boolean;
     incomplete: boolean;
   }
+
+  interface Location {
+    location: string;
+    lat: number;
+    lng: number;
+  }
 }
