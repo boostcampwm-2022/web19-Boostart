@@ -29,7 +29,7 @@
   },
   "scripts": {
     "start": "react-scripts start",
-    "dev": "set REACT_APP_MODE=dev && react-scripts start",
+    "dev": "export REACT_APP_MODE=dev && react-scripts start",
     "build:dev": "export REACT_APP_MODE=dev && BUILD_PATH='../server/build' react-scripts build",
     "build:prod": "export REACT_APP_MODE=prod && BUILD_PATH='../server/build' react-scripts build",
     "test": "react-scripts test",
