@@ -3,7 +3,7 @@ import { FaStar } from 'react-icons/fa';
 
 export const Rating = styled.div`
   & :hover svg {
-    color: rgb(212, 180, 0);
+    color: #d4b400;
   }
 
   & svg:hover ~ svg {
@@ -23,7 +23,7 @@ export const Rating = styled.div`
   }
 `;
 
-export const Star = styled(FaStar)<{ isClicked: boolean }>`
+export const Star = styled(FaStar)<{ clicked: boolean }>`
   color: var(--color-gray4);
-  ${(props) => props.isClicked && 'color : rgb(212, 160, 0);'};
+  ${(props) => props.clicked && 'color : #d4a400'};
 `;
