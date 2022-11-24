@@ -88,6 +88,7 @@ declare module 'GlobalType' {
   interface DiaryObjects {
     [key: string]: fabric.Rect | fabric.Triangle | fabric.Ellipse | fabric.IText | fabric.Path;
   }
+
   interface Location {
     location: string;
     lat: number;
