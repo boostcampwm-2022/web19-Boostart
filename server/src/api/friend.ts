@@ -52,7 +52,7 @@ router.put('/request/:user_idx', authenticateToken, async (req: AuthorizedReques
   const { userIdx } = req.user;
   const friendIdx = req.params.user_idx;
 
-  if (userIdx.toString() === friendIdx) return res.status(404).json({ msg: '스스로에게 친구 요청을 할 수 없어요.' });
+  if (userIdx.toString() === friendIdx) return res.status(409).json({ msg: '스스로에게 친구 요청을 할 수 없어요.' });
 
   const notExistUser = ((await executeSql('select idx from user where idx = ?', [friendIdx.toString()])) as RowDataPacket).length === 0;
   if (notExistUser) return res.status(404).json({ msg: '존재하지 않는 사용자예요.' });
@@ -67,13 +67,13 @@ router.put('/request/:user_idx', authenticateToken, async (req: AuthorizedReques
 
     if (friendRequest.length === 0) {
       await executeSql('insert into friendship (sender_idx, receiver_idx, accepted) values (?, ?, false)', [userIdx.toString(), friendIdx.toString()]);
-      return res.sendStatus(200);
+      return res.sendStatus(201);
     }
 
     const { sender_idx: senderIdx, accepted } = friendRequest[0];
 
-    if (accepted) return res.status(404).json({ msg: '이미 친구예요.' });
-    if (senderIdx === userIdx) return res.status(404).json({ msg: '이미 친구 요청을 보냈어요.' });
+    if (accepted) return res.status(409).json({ msg: '이미 친구예요.' });
+    if (senderIdx === userIdx) return res.status(409).json({ msg: '이미 친구 요청을 보냈어요.' });
 
     await executeSql('update friendship set accepted = true where sender_idx = ? and receiver_idx = ?', [friendIdx.toString(), userIdx.toString()]);
     return res.status(200).json({ msg: '이미 나에게 친구 요청을 보낸 사용자예요. 자동으로 친구가 되었어요.' });
