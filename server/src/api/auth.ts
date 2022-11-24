@@ -173,4 +173,9 @@ router.get('/check-login', authenticateToken, (req: AuthorizedRequest, res) => {
   res.send(req.user ?? 401);
 });
 
+router.get('/logout', authenticateToken, (req, res) => {
+  res.clearCookie('token');
+  res.sendStatus(204);
+});
+
 export default router;

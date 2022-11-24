@@ -35,6 +35,7 @@ declare module 'GlobalType' {
     idx: number;
     title: string;
     color: string;
+    count: number;
   }
 
   interface CompletionCheckBoxStatus {
@@ -86,5 +87,10 @@ declare module 'GlobalType' {
   }
   interface DiaryObjects {
     [key: string]: fabric.Rect | fabric.Triangle | fabric.Ellipse | fabric.IText | fabric.Path;
+  }
+  interface Location {
+    location: string;
+    lat: number;
+    lng: number;
   }
 }
