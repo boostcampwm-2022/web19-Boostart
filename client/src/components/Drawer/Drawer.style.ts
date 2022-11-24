@@ -9,6 +9,14 @@ export const DRAWER_HEIGHT = '100%';
 export const DRAWER_Z_INDEX = 999;
 export const DRAWER_TOP = '0';
 
+const unselectable = `
+  -moz-user-select: -moz-none;
+  -khtml-user-select: none;
+  -webkit-user-select: none;
+  -o-user-select: none;
+  user-select: none;
+`;
+
 export const Drawer = styled.div<{ open: boolean }>`
   position: fixed;
   display: flex;
@@ -22,6 +30,9 @@ export const Drawer = styled.div<{ open: boolean }>`
   background-color: #ffffff;
   transition: all ease 1s;
   ${(props) => props.open && `transform: translateX(${DRAWER_RIGHT});`}
+  img {
+    ${unselectable}
+  }
 `;
 
 // 공통
