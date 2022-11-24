@@ -93,17 +93,31 @@ export const DateBox = styled.div`
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  color: #8b8b8b;
-  font-size: 0.6rem;
-  font-weight: 700;
-  font-family: 'Noto Sans KR', sans-serif;
+  box-sizing: border-box;
+  cursor: pointer;
+`;
+
+export const TodayMarker = styled.div<{
+  isToday: boolean;
+}>`
+  width: 2rem;
+  height: 2rem;
+  line-height: 2rem;
+  border-radius: 5rem;
+  margin-bottom: 0.25rem;
+  text-align: center;
+  background: ${(props) => (props.isToday ? '#cadfff' : '#FFFFFF')};
 `;
 
 export const Date = styled.span`
-  font-size: 0.5rem;
-  text-align: center;
   margin-top: -0.25rem;
+  color: #8b8b8b;
+  font-size: 0.5rem;
+  font-weight: 700;
+  font-family: 'Noto Sans KR', sans-serif;
+  text-align: center;
   cursor: pointer;
+  pointer-events: none;
 `;
 
 export const DateLogo = styled.span<{
@@ -115,6 +129,7 @@ export const DateLogo = styled.span<{
   -webkit-background-clip: text;
   color: transparent;
   cursor: pointer;
+  pointer-events: none;
 `;
 
 export const MenuSelector = styled.div`

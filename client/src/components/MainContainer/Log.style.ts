@@ -54,7 +54,7 @@ export const TimeMarker = styled.div<{
   width: 0.85rem;
   height: ${(props) => props.duration * 1.3}rem;
   position: absolute;
-  background: #99b1db;
+  background: var(--color-main);
   top: ${(props) => props.startedAt * 1.3}rem;
   transition: all 0.5s;
 `;
@@ -84,13 +84,6 @@ export const SortOptionSelect = styled.select`
     font-size: 0.625rem;
     font-family: 'Noto Sans KR', sans-serif;
   }
-`;
-
-export const DateController = styled.span`
-  color: #99b1db;
-  font-size: 1.5rem;
-  font-family: 'Press Start 2P', cursive;
-  cursor: default;
 `;
 
 export const LogMainSection = styled.div`
@@ -228,4 +221,8 @@ export const CheckBox = styled.input`
   margin-right: 0.25rem;
   border-radius: 0.5rem;
   accent-color: #7991db;
+`;
+
+export const DateArrow = styled.div`
+  cursor: pointer;
 `;

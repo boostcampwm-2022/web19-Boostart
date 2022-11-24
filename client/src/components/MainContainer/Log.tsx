@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import DateSelector from './DateSelector';
 import TaskList from './TaskItem';
 import { Task, CompletionCheckBoxStatus } from 'GlobalType';
 import { dummyTaskList } from '../common/dummy';
@@ -133,7 +134,7 @@ const Log = () => {
             <option value="time">시간순</option>
             <option value="importance">중요도순</option>
           </S.SortOptionSelect>
-          <S.DateController>{'< 11.12 >'}</S.DateController>
+          <DateSelector />
           <S.CheckBoxContainer>
             <S.CheckBoxLabel htmlFor="complete">완료</S.CheckBoxLabel>
             <S.CheckBox type="checkbox" id="complete" defaultChecked={completionCheckBoxStatus.complete} onChange={(e) => handleCheckBoxChange(e, 'complete')} />
@@ -145,12 +146,10 @@ const Log = () => {
           <S.SlideObserver data-direction="left" direction="left"></S.SlideObserver>
           {tagList.map((tag) => {
             return (
-              <>
-                <S.TagWrap key={tag} data-tag={tag} onClick={handleTagWrapClick} onMouseDown={handleMouseDown}>
-                  <S.TagTitle data-tag={tag}>#{tag}</S.TagTitle>
-                  <TaskList taskList={filteredTasks(tag)} activeTask={activeTask} completionFilter={completionCheckBoxStatus} />
-                </S.TagWrap>
-              </>
+              <S.TagWrap key={tag} data-tag={tag} onClick={handleTagWrapClick} onMouseDown={handleMouseDown}>
+                <S.TagTitle data-tag={tag}>#{tag}</S.TagTitle>
+                <TaskList taskList={filteredTasks(tag)} activeTask={activeTask} completionFilter={completionCheckBoxStatus} />
+              </S.TagWrap>
             );
           })}
           <S.SlideObserver data-direction="right" direction="right"></S.SlideObserver>
