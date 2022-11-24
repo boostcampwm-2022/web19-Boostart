@@ -9,44 +9,46 @@ import { Tag } from 'GlobalType';
 axios.defaults.withCredentials = true; // withCredentials 전역 설정
 
 interface TagInputProps {
-  setTagIdx: React.Dispatch<React.SetStateAction<number | null>>;
+  tagObject: Tag | null;
+  setTagObject: React.Dispatch<React.SetStateAction<Tag | null>>;
 }
 
-const TagInput = ({ setTagIdx }: TagInputProps) => {
+const TagInput = ({ tagObject, setTagObject }: TagInputProps) => {
+  const [isTagInputFocused, setIsTagInputFocused] = useState(false);
+  const [tagInput, onChangeTagInput, setTagInput] = useInput('');
   const [tagList, setTagList] = useState<Tag[]>([]);
-  const [tagInput, onTagInputChange, setTagInput] = useInput('');
-  const [selectedTag, setSelectedTag] = useState<Tag | null>(); // 선택된 하나의 태그
-  const [isTagInputFocused, setIsTagInputFocused] = useState<Boolean>(false); // Input창이 Focus될 때만 List 표시
-  const [newTagColor, setNewTagColor] = useState(''); // 새로운 Tag 추가 시 색깔 랜덤 배정
+  const [searchedTagList, setSearchedTagList] = useState<Tag[]>([]);
+  const [newTagColor, setNewTagColor] = useState('');
+  const [reload, setReload] = useState(0);
+
+  //태그 선택 해제
+  const unSetTagItem = () => {
+    setTagObject(null);
+    setTagInput('');
+  };
 
   //TAG GET
   useEffect(() => {
-    const fetchData = async () => {
+    const getTagList = async () => {
       try {
         const result = await axios.get(`${HOST}/api/v1/tag`);
-        setTagList(result.data);
+        const list = result.data.sort((a: Tag, b: Tag) => b.count - a.count);
+        setTagList(list);
       } catch (error) {
         console.log(error);
       }
     };
-    fetchData();
-  }, [, () => postNewTag]);
+    getTagList();
+  }, [reload]);
 
   //검색된 Tag
-  const filteredTagList = tagList.filter((itemList) => itemList.title.toUpperCase().includes(tagInput.toUpperCase()));
+  useEffect(() => {
+    setSearchedTagList(tagList.filter((itemList) => itemList.title.toUpperCase().includes(tagInput.toUpperCase())));
+  }, [tagList, tagInput]);
 
   //하나의 태그 선택
   const setTagItem = (e: React.MouseEvent<HTMLDivElement>) => {
-    setSelectedTag(filteredTagList.find((item) => item.idx.toString() === e.currentTarget!.dataset.idx));
-    setTagIdx(Number(e.currentTarget.dataset.idx));
-  };
-
-  //태그 선택 해제
-  const unSetTagItem = () => {
-    setSelectedTag(null);
-    setTagIdx(null);
-    setIsTagInputFocused(true);
-    setTagInput('');
+    setTagObject(searchedTagList.find((item) => item.idx.toString() === e.currentTarget!.dataset.idx) || null);
   };
 
   //POST TAG
@@ -56,58 +58,94 @@ const TagInput = ({ setTagIdx }: TagInputProps) => {
         title: tagInput,
         color: newTagColor,
       } as Tag;
-      const result = await axios.post(`${HOST}/api/v1/tag`, newTagData);
-
-      if (result.status === 200) {
-        setSelectedTag(newTagData); // 표시되는 데이터 갱신
-        setTagIdx(result.data.idx); // tagIdx(form에서 사용되는 값)를 추가된 Tag의 idx로 갱신
-      }
+      await axios.post(`${HOST}/api/v1/tag`, newTagData).then((res) => {
+        if (res.status === 200) {
+          setTagObject({ ...newTagData, idx: res.data.idx, count: 0 });
+          setReload(reload + 1);
+        }
+      });
     } catch (error) {
-      alert('Tag 생성에 실패했습니다.');
-      // 각 실패 처리에 대한 논의 후 에러 메시지 분기 추가하겠습니다.
-      console.log(error);
+      alert('이미 존재하는 태그입니다.');
+    }
+  };
+
+  //DELET TAG
+  const deleteTag = async (e: React.MouseEvent<HTMLDivElement>) => {
+    e.stopPropagation();
+    try {
+      await axios.delete(`${HOST}/api/v1/tag/${e.currentTarget!.dataset.idx}`).then((res) => {
+        if (res.status == 200) setReload(reload + 1);
+      });
+    } catch (error) {
+      alert('태그 삭제에 실패했습니다.');
+    }
+    setIsTagInputFocused(true);
+  };
+
+  const onChangeTagColor = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setTagObject((prev) => {
+      return { ...prev, color: e.target.value } as Tag;
+    });
+  };
+
+  const postColorChange = async (e: React.FocusEvent<HTMLInputElement>) => {
+    try {
+      const r = await axios.post(`${HOST}/api/v1/tag/color/${tagObject!.idx}`, { color: tagObject!.color }).then((res) => {
+        if (res.status == 200) setReload(reload + 1);
+      });
+    } catch (error) {
+      alert('색상 변경에 실패했습니다.');
     }
   };
 
   useEffect(() => {
-    setNewTagColor(`#${Math.round(Math.random() * 0xffff).toString(16)}`);
-  }, []);
+    let color_r = Math.floor(Math.random() * 127 + 128).toString(16);
+    let color_g = Math.floor(Math.random() * 127 + 128).toString(16);
+    let color_b = Math.floor(Math.random() * 127 + 128).toString(16);
+    setNewTagColor(`#${color_r + color_g + color_b}`);
+  }, [reload]);
 
-  if (selectedTag === null || selectedTag == undefined)
-    // 태그 선택 전
+  const SearchedTagList = () => {
     return (
-      <TagContainer>
-        <InputBar onChange={onTagInputChange} onFocus={(e) => setIsTagInputFocused(true)} onBlur={(e) => setIsTagInputFocused(false)} />
-        {isTagInputFocused ? (
-          <TagList>
-            {filteredTagList.map((item) => {
-              return (
-                <TagListItem key={item.idx} data-idx={item.idx} onMouseDown={setTagItem}>
-                  <TagTitle color={item.color}>
-                    <a>{item.title}</a>
-                  </TagTitle>
-                </TagListItem>
-              );
-            })}
-            {tagInput != '' ? (
-              <TagListItem onMouseDown={postNewTag}>
-                <TagTitle color={newTagColor}>
-                  생성 : <a>{tagInput}</a>
-                </TagTitle>
-              </TagListItem>
-            ) : null}
-          </TagList>
-        ) : null}
-      </TagContainer>
+      <TagList>
+        {searchedTagList.map(({ idx, color, title, count }) => {
+          return (
+            <TagListItem key={idx} data-idx={idx} onMouseDown={setTagItem}>
+              <TagTitle color={color} create={false}>
+                <span>{title}</span>
+                {count === 0 && (
+                  <DeleteIcon data-idx={idx} onMouseDown={deleteTag}>
+                    삭제
+                  </DeleteIcon>
+                )}
+              </TagTitle>
+            </TagListItem>
+          );
+        })}
+        {tagInput !== '' && (
+          <TagListItem onMouseDown={postNewTag}>
+            <TagTitle color={newTagColor} create={true}>
+              {'생성 : '}
+              <span>{tagInput}</span>
+            </TagTitle>
+          </TagListItem>
+        )}
+      </TagList>
     );
+  };
 
-  // 하나의 태그가 선택되었을 때
-  return (
+  return tagObject === null ? (
+    <TagContainer>
+      <InputBar value={tagInput} onChange={onChangeTagInput} onFocus={(e) => setIsTagInputFocused(true)} onBlur={(e) => setIsTagInputFocused(false)} />
+      {isTagInputFocused && <SearchedTagList />}
+    </TagContainer>
+  ) : (
     <TagContainer>
       <Bar>
-        <SelectedTag color={selectedTag?.color}>
-          {selectedTag!.title} <CloseButton onClick={unSetTagItem} />
+        <SelectedTag color={tagObject?.color}>
+          {tagObject!.title} <CloseButton onClick={unSetTagItem} />
         </SelectedTag>
+        <ColorPicker type="color" value={tagObject.color} onChange={onChangeTagColor} onBlur={postColorChange} />
       </Bar>
     </TagContainer>
   );
@@ -139,21 +177,37 @@ const TagListItem = styled.div`
   }
 `;
 
-const TagTitle = styled.div`
-  display: table-cell;
-  vertical-align: middle;
+const TagTitle = styled.div<{ color: string; create: boolean }>`
+  display: flex;
   padding: 2.5px 3px 2.5px 5px;
-  a {
+  align-items: center;
+  height: 27px;
+  font-size: 0.8rem;
+  justify-content: ${(props) => (props.create ? 'baseline' : 'space-between')};
+
+  span {
+    cursor: pointer;
+    margin: 0px;
     display: inline-block;
     padding: 2px 6px 2px 6px;
-    background-color: ${(props) => props.color || 'black'};
+    background-color: ${(props) => props.color || 'white'};
     border-radius: 3px;
     height: 19px;
     line-height: 19px;
   }
-  font-size: 0.8rem;
 `;
 
+const DeleteIcon = styled.div`
+  text-align: right;
+  cursor: pointer;
+  color: var(--color-gray6);
+  margin: 0px;
+  font-size: 10px;
+  display: inline-block;
+  padding: 2px 6px 2px 6px;
+  height: 19px;
+  line-height: 19px;
+`;
 export const InputBar = styled.input`
   margin: auto;
   background: var(--color-gray0);
@@ -177,6 +231,7 @@ export const Bar = styled.div`
   padding-left: 0.6rem;
   display: flex;
   align-items: center;
+  justify-content: space-between;
 `;
 
 const SelectedTag = styled.div`
@@ -184,7 +239,7 @@ const SelectedTag = styled.div`
   display: flex;
   line-height: 19px;
   height: 19px;
-  background-color: ${(props) => props.color || 'black'};
+  background-color: ${(props) => props.color || 'white'};
   border-radius: 3px;
   font-size: 0.8rem;
 `;
@@ -195,4 +250,22 @@ const CloseButton = styled(RiCloseLine)`
   margin: auto;
   padding: 3px;
   cursor: pointer;
+`;
+
+const ColorPicker = styled.input`
+  cursor: pointer;
+  border: 1px solid var(--color-gray3);
+  padding: 0px;
+  background-color: inherit;
+  width: 1.2rem;
+  height: 1.2rem;
+  margin: 0.8rem;
+  z-index: 999;
+
+  ::-webkit-color-swatch-wrapper {
+    padding: 0;
+  }
+  ::-webkit-color-swatch {
+    border: none;
+  }
 `;

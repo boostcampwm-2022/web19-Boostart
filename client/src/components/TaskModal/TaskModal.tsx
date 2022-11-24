@@ -1,4 +1,4 @@
-import React, { Component, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import * as S from './TaskModal.style';
 import ImportanceInput from './ImportanceInput';
 import TagInput from './TagInput';
@@ -6,13 +6,14 @@ import useInput from '../../hooks/useInput';
 import LocationSearchInput from './LocationSearchInput';
 import { Location } from 'GlobalType';
 import useCurrentDate from '../../hooks/useCurrentDate';
-import { StyledComponent } from 'styled-components';
-
+import { Tag } from 'GlobalType';
+ 
 interface Props {
   setIsModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }
+
 const TaskModal = (props: Props) => {
-  const [tagidx, setTagIdx] = useState<number | null>(null);
+  const [tagObject, setTagObject] = useState<Tag | null>(null);
   const [locationObject, setLocationObject] = useState<Location | null>(null); // { location, lng, lat }
 
   const [isDetailOpen, setIsDetailOpen] = useState(false);
@@ -43,7 +44,7 @@ const TaskModal = (props: Props) => {
         <S.TaskForm>
           <S.FormTable>
             <Row title="제목" content={<S.InputBar />} />
-            <Row title="태그" content={<TagInput setTagIdx={setTagIdx} />} />
+            <Row title="태그" content={<TagInput tagObject={tagObject} setTagObject={setTagObject} />} />
             <Row
               title="시간"
               content={
