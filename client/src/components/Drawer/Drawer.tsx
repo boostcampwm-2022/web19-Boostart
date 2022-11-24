@@ -19,10 +19,7 @@ const Drawer = ({ open }: { open: boolean }) => {
   return (
     <>
       <S.Drawer open={open}>
-        <S.ProfileEditButton onClick={handleProfileEditButtonClick} href="#">
-          프로필 수정
-        </S.ProfileEditButton>
-        <ProfileSection />
+        <ProfileSection handleProfileEditButtonClick={handleProfileEditButtonClick} />
         <S.HorizontalRule />
         <ReceivedFriendRequestSection />
         <S.HorizontalRule />
@@ -45,16 +42,25 @@ const Drawer = ({ open }: { open: boolean }) => {
   );
 };
 
-const ProfileSection = () => {
+interface ProfileSectionProps {
+  handleProfileEditButtonClick: React.MouseEventHandler;
+}
+
+const ProfileSection = ({ handleProfileEditButtonClick }: ProfileSectionProps) => {
   return (
     <S.ProfileSection>
-      <S.MyProfileImage src="https://avatars.githubusercontent.com/u/55306894?s=80&u=aedb7854f1fd10d8eb6dc1272f1583dbb255f5b8&v=4" />
-      <S.ProfileInfo>
-        <S.Greeting>
-          <S.Username>모작</S.Username> 님 반갑습니다
-        </S.Greeting>
-        <S.UserId>@mojac</S.UserId>
-      </S.ProfileInfo>
+      <S.ProfileEditButton onClick={handleProfileEditButtonClick} href="#">
+        프로필 수정
+      </S.ProfileEditButton>
+      <S.Profile>
+        <S.MyProfileImage src="https://avatars.githubusercontent.com/u/55306894?s=80&u=aedb7854f1fd10d8eb6dc1272f1583dbb255f5b8&v=4" />
+        <S.ProfileInfo>
+          <S.Greeting>
+            <S.Username>모작</S.Username> 님 반갑습니다
+          </S.Greeting>
+          <S.UserId>@mojac</S.UserId>
+        </S.ProfileInfo>
+      </S.Profile>
     </S.ProfileSection>
   );
 };

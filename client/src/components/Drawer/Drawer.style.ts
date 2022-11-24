@@ -4,13 +4,15 @@ import styled from 'styled-components';
 export const DRAWER_WIDTH = '23rem';
 export const DRAWER_HORIZON_PADDING = '2rem';
 export const DRAWER_RIGHT = `calc(-${DRAWER_WIDTH} + calc(-${DRAWER_HORIZON_PADDING}*2))`;
-export const DRAWER_HEIGHT = '100vh';
+export const DRAWER_HEIGHT = '100%';
 
 export const DRAWER_Z_INDEX = 999;
 export const DRAWER_TOP = '0';
 
 export const Drawer = styled.div<{ open: boolean }>`
   position: fixed;
+  display: flex;
+  flex-direction: column;
   z-index: ${DRAWER_Z_INDEX};
   top: 0;
   right: ${DRAWER_RIGHT};
@@ -53,12 +55,10 @@ const ProfileImage = styled.img`
 
 // 프로필 수정
 export const ProfileEditButton = styled.a`
-  position: absolute;
-  top: 0;
-  right: 0;
   font-weight: bold;
   color: black;
   text-decoration: none;
+  margin-left: auto;
 `;
 
 export const PROFILE_EDIT_FORM_WIDTH = '40rem';
@@ -78,8 +78,13 @@ export const ProfileEditForm = styled.div`
 export const ProfileSection = styled.div`
   display: flex;
   justify-content: center;
-  align-items: center;
+  flex-direction: column;
   padding: 1.1rem 0;
+`;
+
+export const Profile = styled.div`
+  display: flex;
+  align-items: center;
 `;
 
 export const ProfileInfo = styled.div`
@@ -168,10 +173,10 @@ export const Notification = styled.div`
 
 // 로그아웃 버튼
 export const LogoutButton = styled.a`
-  position: absolute;
-  bottom: 0;
-  right: 0;
   font-weight: bold;
   color: black;
   text-decoration: none;
+  margin-left: auto;
+  margin-top: auto;
+  padding-bottom: 1rem;
 `;
