@@ -84,7 +84,7 @@ const ReceivedFriendRequestSection = () => {
       <S.SectionHeader>나에게 온 친구 요청</S.SectionHeader>
       <div>
         {dummyReceivedFriendRequests.map(({ userId, username, profileImg }) => (
-          <ReceivedFriendRequest userId={userId} username={username} profileImg={profileImg} />
+          <ReceivedFriendRequest key={userId} userId={userId} username={username} profileImg={profileImg} />
         ))}
       </div>
     </S.ReceivedFriendRequestSection>
@@ -121,7 +121,7 @@ const NotificationSection = () => {
       <S.SectionHeader>알림</S.SectionHeader>
       <div>
         {dummyNotifications.map(({ idx, content }) => (
-          <S.Notification>{content}</S.Notification>
+          <S.Notification key={idx}>{content}</S.Notification>
         ))}
       </div>
     </S.NotificationSection>
