@@ -12,7 +12,7 @@ const Drawer = ({ open }: { open: boolean }) => {
   };
 
   const handleLogoutButtonClick = () => {
-    alert('서버에 로그아웃하겠다고 알릴게요');
+    console.log('LogoutButtonClicked');
   };
 
   return (
@@ -66,7 +66,7 @@ const ProfileSection = ({ handleProfileEditButtonClick }: ProfileSectionProps) =
         프로필 수정
       </S.ProfileEditButton>
       <S.Profile>
-        <S.MyProfileImage src="https://avatars.githubusercontent.com/u/55306894?s=80&u=aedb7854f1fd10d8eb6dc1272f1583dbb255f5b8&v=4" />
+        <S.ProfileImage size="5rem" padding="1rem" src="https://avatars.githubusercontent.com/u/55306894?s=80&u=aedb7854f1fd10d8eb6dc1272f1583dbb255f5b8&v=4" />
         <S.ProfileInfo>
           <S.SizedText fontSize="1.1rem">
             <S.Username>모작</S.Username>님 반갑습니다
@@ -93,16 +93,16 @@ const ReceivedFriendRequestSection = () => {
 
 const ReceivedFriendRequest = ({ userId, username, profileImg }: { userId: string; username: string; profileImg: string }) => {
   const handleAcceptButtonClick = () => {
-    alert(`${userId} 님의 친구 요청을 수락하겠다고 서버에 알릴게요.`);
+    console.log('AcceptButtonClicked');
   };
 
   const handleRejectButtonClick = () => {
-    alert(`${userId} 님의 친구 요청을 거절하겠다고 서버에 알릴게요.`);
+    console.log('RejectButtonClicked');
   };
 
   return (
     <S.ReceivedFriendRequest>
-      <S.ReceivedFriendProfileImage src={profileImg} />
+      <S.ProfileImage size="4rem" padding="1rem" src={profileImg} />
       <S.ReceivedFriendRequestInfo>
         <S.Username>{username}</S.Username>
         <S.UserId>@{userId}</S.UserId>

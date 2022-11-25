@@ -1,13 +1,12 @@
 import styled from 'styled-components';
 
 // 최상위 레이아웃
-export const DRAWER_WIDTH = '23rem';
-export const DRAWER_HORIZON_PADDING = '2rem';
-export const DRAWER_RIGHT = `calc(-${DRAWER_WIDTH} + calc(-${DRAWER_HORIZON_PADDING}*2))`;
-export const DRAWER_HEIGHT = '100%';
+const DRAWER_WIDTH = '23rem';
+const DRAWER_HEIGHT = '100%';
+const DRAWER_HORIZON_PADDING = '2rem';
+const DRAWER_RIGHT = `calc(-${DRAWER_WIDTH} + calc(-${DRAWER_HORIZON_PADDING}*2))`;
 
 export const DRAWER_Z_INDEX = 999;
-export const DRAWER_TOP = '0';
 
 const unselectable = `
   -moz-user-select: -moz-none;
@@ -135,19 +134,6 @@ export const ProfileInfo = styled.div<{ height?: string; marginTop?: string }>`
   ${(props) => props.marginTop && `margin-top: ${props.marginTop};`}
   width: 15rem;
   height: ${(props) => props.height ?? '3rem'};
-`;
-
-export const MyProfileImage = styled(ProfileImage)`
-  width: 5rem;
-  height: 5rem;
-  padding: 1rem;
-`;
-
-// 받은 친구 요청 영역
-export const ReceivedFriendProfileImage = styled(ProfileImage)`
-  width: 4rem;
-  height: 4rem;
-  padding: 1rem;
 `;
 
 export const ReceivedFriendRequestSection = styled.div`
