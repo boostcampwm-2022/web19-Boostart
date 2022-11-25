@@ -83,8 +83,8 @@ export const ProfileEditButton = styled.a`
   margin-left: auto;
 `;
 
-export const PROFILE_EDIT_FORM_WIDTH = '40rem';
-export const PROFILE_EDIT_FORM_HEIGHT = '30rem';
+const PROFILE_EDIT_FORM_WIDTH = '40rem';
+const PROFILE_EDIT_FORM_HEIGHT = '30rem';
 export const PROFILE_EDIT_FORM_Z_INDEX = 1001;
 export const PROFILE_EDIT_FORM_TOP = '50%';
 export const PROFILE_EDIT_FORM_LEFT = '50%';
