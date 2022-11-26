@@ -36,6 +36,9 @@ app.get('*', (req, res) => {
 const diaryObjects = {};
 
 io.on('connection', (socket) => {
+  socket.on('requestCurrentObjects', () => {
+    io.to(socket.id).emit('offerCurrentObjects', diaryObjects);
+  });
   socket.on('sendModifiedObject', (objectData) => {
     const objectId = objectData.id;
     diaryObjects[objectId] = objectData;

@@ -1,15 +1,17 @@
-import { FabricText, Shape, FabricLine } from 'GlobalType';
+import { FabricText, Shape, FabricLine, ObjectData } from 'GlobalType';
 import { io, Socket } from 'socket.io-client';
 import { HOST } from '../../constants/index';
 
 interface ServerToClientEvents {
-  updateModifiedObject: (lineData: FabricLine | FabricText | Shape) => void;
+  updateModifiedObject: (objectData: FabricLine | FabricText | Shape) => void;
   applyObjectRemoving: (objectId: string) => void;
+  offerCurrentObjects: (objectDataMap: ObjectData) => void;
 }
 
 interface ClientToServerEvents {
-  sendModifiedObject: (lineData: FabricLine | FabricText | Shape) => void;
+  sendModifiedObject: (objectData: FabricLine | FabricText | Shape) => void;
   sendRemovedObjectId: (objectId: string) => void;
+  requestCurrentObjects: () => void;
 }
 
 class GlobalSocket {

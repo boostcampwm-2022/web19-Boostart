@@ -265,6 +265,11 @@ const Canvas = () => {
   globalSocket.on('applyObjectRemoving', (objectId) => {
     removeObject(objectId);
   });
+  globalSocket.on('offerCurrentObjects', (objectdataMap) => {
+    Object.values(objectdataMap).forEach((objectData) => {
+      updateModifiedObject(objectData);
+    });
+  });
 
   useEffect(() => {
     if (!canvasRef.current) canvasRef.current = initCanvas();
@@ -272,6 +277,7 @@ const Canvas = () => {
     canvasRef.current.on('object:modified', dispatchModifiedObject);
     canvasRef.current.on('object:moving', dispatchModifiedObject);
     window.addEventListener('keydown', handleKeydown);
+    globalSocket.emit('requestCurrentObjects');
 
     return () => {
       if (!canvasRef.current) return;
@@ -279,6 +285,7 @@ const Canvas = () => {
       canvasRef.current.off('object:modified', dispatchModifiedObject);
       canvasRef.current.off('object:moving', dispatchModifiedObject);
       window.removeEventListener('keydown', handleKeydown);
+      canvasRef.current.clear();
     };
   }, []);
 

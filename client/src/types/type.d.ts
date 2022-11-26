@@ -95,4 +95,7 @@ declare module 'GlobalType' {
     lng: number;
   }
   type ShapeType = 'rect' | 'triangle' | 'circle';
+  interface ObjectData {
+    [key: string]: FabricLine | FabricText | Shape;
+  }
 }
