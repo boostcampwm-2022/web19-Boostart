@@ -64,3 +64,14 @@ declare module 'GlobalType' {
     lng: number;
   }
 }
+
+interface ModalProps {
+  component: JSX.Element;
+  zIndex: number;
+  top?: string;
+  bottom?: string;
+  left?: string;
+  right?: string;
+  transform?: string;
+  handleDimmedClick: React.MouseEventHandler;
+}
