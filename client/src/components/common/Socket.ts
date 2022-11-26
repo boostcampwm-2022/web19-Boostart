@@ -4,10 +4,12 @@ import { HOST } from '../../constants/index';
 
 interface ServerToClientEvents {
   updateModifiedObject: (lineData: FabricLine | FabricText | Shape) => void;
+  applyObjectRemoving: (objectId: string) => void;
 }
 
 interface ClientToServerEvents {
   sendModifiedObject: (lineData: FabricLine | FabricText | Shape) => void;
+  sendRemovedObjectId: (objectId: string) => void;
 }
 
 class GlobalSocket {

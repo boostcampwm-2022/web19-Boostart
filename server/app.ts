@@ -36,10 +36,13 @@ app.get('*', (req, res) => {
 const diaryObjects = {};
 
 io.on('connection', (socket) => {
-  socket.on('sendModifiedObject', (objectData, senderId) => {
+  socket.on('sendModifiedObject', (objectData) => {
     const objectId = objectData.id;
     diaryObjects[objectId] = objectData;
-    socket.broadcast.emit('updateModifiedObject', objectData, senderId);
+    socket.broadcast.emit('updateModifiedObject', objectData);
+  });
+  socket.on('sendRemovedObjectId', (objectId) => {
+    socket.broadcast.emit('applyObjectRemoving', objectId);
   });
 
   socket.on('disconnect', () => {});

@@ -54,10 +54,12 @@ const Canvas = () => {
 
   const eraseSelectedObject = () => {
     if (!canvasRef.current) return;
-    const currentTarget = canvasRef.current.getActiveObject();
+    const currentTarget: any = canvasRef.current.getActiveObject();
     if (!currentTarget) return;
     if (currentTarget instanceof fabric.IText && currentTarget.isEditing) return;
     canvasRef.current.remove(currentTarget);
+    const objectId = currentTarget.id;
+    globalSocket.emit('sendRemovedObjectId', objectId);
   };
 
   // Create Objects
@@ -244,6 +246,15 @@ const Canvas = () => {
     else drawShapeOnCanvas(objectData as Shape);
   };
 
+  //remove Object
+
+  const removeObject = (objectId: string) => {
+    const targetObject = diaryObjects.get(objectId);
+    if (!canvasRef.current) return;
+    canvasRef.current.remove(targetObject);
+    diaryObjects.delete(objectId);
+  };
+
   const dispatchCanvasChange = (objectData: FabricLine | FabricText | Shape) => {
     globalSocket.emit('sendModifiedObject', objectData);
   };
@@ -251,17 +262,22 @@ const Canvas = () => {
   globalSocket.on('updateModifiedObject', (objectData) => {
     updateModifiedObject(objectData);
   });
+  globalSocket.on('applyObjectRemoving', (objectId) => {
+    removeObject(objectId);
+  });
 
   useEffect(() => {
     if (!canvasRef.current) canvasRef.current = initCanvas();
     canvasRef.current.on('path:created', dispatchCreatedLine);
     canvasRef.current.on('object:modified', dispatchModifiedObject);
+    canvasRef.current.on('object:moving', dispatchModifiedObject);
     window.addEventListener('keydown', handleKeydown);
 
     return () => {
       if (!canvasRef.current) return;
       canvasRef.current.off('path:created', dispatchCreatedLine);
       canvasRef.current.off('object:modified', dispatchModifiedObject);
+      canvasRef.current.off('object:moving', dispatchModifiedObject);
       window.removeEventListener('keydown', handleKeydown);
     };
   }, []);
