@@ -94,4 +94,5 @@ declare module 'GlobalType' {
     lat: number;
     lng: number;
   }
+  type ShapeType = 'rect' | 'triangle' | 'circle';
 }

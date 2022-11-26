@@ -36,35 +36,10 @@ app.get('*', (req, res) => {
 const diaryObjects = {};
 
 io.on('connection', (socket) => {
-  socket.on('sendCreatedShape', (shape, senderId) => {
-    const objectId = shape.id;
-    diaryObjects[objectId] = shape;
-    socket.broadcast.emit('dispatchCreatedShape', shape, senderId);
-  });
-  socket.on('sendCreatedText', (textData, senderId) => {
-    const objectId = textData.id;
-    diaryObjects[objectId] = textData;
-    socket.broadcast.emit('dispatchCreatedText', textData, senderId);
-  });
-  socket.on('sendCreatedLine', (lineData, senderId) => {
-    const objectId = lineData.id;
-    diaryObjects[objectId] = lineData;
-    socket.broadcast.emit('dispatchCreatedLine', lineData, senderId);
-  });
-  socket.on('sendModifiedLine', (lineData, senderId) => {
-    const objectId = lineData.id;
-    diaryObjects[objectId] = lineData;
-    socket.broadcast.emit('updateModifiedLine', lineData, senderId);
-  });
-  socket.on('sendModifiedText', (textData, senderId) => {
-    const objectId = textData.id;
-    diaryObjects[objectId] = textData;
-    socket.broadcast.emit('updateModifiedText', textData, senderId);
-  });
-  socket.on('sendModifiedShape', (ShapeData, senderId) => {
-    const objectId = ShapeData.id;
-    diaryObjects[objectId] = ShapeData;
-    socket.broadcast.emit('updateModifiedShape', ShapeData, senderId);
+  socket.on('sendModifiedObject', (objectData, senderId) => {
+    const objectId = objectData.id;
+    diaryObjects[objectId] = objectData;
+    socket.broadcast.emit('updateModifiedObject', objectData, senderId);
   });
 
   socket.on('disconnect', () => {});
