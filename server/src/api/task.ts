@@ -12,24 +12,61 @@ router.get('/', authenticateToken, async (req: AuthorizedRequest, res) => {
   res.json(rows);
 });
 
+const MIN_IMPORTANCE = 1;
 const MAX_IMPORTANCE = 5;
 const validateImportance = (importance: number) => {
-  return importance <= MAX_IMPORTANCE;
+  return typeof importance === 'number' && importance >= MIN_IMPORTANCE && importance <= MAX_IMPORTANCE;
 };
 const validateLatitude = (lat: number) => {
-  return lat >= -90 && lat <= 90;
+  return typeof lat === 'number' && lat >= -90 && lat <= 90;
 };
 const validateLongitude = (lng: number) => {
-  return lng >= -180 && lng <= 180;
+  return typeof lng === 'number' && lng >= -180 && lng <= 180;
+};
+
+const DEFAULT_TAG_INDEX = 1;
+
+const validateTitle = (title: string) => {
+  return typeof title === 'string';
+};
+const validateDate = (date: string) => {
+  const regex = /^\d{4}-(0[1-9]|1[012])-(0[1-9]|[12][0-9]|3[01])$/;
+  return regex.test(date);
+};
+const validateIsPublic = (isPublic: boolean) => {
+  return typeof isPublic === 'boolean';
+};
+const validateTime = (time: string) => {
+  const regex = /^([01][0-9]|2[0-3]):([0-5][0-9])$/;
+  return regex.test(time);
+};
+const validateTagIdx = (tagIdx: number) => {
+  return typeof tagIdx === 'number';
+};
+const validateDone = (done: boolean) => {
+  return typeof done === 'boolean';
+};
+// TODO: implement
+const validateLabels = (labels: any[]) => {
+  return false;
 };
 
 router.post('/', authenticateToken, async (req: AuthorizedRequest, res) => {
   const { userIdx } = req.user;
-  const { title, importance, startedAt, endedAt, lat, lng, isPublic, tagIdx, content, done, date, labels } = req.body;
+  let { title, date, importance, startedAt, endedAt, lat, lng, isPublic, tagIdx, content, done, labels } = req.body;
 
-  if (!validateImportance(importance)) res.sendStatus(400);
-  if (!validateLatitude(lat)) res.sendStatus(400);
-  if (!validateLongitude(lng)) res.sendStatus(400);
+  if (!validateTitle(title)) return res.status(400).send({ msg: '제목을 입력해주세요.' });
+  if (!validateDate(date)) return res.status(400).send({ msg: '날짜를 입력해주세요.' });
+  if (!validateImportance(importance)) importance = (MIN_IMPORTANCE + MAX_IMPORTANCE) / 2;
+  if (!validateTime(startedAt)) startedAt = null;
+  if (!validateTime(endedAt)) endedAt = null;
+  if (!validateLatitude(lat)) lat = null;
+  if (!validateLongitude(lng)) lng = null;
+  if (!validateIsPublic(isPublic)) isPublic = false;
+  if (!validateTagIdx(tagIdx)) tagIdx = DEFAULT_TAG_INDEX;
+  if (!validateLongitude(content)) content = null;
+  if (!validateDone(done)) done = false;
+  if (!validateLabels(labels)) labels = [];
 
   try {
     const result = (await executeSql('insert into task (title, importance, date, started_at, ended_at, lat, lng, content, done, public, tag_idx, user_idx) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', [
