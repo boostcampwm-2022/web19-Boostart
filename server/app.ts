@@ -45,6 +45,7 @@ io.on('connection', (socket) => {
     socket.broadcast.emit('updateModifiedObject', objectData);
   });
   socket.on('sendRemovedObjectId', (objectId) => {
+    delete diaryObjects[objectId];
     socket.broadcast.emit('applyObjectRemoving', objectId);
   });
 
