@@ -2,7 +2,10 @@ import React from 'react';
 import Clock from './Clock/Clock';
 import * as S from './TopBar.style';
 
-const TopBar = () => {
+interface TopBarProps {
+  handleMenuClick: React.MouseEventHandler;
+}
+const TopBar = ({ handleMenuClick }: TopBarProps) => {
   return (
     <>
       <S.TopBarContainer>

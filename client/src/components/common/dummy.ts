@@ -204,3 +204,22 @@ export const dummyTaskList: Task[] = [
     ],
   },
 ];
+
+export const dummyReceivedFriendRequests = [
+  {
+    userId: 'mikaniz',
+    username: '믹',
+    profileImg: 'https://avatars.githubusercontent.com/u/92143119?s=60&v=4',
+  },
+];
+
+export const dummyNotifications = [
+  {
+    idx: 330,
+    content: '제리 님이 내 일기에 참여했습니다.',
+  },
+  {
+    idx: 331,
+    content: '마요 님이 내 일기에 참여했습니다.',
+  },
+];

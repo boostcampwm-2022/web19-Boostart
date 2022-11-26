@@ -18,4 +18,5 @@ export const MainTitle = styled.span`
 
 export const MenuIcon = styled.img`
   align-self: center;
+  cursor: pointer;
 `;
