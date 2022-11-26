@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { OkPacket } from 'mysql2';
+import { OkPacket, RowDataPacket } from 'mysql2';
 import { executeSql } from '../db';
 import { AuthorizedRequest } from '../types';
 import { authenticateToken } from '../utils/auth';
@@ -56,6 +56,26 @@ router.post('/', authenticateToken, async (req: AuthorizedRequest, res) => {
     res.sendStatus(200);
   } catch (error) {
     res.sendStatus(400);
+  }
+});
+
+router.patch('/:task_idx', authenticateToken, async (req: AuthorizedRequest, res) => {
+  const { userIdx } = req.user;
+  const taskIdx = req.params.task_idx;
+
+  if (!(Object.keys(req.body).length === 1 && req.body.done === true)) return res.sendStatus(400);
+
+  try {
+    const [task] = (await executeSql('select user_idx, done from task where idx = ?', [taskIdx])) as RowDataPacket[];
+
+    if (!task) return res.sendStatus(404);
+    if (task.user_idx !== userIdx) return res.sendStatus(403);
+    if (task.done) return res.sendStatus(409);
+
+    await executeSql('update task set done = true where idx = ?', [taskIdx]);
+    res.sendStatus(200);
+  } catch (error) {
+    res.sendStatus(500);
   }
 });
 
