@@ -1,17 +1,33 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { FriendsList } from 'GlobalType';
-import { dummyFriendList } from '../common/dummy';
+import { HOST } from '../../constants';
+import axios from 'axios';
 import * as S from './FriendsBar.style';
 
 const FriendsBar = () => {
-  const [friendsList, setFriendsList] = useState<FriendsList[]>(dummyFriendList);
-  const plusIcon = './plus.svg';
+  const [friendsList, setFriendsList] = useState<FriendsList[] | null>(null);
+  const plusIcon = '/plus.svg';
+  const getFriendsList = async () => {
+    try {
+      setFriendsList(null);
+      const response = await axios.get(`${HOST}/api/v1/friend`);
+      setFriendsList(response.data);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  useEffect(() => {
+    getFriendsList();
+  }, []);
+
   return (
     <>
       <S.FriendsBarContainer>
-        {friendsList.map(({ idx, userId, profileImg }) => {
-          return <S.ProfileBox key={userId} data-idx={idx} imgURL={profileImg}></S.ProfileBox>;
-        })}
+        {friendsList &&
+          friendsList.map(({ idx, userId, profileImg }) => {
+            return <S.ProfileBox key={userId} data-idx={idx} imgURL={profileImg}></S.ProfileBox>;
+          })}
         <S.ProfileBox imgURL={plusIcon}></S.ProfileBox>
       </S.FriendsBarContainer>
     </>

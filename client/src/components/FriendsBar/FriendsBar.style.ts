@@ -22,7 +22,7 @@ export const ProfileBox = styled.div<{
   border: 1px solid #d4d4d4;
   margin: 0 0.4rem;
   box-sizing: border-box;
-  background: url(${(props) => props.imgURL}) no-repeat center center / ${(props) => (props.imgURL === './plus.svg' ? '1.25rem 2.8rem' : '3.5rem 3.5rem')};
+  background: url(${(props) => props.imgURL}) no-repeat center center / ${(props) => (props.imgURL === '/plus.svg' ? '1.25rem 2.8rem' : '3.5rem 3.5rem')};
   &:hover {
     border: 5px solid #bccdec;
   }
