@@ -287,7 +287,7 @@ const Canvas = () => {
       window.removeEventListener('keydown', handleKeydown);
       canvasRef.current.clear();
     };
-  }, []);
+  });
 
   return (
     <>
@@ -295,10 +295,10 @@ const Canvas = () => {
       <span onClick={() => enterDrawingMode(3)}>연필</span>
       <span onClick={() => enterDrawingMode(10)}>형광펜</span>
       <span onClick={() => enterDrawingMode(20)}>브러쉬</span>
-      <img src="/rect.svg" onClick={() => createNewShape('rect')} />
-      <img src="/triangle.svg" onClick={() => createNewShape('triangle')} />
-      <img src="/circle.svg" onClick={() => createNewShape('circle')} />
-      <img src="/textIcon.svg" onClick={() => createNewText()} />
+      <img src="/rect.svg" onClick={() => createNewShape('rect')} alt="" />
+      <img src="/triangle.svg" onClick={() => createNewShape('triangle')} alt="" />
+      <img src="/circle.svg" onClick={() => createNewShape('circle')} alt="" />
+      <img src="/textIcon.svg" onClick={() => createNewText()} alt="" />
       <input type="color" ref={colorRef} onChange={changeBrushColor} />
     </>
   );
