@@ -11,7 +11,7 @@ const TopBar = ({ handleMenuClick }: TopBarProps) => {
       <S.TopBarContainer>
         <Clock />
         <S.MainTitle>Boostart</S.MainTitle>
-        <S.MenuIcon src="/menu.svg" />
+        <S.MenuIcon src="/menu.svg" onClick={handleMenuClick} />
       </S.TopBarContainer>
     </>
   );
