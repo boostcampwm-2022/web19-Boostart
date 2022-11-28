@@ -14,7 +14,7 @@ router.put('/task/:task_idx', authenticateToken, async (req: PutEmoticonRequest,
     if (!emoticon) return res.sendStatus(400);
 
     const notExistTask = ((await executeSql('select idx from task where idx = ?', [taskIdx])) as RowDataPacket).length === 0;
-    if (notExistTask) return res.status(404).json({ msg: '존재하지 않는 태스크예요.' });
+    if (notExistTask) return res.status(404).json({ msg: '존재하지 않는 일정이에요.' });
 
     const notExistEmoticon = ((await executeSql('select idx from emoticon where idx = ?', [emoticon.toString()])) as RowDataPacket).length === 0;
     if (notExistEmoticon) return res.status(404).json({ msg: '존재하지 않는 이모티콘이에요.' });
