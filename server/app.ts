@@ -10,19 +10,16 @@ import http from 'http';
 const app = express();
 const httpServer = http.createServer(app);
 
-const io = new Server(httpServer, {
-  cors: {
-    origin: 'http://localhost:3000',
-    methods: ['GET', 'POST'],
-    credentials: true,
-  },
-});
-
 const corsOptions = {
   origin: CLIENT,
   credentials: true,
   methods: ['GET', 'POST', 'DELETE', 'PUT', 'PATCH'],
 };
+
+const io = new Server(httpServer, {
+  cors: corsOptions,
+});
+
 app.use(express.json());
 app.use(cookieParser());
 app.use(cors(corsOptions));

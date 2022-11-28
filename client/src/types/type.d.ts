@@ -98,6 +98,9 @@ declare module 'GlobalType' {
   interface ObjectData {
     [key: string]: FabricLine | FabricText | Shape;
   }
+  interface FabricObject extends fabric.Object {
+    id: string;
+  }
 }
 
 interface ModalProps {

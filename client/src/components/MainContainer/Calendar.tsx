@@ -68,15 +68,7 @@ const Calendar = () => {
             return <DateContainer key={'date' + (idx + 1)} calendarYear={calendarDate.getFullYear()} calendarDate={idx + 1} calendarMonth={calendarDate.getMonth()}></DateContainer>;
           })}
         </S.DateSelector>
-<<<<<<< HEAD
-        <S.MenuSelector>
-          {Menus.map((menu) => {
-            return <MenuLinkButton key={menu} menu={menu} />;
-          })}
-        </S.MenuSelector>
-=======
         <MenuSelector />
->>>>>>> 25bba2efcd7d74aecdcbe93f60d788e61ec600a1
       </S.CalendarContainer>
     </>
   );

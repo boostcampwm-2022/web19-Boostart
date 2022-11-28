@@ -1,7 +1,7 @@
 import { useEffect, useRef } from 'react';
 import globalSocket from '../common/Socket';
 import { DEFAULT_OBJECT_VALUE } from '../../constants';
-import { Shape, FabricText, FabricLine, ShapeType } from 'GlobalType';
+import { Shape, FabricText, FabricLine, ShapeType, FabricObject } from 'GlobalType';
 import { fabric } from 'fabric';
 import { v4 } from 'uuid';
 
@@ -54,7 +54,7 @@ const Canvas = () => {
 
   const eraseSelectedObject = () => {
     if (!canvasRef.current) return;
-    const currentTarget: any = canvasRef.current.getActiveObject();
+    const currentTarget = canvasRef.current.getActiveObject() as FabricObject;
     if (!currentTarget) return;
     if (currentTarget instanceof fabric.IText && currentTarget.isEditing) return;
     canvasRef.current.remove(currentTarget);
