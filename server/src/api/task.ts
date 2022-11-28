@@ -14,59 +14,99 @@ router.get('/', authenticateToken, async (req: AuthorizedRequest, res) => {
 
 const MIN_IMPORTANCE = 1;
 const MAX_IMPORTANCE = 5;
-const validateImportance = (importance: number) => {
-  return typeof importance === 'number' && importance >= MIN_IMPORTANCE && importance <= MAX_IMPORTANCE;
-};
-const validateLatitude = (lat: number) => {
-  return typeof lat === 'number' && lat >= -90 && lat <= 90;
-};
-const validateLongitude = (lng: number) => {
-  return typeof lng === 'number' && lng >= -180 && lng <= 180;
+
+const TaskBodyKeys = {
+  title: 'title',
+  date: 'date',
+  importance: 'importance',
+  lat: 'lat',
+  lng: 'lng',
+  isPublic: 'isPublic',
+  startedAt: 'startedAt',
+  endedAt: 'endedAt',
+  tagIdx: 'tagIdx',
+  done: 'done',
+  labels: 'labels',
+  content: 'content',
+} as const;
+
+const TaskBodyDefaultValues = {
+  [TaskBodyKeys.importance]: (MIN_IMPORTANCE + MAX_IMPORTANCE) / 2,
+  [TaskBodyKeys.lat]: null,
+  [TaskBodyKeys.lng]: null,
+  [TaskBodyKeys.isPublic]: true,
+  [TaskBodyKeys.tagIdx]: 1,
+  [TaskBodyKeys.done]: false,
+  [TaskBodyKeys.labels]: [],
+  [TaskBodyKeys.content]: null,
+} as const;
+
+type TaskBodyKeys = typeof TaskBodyKeys[keyof typeof TaskBodyKeys];
+
+const validate = (key, value) => {
+  switch (key) {
+    case TaskBodyKeys.title: {
+      if (typeof value !== 'string') {
+        throw new ValidationError('올바른 제목을 입력해주세요.');
+      }
+      return true;
+    }
+    case TaskBodyKeys.date: {
+      const regex = /^\d{4}-(0[1-9]|1[012])-(0[1-9]|[12][0-9]|3[01])$/;
+      if (!regex.test(value)) {
+        throw new ValidationError('올바른 날짜를 입력해주세요.');
+      }
+      return true;
+    }
+    case TaskBodyKeys.importance: {
+      return typeof value === 'number' && MIN_IMPORTANCE <= value && value <= MAX_IMPORTANCE;
+    }
+    case TaskBodyKeys.lat: {
+      return typeof value === 'number' && value >= -90 && value <= 90;
+    }
+    case TaskBodyKeys.lng: {
+      return typeof value === 'number' && value >= -180 && value <= 180;
+    }
+    case TaskBodyKeys.isPublic: {
+      return typeof value === 'boolean';
+    }
+    case TaskBodyKeys.startedAt:
+    case TaskBodyKeys.endedAt: {
+      const regex = /^([01][0-9]|2[0-3]):([0-5][0-9])$/;
+      return regex.test(value);
+    }
+    case TaskBodyKeys.tagIdx: {
+      return typeof value === 'number';
+    }
+    case TaskBodyKeys.done: {
+      return typeof value === 'boolean';
+    }
+    case TaskBodyKeys.labels: {
+      return false; // to do implement
+    }
+    case TaskBodyKeys.content: {
+      return typeof value === 'string';
+    }
+    default: {
+      throw new ValidationError();
+    }
+  }
 };
 
-const DEFAULT_TAG_INDEX = 1;
-
-const validateTitle = (title: string) => {
-  return typeof title === 'string';
-};
-const validateDate = (date: string) => {
-  const regex = /^\d{4}-(0[1-9]|1[012])-(0[1-9]|[12][0-9]|3[01])$/;
-  return regex.test(date);
-};
-const validateIsPublic = (isPublic: boolean) => {
-  return typeof isPublic === 'boolean';
-};
-const validateTime = (time: string) => {
-  const regex = /^([01][0-9]|2[0-3]):([0-5][0-9])$/;
-  return regex.test(time);
-};
-const validateTagIdx = (tagIdx: number) => {
-  return typeof tagIdx === 'number';
-};
-const validateDone = (done: boolean) => {
-  return typeof done === 'boolean';
-};
-// TODO: implement
-const validateLabels = (labels: any[]) => {
-  return false;
-};
+class ValidationError extends Error {}
 
 router.post('/', authenticateToken, async (req: AuthorizedRequest, res) => {
   const { userIdx } = req.user;
-  let { title, date, importance, startedAt, endedAt, lat, lng, isPublic, tagIdx, content, done, labels } = req.body;
 
-  if (!validateTitle(title)) return res.status(400).send({ msg: '제목을 입력해주세요.' });
-  if (!validateDate(date)) return res.status(400).send({ msg: '날짜를 입력해주세요.' });
-  if (!validateImportance(importance)) importance = (MIN_IMPORTANCE + MAX_IMPORTANCE) / 2;
-  if (!validateTime(startedAt)) startedAt = null;
-  if (!validateTime(endedAt)) endedAt = null;
-  if (!validateLatitude(lat)) lat = null;
-  if (!validateLongitude(lng)) lng = null;
-  if (!validateIsPublic(isPublic)) isPublic = false;
-  if (!validateTagIdx(tagIdx)) tagIdx = DEFAULT_TAG_INDEX;
-  if (!validateLongitude(content)) content = null;
-  if (!validateDone(done)) done = false;
-  if (!validateLabels(labels)) labels = [];
+  try {
+    Object.values(TaskBodyKeys).forEach((key) => {
+      if (!validate(key, req.body[key])) req.body[key] = TaskBodyDefaultValues[key];
+    });
+  } catch (error) {
+    return res.status(400).send({ msg: error.message });
+  }
+
+  const { title, date, importance, startedAt, endedAt, lat, lng, isPublic, tagIdx, content, done, labels } = req.body;
 
   try {
     const result = (await executeSql('insert into task (title, importance, date, started_at, ended_at, lat, lng, content, done, public, tag_idx, user_idx) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', [
