@@ -5,7 +5,7 @@ import MainContents from '../components/MainContainer/MainContainer';
 import Drawer from '../components/Drawer/Drawer';
 import GNB from '../components/TopBar/TopBar';
 import { DRAWER_Z_INDEX } from '../components/Drawer/Drawer.style';
-import { Dimmed } from '../components/Drawer/Modal';
+import { Dimmed } from '../components/common/Modal';
 
 const MainPage = () => {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);

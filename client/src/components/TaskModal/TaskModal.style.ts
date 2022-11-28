@@ -1,18 +1,6 @@
 import styled from 'styled-components';
 import { CgClose } from 'react-icons/cg';
 
-export const Container = styled.div`
-  position: absolute;
-  z-index: 100;
-  width: 100vw;
-  height: 100%;
-  overflow-y: scroll;
-  background: rgba(0, 0, 0, 0.5);
-  display: grid;
-  justify-content: center;
-  align-items: center;
-  transform: translateY(-9.5rem);
-`;
 export const ModalContainer = styled.div<{ isDetailOpen: boolean }>`
   position: relative;
   width: 36.4rem;
@@ -53,8 +41,16 @@ export const FormTable = styled.table`
     justify-content: space-between;
     align-items: center;
   }
-  tr:nth-child(2) {
-    z-index: 999;
+`;
+export const LagreTr = styled.tr`
+  height: 5.6rem;
+
+  td:nth-child(1) {
+    width: 4.5rem;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--color-gray7);
+    vertical-align: text-top;
   }
 `;
 
