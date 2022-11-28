@@ -17,6 +17,7 @@ app.use(cookieParser());
 app.use(cors(corsOptions));
 app.use(`/api/${API_VERSION}`, apiRouter);
 app.use(express.static(path.join(__dirname, 'build')));
+app.use(express.static(path.join(__dirname, 'uploads')));
 
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, 'build/index.html'));
