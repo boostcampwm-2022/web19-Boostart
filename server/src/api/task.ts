@@ -10,7 +10,7 @@ router.get('/', authenticateToken, async (req: AuthorizedRequest, res) => {
   const { userIdx } = req.user;
   const { date } = req.query;
   if (!date) return res.status(400).send({ msg: '날짜를 지정해주세요.' });
-  const rows = await executeSql('select * from task where user_idx = ? and date = ?', [userIdx.toString(), date.toString()]);
+  const rows = await executeSql('select * from task where user_idx = ? and date = ?', [userIdx, date]);
   res.json(rows);
 });
 
@@ -75,7 +75,7 @@ router.patch('/:task_idx', authenticateToken, async (req: AuthorizedRequest, res
     if (task.user_idx !== userIdx) return res.sendStatus(403);
     if (task.done === done) return res.sendStatus(409);
 
-    await executeSql('update task set done = ? where idx = ?', [done, taskIdx] as any); // TODO: executeSql 함수 매개변수 타입 수정 후 타입 캐스팅 삭제
+    await executeSql('update task set done = ? where idx = ?', [done, taskIdx]);
     res.sendStatus(200);
   } catch (error) {
     res.sendStatus(500);
