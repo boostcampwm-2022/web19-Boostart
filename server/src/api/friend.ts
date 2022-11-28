@@ -47,7 +47,7 @@ router.put('/request/:user_idx', authenticateToken, async (req: AuthorizedReques
   const { userIdx } = req.user;
   const friendIdx = req.params.user_idx;
 
-  if (userIdx.toString() === friendIdx) return res.status(409).json({ msg: '스스로에게 친구 요청을 할 수 없어요.' });
+  if (userIdx === parseInt(friendIdx)) return res.status(409).json({ msg: '스스로에게 친구 요청을 할 수 없어요.' });
 
   const notExistUser = ((await executeSql('select idx from user where idx = ?', [friendIdx])) as RowDataPacket).length === 0;
   if (notExistUser) return res.status(404).json({ msg: '존재하지 않는 사용자예요.' });
