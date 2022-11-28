@@ -56,12 +56,20 @@ declare module 'GlobalType' {
     angle: number;
     scaleX: number;
     scaleY: number;
- }
- 
+  }
+
   interface Location {
     location: string;
     lat: number;
     lng: number;
+  }
+
+  interface Label {
+    idx: number;
+    title: string;
+    color: string;
+    unit: string;
+    amount: number?;
   }
 }
 
