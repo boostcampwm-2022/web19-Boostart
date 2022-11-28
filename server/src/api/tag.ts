@@ -8,7 +8,7 @@ const router = Router();
 
 router.get('/', authenticateToken, async (req: AuthorizedRequest, res) => {
   const { userIdx } = req.user;
-  const tags = await executeSql('select tag.idx as idx, tag.title as title, tag.color as color, count(task.idx) as count from tag left join task on task.tag_idx = tag.idx where tag.user_idx = ? group by tag.idx', [userIdx.toString()]);
+  const tags = await executeSql('select tag.idx as idx, tag.title as title, tag.color as color, count(task.idx) as count from tag left join task on task.tag_idx = tag.idx where tag.user_idx = ? group by tag.idx', [userIdx]);
   res.json(tags);
 });
 
@@ -40,7 +40,7 @@ router.delete('/:tag_idx', authenticateToken, async (req: AuthorizedRequest, res
   const tagIdx = req.params.tag_idx;
 
   try {
-    await executeSql('delete from tag where user_idx = ? and idx = ?', [userIdx.toString(), tagIdx]);
+    await executeSql('delete from tag where user_idx = ? and idx = ?', [userIdx, tagIdx]);
     res.sendStatus(200);
   } catch (error) {
     res.sendStatus(403);

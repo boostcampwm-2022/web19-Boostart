@@ -10,7 +10,7 @@ router.get('/', authenticateToken, async (req: AuthorizedRequest, res) => {
   const { userIdx } = req.user;
   const { date } = req.query;
   if (!date) return res.status(400).send({ msg: '날짜를 지정해주세요.' });
-  const rows = await executeSql('select * from task where user_idx = ? and date = ?', [userIdx.toString(), date.toString()]);
+  const rows = await executeSql('select * from task where user_idx = ? and date = ?', [userIdx, date]);
   res.json(rows);
 });
 
