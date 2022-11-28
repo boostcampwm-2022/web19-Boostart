@@ -73,7 +73,10 @@ const validate = (key, value) => {
     case TaskBodyKeys.startedAt:
     case TaskBodyKeys.endedAt: {
       const regex = /^([01][0-9]|2[0-3]):([0-5][0-9])$/;
-      return regex.test(value);
+      if (!regex.test(value)) {
+        throw new ValidationError();
+      }
+      return true;
     }
     case TaskBodyKeys.tagIdx: {
       return typeof value === 'number';
