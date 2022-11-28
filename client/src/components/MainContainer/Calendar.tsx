@@ -1,16 +1,13 @@
 import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import useCurrentDate from '../../hooks/useCurrentDate';
-import { EngMonth, Days, WEEK_LENGTH, Menus, RoutePath } from '../../constants';
+import { EngMonth, Days, WEEK_LENGTH } from '../../constants';
+import MenuSelector from './MenuSelector';
 import * as S from './Calendar.style';
 
 interface DateContainerProps {
   calendarYear: number;
   calendarMonth: number;
   calendarDate: number;
-}
-interface MenuLinkButtonProps {
-  menu: string;
 }
 
 const createArray = (count: number) => {
@@ -71,11 +68,15 @@ const Calendar = () => {
             return <DateContainer key={'date' + (idx + 1)} calendarYear={calendarDate.getFullYear()} calendarDate={idx + 1} calendarMonth={calendarDate.getMonth()}></DateContainer>;
           })}
         </S.DateSelector>
+<<<<<<< HEAD
         <S.MenuSelector>
           {Menus.map((menu) => {
             return <MenuLinkButton key={menu} menu={menu} />;
           })}
         </S.MenuSelector>
+=======
+        <MenuSelector />
+>>>>>>> 25bba2efcd7d74aecdcbe93f60d788e61ec600a1
       </S.CalendarContainer>
     </>
   );
@@ -100,23 +101,3 @@ const DateContainer = ({ calendarYear, calendarMonth, calendarDate }: DateContai
 };
 
 export default Calendar;
-
-const MenuLinkButton = ({ menu }: MenuLinkButtonProps) => {
-  const [selectedMenu, setSelectedMenu] = useState('LOG');
-  const navigate = useNavigate();
-  const handleMenuClick = (e: React.MouseEvent) => {
-    const target = e.target;
-    if (!(target instanceof HTMLDivElement)) return;
-    const selectedMenu = target.dataset.menu;
-    if (selectedMenu) {
-      setSelectedMenu(selectedMenu);
-      navigate(RoutePath[selectedMenu]);
-    }
-  };
-
-  return (
-    <S.MenuButton key={menu} data-menu={menu} onClick={handleMenuClick} isActivatedMenu={menu === selectedMenu}>
-      {menu}
-    </S.MenuButton>
-  );
-};
