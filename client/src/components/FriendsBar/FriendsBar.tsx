@@ -1,18 +1,22 @@
 import { useState } from 'react';
-import { FriendsList } from 'GlobalType';
+import { Friend } from 'GlobalType';
 import { dummyFriendList } from '../common/dummy';
 import * as S from './FriendsBar.style';
 
-const FriendsBar = () => {
-  const [friendsList, setFriendsList] = useState<FriendsList[]>(dummyFriendList);
+interface FriendBarProps {
+  handlePlusButtonClick: React.MouseEventHandler;
+}
+
+const FriendsBar = ({ handlePlusButtonClick }: FriendBarProps) => {
+  const [friendsList, setFriendsList] = useState<Friend[]>(dummyFriendList);
   const plusIcon = './plus.svg';
   return (
     <>
       <S.FriendsBarContainer>
-        {friendsList.map(({ idx, userId, profileImg }) => {
-          return <S.ProfileBox key={userId} data-idx={idx} imgURL={profileImg}></S.ProfileBox>;
+        {friendsList.map(({ idx, user_id, profile_img }) => {
+          return <S.ProfileBox key={user_id} data-idx={idx} imgURL={profile_img}></S.ProfileBox>;
         })}
-        <S.ProfileBox imgURL={plusIcon}></S.ProfileBox>
+        <S.ProfileBox imgURL={plusIcon} onClick={handlePlusButtonClick}></S.ProfileBox>
       </S.FriendsBarContainer>
     </>
   );

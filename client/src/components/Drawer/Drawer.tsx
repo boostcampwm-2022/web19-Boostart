@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { dummyNotifications, dummyReceivedFriendRequests } from '../common/dummy';
 import { PROFILE_EDIT_FORM_Z_INDEX, PROFILE_EDIT_FORM_TOP, PROFILE_EDIT_FORM_LEFT, PROFILE_EDIT_FORM_TRANFORM } from './Drawer.style';
-import Modal from './Modal';
+import Modal from '../common/Modal';
 import * as S from './Drawer.style';
 
 const Drawer = ({ open }: { open: boolean }) => {
@@ -83,8 +83,8 @@ const ReceivedFriendRequestSection = () => {
     <S.ReceivedFriendRequestSection>
       <S.SectionHeader>나에게 온 친구 요청</S.SectionHeader>
       <div>
-        {dummyReceivedFriendRequests.map(({ userId, username, profileImg }) => (
-          <ReceivedFriendRequest key={userId} userId={userId} username={username} profileImg={profileImg} />
+        {dummyReceivedFriendRequests.map(({ userId, username, profile_img }) => (
+          <ReceivedFriendRequest key={userId} userId={userId} username={username} profileImg={profile_img} />
         ))}
       </div>
     </S.ReceivedFriendRequestSection>

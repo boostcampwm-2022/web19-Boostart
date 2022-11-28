@@ -1,9 +1,9 @@
 declare module 'GlobalType' {
-  interface FriendsList {
+  interface Friend {
     idx: number;
-    userId: string;
+    user_id: string;
     username: string;
-    profileImg: string;
+    profile_img: string;
   }
 
   interface LabelData {
@@ -56,8 +56,8 @@ declare module 'GlobalType' {
     angle: number;
     scaleX: number;
     scaleY: number;
- }
- 
+  }
+
   interface Location {
     location: string;
     lat: number;
