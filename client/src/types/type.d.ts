@@ -69,6 +69,7 @@ declare module 'GlobalType' {
     title: string;
     color: string;
     unit: string;
+    count: number?;
     amount: number?;
   }
 }

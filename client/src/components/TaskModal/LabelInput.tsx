@@ -23,52 +23,22 @@ const LabelInput = ({ labelArray, setLabelArray }: LabelInputProps) => {
   const [isLabelModalOpen, setIsLabelModalOpen] = useState(false);
 
   useEffect(() => {
-    console.log(labelArray);
-  }, [labelArray]);
+    console.log(labelList);
+  }, [labelList, labelArray]);
 
   //LABEL GET
   useEffect(() => {
     const getLabelList = async () => {
       try {
         const result = await axios.get(`${HOST}/api/v1/label`);
-        setLabelList(result.data);
+        const list = result.data.sort((a: Label, b: Label) => b.count! - a.count!);
+        setLabelList(list);
       } catch (error) {
         console.log(error);
       }
     };
     getLabelList();
   }, []);
-
-  // //   //POST TAG
-  // //   const postNewTag = async () => {
-  // //     try {
-  // //       const newTagData = {
-  // //         title: tagInput,
-  // //         color: newTagColor,
-  // //       } as Tag;
-  // //       await axios.post(`${HOST}/api/v1/tag`, newTagData).then((res) => {
-  // //         if (res.status === 200) {
-  // //           setTagObject({ ...newTagData, idx: res.data.idx, count: 0 });
-  // //           setReload(reload + 1);
-  // //         }
-  // //       });
-  // //     } catch (error) {
-  // //       alert('이미 존재하는 태그입니다.');
-  // //     }
-  // //   };
-
-  // //   //DELET TAG
-  // //   const deleteTag = async (e: React.MouseEvent<HTMLDivElement>) => {
-  // //     e.stopPropagation();
-  // //     try {
-  // //       await axios.delete(`${HOST}/api/v1/tag/${e.currentTarget!.dataset.idx}`).then((res) => {
-  // //         if (res.status == 200) setReload(reload + 1);
-  // //       });
-  // //     } catch (error) {
-  // //       alert('태그 삭제에 실패했습니다.');
-  // //     }
-  // //     setIsTagInputFocused(true);
-  // //   };
 
   const NewLabelModal = () => {
     const [newLabelColor, setNewLabelColor] = useState('');
@@ -93,32 +63,7 @@ const LabelInput = ({ labelArray, setLabelArray }: LabelInputProps) => {
     return (
       <LabelModal>
         {selectedLabel === null ? (
-          <>
-            <LabelModalTable>
-              <tbody>
-                <tr>
-                  <th>
-                    <ModalInputTitle>
-                      <InputBar />
-                      <ColorPicker type="color" value={newLabelColor} disabled />
-                    </ModalInputTitle>
-                  </th>
-                  <th>
-                    <h4>
-                      {' '}
-                      <InputBar />
-                    </h4>
-                  </th>
-                </tr>
-                <tr>
-                  <td colSpan={2}>
-                    <InputBar type="number" min="0" placeholder="숫자를 입력하세요" />
-                  </td>
-                </tr>
-              </tbody>
-            </LabelModalTable>
-            <SubmitButton>NEW LABEL!</SubmitButton>
-          </>
+          <></>
         ) : (
           <>
             <LabelModalTable>
@@ -169,7 +114,7 @@ const LabelInput = ({ labelArray, setLabelArray }: LabelInputProps) => {
             return (
               <LabelListItem delete={true} key={item.idx} color={item.color} onClick={(e) => openAddLabelModal(item)}>
                 {item.title}
-                <DeleteButton />
+                {item.count! === 0 && <DeleteButton />}
               </LabelListItem>
             );
           })}
