@@ -62,17 +62,18 @@ router.post('/', authenticateToken, async (req: AuthorizedRequest, res) => {
 router.patch('/:task_idx', authenticateToken, async (req: AuthorizedRequest, res) => {
   const { userIdx } = req.user;
   const taskIdx = req.params.task_idx;
+  const { done } = req.body;
 
-  if (!(Object.keys(req.body).length === 1 && req.body.done === true)) return res.sendStatus(400);
+  if (!(Object.keys(req.body).length === 1 && typeof done === 'boolean')) return res.sendStatus(400);
 
   try {
     const [task] = (await executeSql('select user_idx, done from task where idx = ?', [taskIdx])) as RowDataPacket[];
 
     if (!task) return res.sendStatus(404);
     if (task.user_idx !== userIdx) return res.sendStatus(403);
-    if (task.done) return res.sendStatus(409);
+    if (task.done === done) return res.sendStatus(409);
 
-    await executeSql('update task set done = true where idx = ?', [taskIdx]);
+    await executeSql('update task set done = ? where idx = ?', [done, taskIdx] as any); // TODO: executeSql 함수 매개변수 타입 수정 후 타입 캐스팅 삭제
     res.sendStatus(200);
   } catch (error) {
     res.sendStatus(500);
