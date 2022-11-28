@@ -23,3 +23,7 @@ declare interface SignupRequest extends Request {
     };
   };
 }
+
+declare interface PutEmoticonRequest extends AuthorizedRequest {
+  emoticon?: number;
+}
