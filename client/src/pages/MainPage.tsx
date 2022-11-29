@@ -12,6 +12,7 @@ import FriendSearchForm, { FRIEND_SEARCH_MODAL_ZINDEX } from '../components/Frie
 import { DRAWER_Z_INDEX } from '../components/Drawer/Drawer.style';
 import { MODAL_CENTER_TOP, MODAL_CENTER_LEFT, MODAL_CENTER_TRANSFORM } from '../constants';
 
+
 const MainPage = () => {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [isFriendSearchFormOpen, setIsFriendSearchFormOpen] = useState(false);

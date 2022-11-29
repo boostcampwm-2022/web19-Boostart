@@ -93,10 +93,21 @@ declare module 'GlobalType' {
     lat: number;
     lng: number;
   }
-  type ShapeType = 'rect' | 'triangle' | 'circle';
+
+  interface Label {
+    idx: number;
+    title: string;
+    color: string;
+    unit: string;
+    count: number?;
+    amount: number?;
+}
+
+type ShapeType = 'rect' | 'triangle' | 'circle';
   interface ObjectData {
     [key: string]: FabricLine | FabricText | Shape;
   }
+  
   interface FabricObject extends fabric.Object {
     id: string;
   }
