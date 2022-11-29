@@ -45,7 +45,7 @@ const MainPage = () => {
   return (
     <RecoilRoot>
       <TopBar handleMenuClick={() => setIsDrawerOpen(true)} />
-      <FriendsBar myProfile={myProfile} friendsList={friendsList} />
+      <FriendsBar myProfile={myProfile} friendsList={friendsList} handlePlusButtonClick={() => setIsFriendSearchFormOpen(true)} />
       <MainContents />
       {isDrawerOpen && <Dimmed zIndex={DRAWER_Z_INDEX - 1} onClick={() => setIsDrawerOpen(false)} />}
       <Drawer open={isDrawerOpen} />

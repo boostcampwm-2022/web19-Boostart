@@ -1,9 +1,9 @@
 declare module 'GlobalType' {
   interface Friend {
     idx: number;
-    user_id: string;
+    userId: string;
     username: string;
-    profile_img: string;
+    profileImg: string;
   }
 
   interface LabelData {

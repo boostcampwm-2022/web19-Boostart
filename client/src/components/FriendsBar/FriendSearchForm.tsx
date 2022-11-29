@@ -6,7 +6,7 @@ import FriendSearchInput from './FriendSearchInput';
 
 interface FriendSearchResultProps {
   idx: number;
-  user_id: string;
+  userId: string;
   username: string;
   profileImg: string;
 }
@@ -20,9 +20,9 @@ const FriendSearchForm = () => {
         <FriendSearchInput setFriendObject={setFriendObject} />
         <FriendResultList>
           {friendObject &&
-            friendObject.map(({ idx, user_id, username, profile_img }) => {
-              console.log(HOST, profile_img);
-              return <FriendSearchResult idx={idx} user_id={user_id} username={username} profileImg={profile_img} />;
+            friendObject.map(({ idx, userId, username, profileImg }) => {
+              console.log(HOST, profileImg);
+              return <FriendSearchResult idx={idx} userId={userId} username={username} profileImg={profileImg} />;
             })}
         </FriendResultList>
         <FriendRequestButton>Friend Request!</FriendRequestButton>
@@ -33,7 +33,7 @@ const FriendSearchForm = () => {
 
 export default FriendSearchForm;
 
-const FriendSearchResult = ({ idx, user_id, username, profileImg }: FriendSearchResultProps) => {
+const FriendSearchResult = ({ idx, userId, username, profileImg }: FriendSearchResultProps) => {
   return (
     <FriendResult>
       <FriendProfile imgURL={HOST + '/' + profileImg}></FriendProfile>
@@ -41,7 +41,7 @@ const FriendSearchResult = ({ idx, user_id, username, profileImg }: FriendSearch
         <span>
           <strong>{username}</strong>님
         </span>
-        <span>@{user_id}</span>
+        <span>@{userId}</span>
       </FriendInfo>
     </FriendResult>
   );
