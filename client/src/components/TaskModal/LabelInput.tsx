@@ -19,12 +19,13 @@ const LabelInput = ({ labelArray, setLabelArray }: LabelInputProps) => {
   const [labelList, setLabelList] = useState<Label[]>([]);
   const [selectedLabel, setSelectedLabel] = useState<Label | null>(null);
 
-  // const [reload, setReload] = useState(0);
+  const [reload, setReload] = useState(0);
   const [isLabelModalOpen, setIsLabelModalOpen] = useState(false);
 
-  // useEffect(() => {
-  //   console.log(labelList);
-  // }, [labelList, labelArray]);
+  useEffect(() => {
+    console.log(labelList);
+    console.log(labelArray);
+  }, [labelList, labelArray]);
 
   //LABEL GET
   useEffect(() => {
@@ -38,7 +39,7 @@ const LabelInput = ({ labelArray, setLabelArray }: LabelInputProps) => {
       }
     };
     getLabelList();
-  }, []);
+  }, [reload]);
 
   const NewLabelModal = () => {
     const [newLabel, setNewLabel] = useState({ title: '', color: '', unit: '' });
@@ -56,6 +57,10 @@ const LabelInput = ({ labelArray, setLabelArray }: LabelInputProps) => {
     };
 
     const pushLabel = () => {
+      if (0 === Number(amount!)) {
+        alert('올바른 값을 입력하세요');
+        return;
+      }
       let found = labelArray.find((label) => label.title === selectedLabel!.title);
       if (found) found.amount! = Number(found.amount!) + Number(amount!);
       else setLabelArray((prev) => [...prev, { ...selectedLabel, amount: Number(amount) } as Label]);
@@ -63,19 +68,26 @@ const LabelInput = ({ labelArray, setLabelArray }: LabelInputProps) => {
       setIsLabelModalOpen(false);
     };
 
-    const postLabel = () => {
-      // try {
-      //   await axios.post(`${HOST}/api/v1/tag`, newLabel).then((res) => {
-      //     if (res.status === 200) {
-      //       setLabelArray((prev) => [...prev, { ...newLabel, amount: Number(amount), idx: res.data.idx } as Label]);
-      //       setSelectedLabel(null);
-      //       setIsLabelModalOpen(false);
-      //     }
-      //   });
-      // } catch (error) {
-      //   alert('이미 존재하는 라벨입니다.');
-      // }
+    const postLabel = async (e: React.MouseEvent<HTMLButtonElement>) => {
+      if (0 === Number(amount!)) {
+        alert('올바른 값을 입력하세요');
+        return;
+      }
+      e.preventDefault();
+      try {
+        await axios.post(`${HOST}/api/v1/label`, newLabel).then((res) => {
+          console.log(res.status);
+          if (res.status === 201) {
+            setLabelArray((prev) => [...prev, { ...newLabel, amount: Number(amount), idx: res.data.idx } as Label]);
+            setIsLabelModalOpen(false);
+            setReload(reload + 1);
+          }
+        });
+      } catch (error) {
+        alert('이미 존재하는 라벨입니다.');
+      }
     };
+
     //추가 modal
     return (
       <LabelModal>
@@ -100,7 +112,7 @@ const LabelInput = ({ labelArray, setLabelArray }: LabelInputProps) => {
             </tr>
             <tr>
               <td colSpan={2}>
-                {selectedLabel ? <InputBar align="right" type="number" min="1" onChange={onChangeAmount} value={amount} placeholder="숫자를 입력하세요" /> : <InputBar align="right" type="number" min="0" placeholder="숫자를 입력하세요" />}
+                <InputBar align="right" type="number" min="1" onChange={onChangeAmount} value={amount} placeholder="숫자를 입력하세요" />
               </td>
             </tr>
           </tbody>
@@ -120,6 +132,17 @@ const LabelInput = ({ labelArray, setLabelArray }: LabelInputProps) => {
     setSelectedLabel(item);
   };
 
+  //DELET LABEL
+  const deleteLabel = async (e: React.MouseEvent<HTMLDivElement>) => {
+    e.stopPropagation();
+    try {
+      await axios.delete(`${HOST}/api/v1/label/${e.currentTarget!.dataset.idx}`).then((res) => {
+        if (res.status == 200) setReload(reload + 1);
+      });
+    } catch (error) {
+      alert('태그 삭제에 실패했습니다.');
+    }
+  };
   // 전체 라벨
   const LabelList = () => {
     return (
@@ -244,7 +267,6 @@ const LabelListContainer = styled.div`
   font-size: 0.8rem;
   display: flex;
   align-items: center;
-  overflow: scroll;
   overflow-x: scroll;
 `;
 
@@ -290,8 +312,8 @@ const LabelModal = styled.div`
   border-radius: 1.5rem;
 `;
 const DeleteButton = styled(RiCloseLine)`
-  width: 8px;
-  height: 8px;
+  width: 10px;
+  height: 10px;
   display: inline-block;
   padding-left: 10px;
 
@@ -299,10 +321,9 @@ const DeleteButton = styled(RiCloseLine)`
 `;
 
 const PlusButton = styled(FiPlus)`
-  width: 17px;
+  min-width: 17px;
   height: 17px;
   display: inline-block;
-  cursor: pointer;
   padding: 3px;
   color: var(--color-gray6);
   border: 1px solid var(--color-gray4);
