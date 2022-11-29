@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Route, Routes } from 'react-router-dom';
+import Modal from '../common/Modal';
 import TaskModal from '../TaskModal/TaskModal';
 import Calendar from './Calendar';
 import Diary from './Diary';
@@ -11,7 +12,7 @@ const MainContents = () => {
 
   return (
     <S.Container>
-      {isModalOpen ? <TaskModal setIsModalOpen={setIsModalOpen} /> : null}
+      {isModalOpen && <Modal component={<TaskModal setIsModalOpen={setIsModalOpen} />} zIndex={1001} top={'50%'} left={'50%'} transform={'translate(-50%, -50%)'} handleDimmedClick={() => {}} />}
       <S.MainContentContainer>
         <S.LeftSection>
           <Calendar></Calendar>

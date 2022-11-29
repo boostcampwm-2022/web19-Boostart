@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { dummyNotifications, dummyReceivedFriendRequests } from '../common/dummy';
 import { PROFILE_EDIT_FORM_Z_INDEX, PROFILE_EDIT_FORM_TOP, PROFILE_EDIT_FORM_LEFT, PROFILE_EDIT_FORM_TRANFORM } from './Drawer.style';
-import Modal from './Modal';
+import Modal from '../common/Modal';
 import * as S from './Drawer.style';
 
 const Drawer = ({ open }: { open: boolean }) => {
