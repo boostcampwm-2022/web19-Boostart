@@ -29,7 +29,7 @@ const FriendSearchForm = ({ selectedFriend, setSelectedFriend, handleRequestButt
         <FriendResultList>
           {friendObject &&
             friendObject.map(({ idx, userId, username, profileImg }) => {
-              return <FriendSearchResult idx={idx} userId={userId} username={username} profileImg={profileImg} selectedFriend={selectedFriend} setSelectedFriend={setSelectedFriend} />;
+              return <FriendSearchResult key={idx} idx={idx} userId={userId} username={username} profileImg={profileImg} selectedFriend={selectedFriend} setSelectedFriend={setSelectedFriend} />;
             })}
         </FriendResultList>
         <FriendRequestButton isSelectedFriendNull={selectedFriend === null} onClick={handleRequestButtonClick}>
