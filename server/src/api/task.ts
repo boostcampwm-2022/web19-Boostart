@@ -10,8 +10,24 @@ router.get('/', authenticateToken, async (req: AuthorizedRequest, res) => {
   const { userIdx } = req.user;
   const { date } = req.query;
   if (!date) return res.status(400).send({ msg: '날짜를 지정해주세요.' });
-  const rows = await executeSql('select content, done, ended_at as endedAt, idx, importance, lat, lng, started_at as startedAt, tag_idx as tagIdx, title, public as isPublic from task where user_idx = ? and date = ?', [userIdx, date]);
-  res.json(rows);
+  try {
+    const tasks = (await executeSql(
+      'select task.idx, task.title, task.importance, task.started_at as startedAt, task.ended_at as endedAt, task.lat, task.lng, task.location, task.public as isPublic, task.tag_idx as tagIdx, tag.title as tagName, task.content, task.done from task left join tag on task.tag_idx = tag.idx where task.user_idx = ? and task.date = ?',
+      [userIdx, date]
+    )) as RowDataPacket;
+
+    const result = await Promise.all(
+      tasks.map(async (task: RowDataPacket) => {
+        const { idx: taskIdx } = task;
+        const labels = await executeSql('select label.idx as labelIdx, label.title, label.color, label.unit, task_label.amount from task_label inner join label on task_label.label_idx = label.idx where task_idx = ?', [taskIdx]);
+        task.labels = labels;
+        return task;
+      })
+    );
+    res.json(result);
+  } catch {
+    res.sendStatus(500);
+  }
 });
 
 const MIN_IMPORTANCE = 1;
