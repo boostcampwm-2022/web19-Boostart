@@ -8,7 +8,7 @@ import { FiPlus } from 'react-icons/fi';
 import { Label } from 'GlobalType';
 import Modal from '../common/Modal';
 
-axios.defaults.withCredentials = true; // withCredentials 전역 설정
+axios.defaults.withCredentials = true;
 
 interface LabelInputProps {
   labelArray: Label[];
@@ -22,17 +22,11 @@ const LabelInput = ({ labelArray, setLabelArray }: LabelInputProps) => {
   const [reload, setReload] = useState(0);
   const [isLabelModalOpen, setIsLabelModalOpen] = useState(false);
 
-  useEffect(() => {
-    console.log(labelList);
-    console.log(labelArray);
-  }, [labelList, labelArray]);
-
   //LABEL GET
   useEffect(() => {
     const getLabelList = async () => {
       try {
         const result = await axios.get(`${HOST}/api/v1/label`);
-        console.log(result.data);
         const list = result.data.sort((a: Label, b: Label) => b.count! - a.count!);
         setLabelList(list);
       } catch (error) {
