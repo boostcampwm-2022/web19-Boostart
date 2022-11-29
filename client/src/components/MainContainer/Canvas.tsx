@@ -1,11 +1,14 @@
 import { useEffect, useRef } from 'react';
+import { useRecoilState, useRecoilValue } from 'recoil';
 import globalSocket from '../common/Socket';
 import { DEFAULT_OBJECT_VALUE } from '../../constants';
 import { Shape, FabricText, FabricLine, ShapeType, FabricObject } from 'GlobalType';
 import { fabric } from 'fabric';
 import { v4 } from 'uuid';
+import { visitState } from '../common/atoms';
 
 const Canvas = () => {
+  const currentVisit = useRecoilValue(visitState);
   const canvasRef = useRef<fabric.Canvas | null>(null);
   const colorRef = useRef<HTMLInputElement | null>(null);
   const canvasBackground = '/canvasBackground.png';
