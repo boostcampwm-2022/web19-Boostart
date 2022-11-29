@@ -4,14 +4,22 @@ import styled from 'styled-components';
 import { HOST } from '../../constants';
 import FriendSearchInput from './FriendSearchInput';
 
+interface FriendSearchFormProps {
+  selectedFriend: number | null;
+  setSelectedFriend: React.Dispatch<React.SetStateAction<number | null>>;
+  handleRequestButtonClick: React.MouseEventHandler;
+}
+
 interface FriendSearchResultProps {
   idx: number;
   userId: string;
   username: string;
   profileImg: string;
+  selectedFriend: number | null;
+  setSelectedFriend: React.Dispatch<React.SetStateAction<number | null>>;
 }
 
-const FriendSearchForm = () => {
+const FriendSearchForm = ({ selectedFriend, setSelectedFriend, handleRequestButtonClick }: FriendSearchFormProps) => {
   const [friendObject, setFriendObject] = useState<Friend[] | null>(null);
   return (
     <>
@@ -21,11 +29,12 @@ const FriendSearchForm = () => {
         <FriendResultList>
           {friendObject &&
             friendObject.map(({ idx, userId, username, profileImg }) => {
-              console.log(HOST, profileImg);
-              return <FriendSearchResult idx={idx} userId={userId} username={username} profileImg={profileImg} />;
+              return <FriendSearchResult key={idx} idx={idx} userId={userId} username={username} profileImg={profileImg} selectedFriend={selectedFriend} setSelectedFriend={setSelectedFriend} />;
             })}
         </FriendResultList>
-        <FriendRequestButton>Friend Request!</FriendRequestButton>
+        <FriendRequestButton isSelectedFriendNull={selectedFriend === null} onClick={handleRequestButtonClick}>
+          Friend Request!
+        </FriendRequestButton>
       </FriendSearchContainer>
     </>
   );
@@ -33,9 +42,12 @@ const FriendSearchForm = () => {
 
 export default FriendSearchForm;
 
-const FriendSearchResult = ({ idx, userId, username, profileImg }: FriendSearchResultProps) => {
+const FriendSearchResult = ({ idx, userId, username, profileImg, selectedFriend, setSelectedFriend }: FriendSearchResultProps) => {
+  const handleFriendClick = () => {
+    setSelectedFriend(idx);
+  };
   return (
-    <FriendResult>
+    <FriendResult isSelected={idx === selectedFriend} onClick={handleFriendClick}>
       <FriendProfile imgURL={HOST + '/' + profileImg}></FriendProfile>
       <FriendInfo>
         <span>
@@ -73,15 +85,20 @@ const FriendResultList = styled.div`
   height: 21rem;
   overflow-y: scroll;
 `;
-const FriendResult = styled.div`
+const FriendResult = styled.div<{
+  isSelected: boolean;
+}>`
   width: 21rem;
   height: 6.5rem;
   margin: 0 0 1rem;
-  padding: 1rem;
+  padding: ${({ isSelected }) => (isSelected ? '1rem 1rem 1rem 0.5rem' : '1rem')};
+  border: ${({ isSelected }) => (isSelected ? '0.5rem solid var(--color-main)' : 'none')};
   display: flex;
+  align-items: center;
   border-radius: 1rem;
   background: #f8f8f8;
   box-sizing: border-box;
+  cursor: pointer;
 `;
 
 const FriendProfile = styled.div<{
@@ -102,15 +119,16 @@ const FriendInfo = styled.div`
   justify-content: center;
 `;
 
-const FriendRequestButton = styled.button`
+const FriendRequestButton = styled.button<{ isSelectedFriendNull: boolean }>`
   width: 18.5rem;
   height: 2rem;
   border: none;
   border-radius: 1rem;
   margin: 0 auto;
-  background: var(--color-main);
+  background: ${(props) => (props.isSelectedFriendNull ? 'var(--color-gray3)' : 'var(--color-main)')};
   color: white;
   font-family: 'Press Start 2P', cursive;
   font-size: 0.875rem;
   text-align: center;
+  cursor: pointer;
 `;
