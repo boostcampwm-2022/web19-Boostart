@@ -24,8 +24,7 @@ declare module 'GlobalType' {
     lng: number;
     location: string;
     isPublic: boolean;
-    tag_idx: number;
-    tag_name: string;
+    tagIdx: number;
     content: string;
     done: boolean;
     labels: LabelData[];
