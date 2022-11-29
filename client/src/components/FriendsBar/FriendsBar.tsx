@@ -1,17 +1,22 @@
-import { useState } from 'react';
-import { FriendsList } from 'GlobalType';
-import { dummyFriendList } from '../common/dummy';
+import React from 'react';
+import { Friend } from 'GlobalType';
 import * as S from './FriendsBar.style';
 
-const FriendsBar = () => {
-  const [friendsList, setFriendsList] = useState<FriendsList[]>(dummyFriendList);
-  const plusIcon = './plus.svg';
+interface FriendsBarProps {
+  myProfile: Friend | null;
+  friendsList: Friend[] | null;
+}
+const FriendsBar = ({ myProfile, friendsList }: FriendsBarProps) => {
+  const plusIcon = '/plus.svg';
+
   return (
     <>
       <S.FriendsBarContainer>
-        {friendsList.map(({ idx, userId, profileImg }) => {
-          return <S.ProfileBox key={userId} data-idx={idx} imgURL={profileImg}></S.ProfileBox>;
-        })}
+        {myProfile && <S.ProfileBox imgURL={myProfile.profile_img}></S.ProfileBox>}
+        {friendsList &&
+          friendsList.map(({ idx, userId, profile_img }) => {
+            return <S.ProfileBox key={userId} data-idx={idx} imgURL={profile_img}></S.ProfileBox>;
+          })}
         <S.ProfileBox imgURL={plusIcon}></S.ProfileBox>
       </S.FriendsBarContainer>
     </>
