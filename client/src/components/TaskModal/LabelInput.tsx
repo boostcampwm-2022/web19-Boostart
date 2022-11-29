@@ -22,9 +22,9 @@ const LabelInput = ({ labelArray, setLabelArray }: LabelInputProps) => {
   // const [reload, setReload] = useState(0);
   const [isLabelModalOpen, setIsLabelModalOpen] = useState(false);
 
-  useEffect(() => {
-    console.log(labelList);
-  }, [labelList, labelArray]);
+  // useEffect(() => {
+  //   console.log(labelList);
+  // }, [labelList, labelArray]);
 
   //LABEL GET
   useEffect(() => {
@@ -41,15 +41,19 @@ const LabelInput = ({ labelArray, setLabelArray }: LabelInputProps) => {
   }, []);
 
   const NewLabelModal = () => {
-    const [newLabelColor, setNewLabelColor] = useState('');
+    const [newLabel, setNewLabel] = useState({ title: '', color: '', unit: '' });
     const [amount, onChangeAmount, setAmount] = useInput('');
 
     useEffect(() => {
       let color_r = Math.floor(Math.random() * 127 + 128).toString(16);
       let color_g = Math.floor(Math.random() * 127 + 128).toString(16);
       let color_b = Math.floor(Math.random() * 127 + 128).toString(16);
-      setNewLabelColor(`#${color_r + color_g + color_b}`);
+      setNewLabel((prev) => ({ ...prev, color: `#${color_r + color_g + color_b}` }));
     }, []);
+
+    const onChangeNewLabel = (e: React.ChangeEvent<HTMLInputElement>) => {
+      setNewLabel((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+    };
 
     const pushLabel = () => {
       let found = labelArray.find((label) => label.title === selectedLabel!.title);
@@ -59,37 +63,49 @@ const LabelInput = ({ labelArray, setLabelArray }: LabelInputProps) => {
       setIsLabelModalOpen(false);
     };
 
+    const postLabel = () => {
+      // try {
+      //   await axios.post(`${HOST}/api/v1/tag`, newLabel).then((res) => {
+      //     if (res.status === 200) {
+      //       setLabelArray((prev) => [...prev, { ...newLabel, amount: Number(amount), idx: res.data.idx } as Label]);
+      //       setSelectedLabel(null);
+      //       setIsLabelModalOpen(false);
+      //     }
+      //   });
+      // } catch (error) {
+      //   alert('이미 존재하는 라벨입니다.');
+      // }
+    };
     //추가 modal
     return (
       <LabelModal>
-        {selectedLabel === null ? (
-          <></>
-        ) : (
-          <>
-            <LabelModalTable>
-              <tbody>
-                <tr>
-                  <th>
-                    <ModalInputTitle>
-                      <LabelListItem delete={false} color={selectedLabel.color}>
-                        {selectedLabel?.title}
-                      </LabelListItem>
-                    </ModalInputTitle>
-                  </th>
-                  <th>
-                    <h4> {selectedLabel?.unit}</h4>
-                  </th>
-                </tr>
-                <tr>
-                  <td colSpan={2}>
-                    <InputBar type="number" min="1" onChange={onChangeAmount} value={amount} placeholder="숫자를 입력하세요" />
-                  </td>
-                </tr>
-              </tbody>
-            </LabelModalTable>
-            <SubmitButton onClick={pushLabel}>ADD LABEL!</SubmitButton>
-          </>
-        )}
+        <LabelModalTable>
+          <tbody>
+            <tr>
+              <th>
+                {selectedLabel ? (
+                  <ModalInputTitle>
+                    <LabelListItem delete={false} color={selectedLabel.color}>
+                      {selectedLabel?.title}
+                    </LabelListItem>
+                  </ModalInputTitle>
+                ) : (
+                  <ModalInputTitle>
+                    <InputBar width="4.6rem" align="left" placeholder="라벨 이름" name="title" value={newLabel.title} onChange={onChangeNewLabel} />
+                    <ColorPicker type="color" name="color" value={newLabel.color} onChange={onChangeNewLabel} />
+                  </ModalInputTitle>
+                )}
+              </th>
+              <th>{selectedLabel ? <h4> {selectedLabel?.unit}</h4> : <InputBar placeholder="단위" align="right" width="2rem" name="unit" value={newLabel.unit} onChange={onChangeNewLabel} />}</th>
+            </tr>
+            <tr>
+              <td colSpan={2}>
+                {selectedLabel ? <InputBar align="right" type="number" min="1" onChange={onChangeAmount} value={amount} placeholder="숫자를 입력하세요" /> : <InputBar align="right" type="number" min="0" placeholder="숫자를 입력하세요" />}
+              </td>
+            </tr>
+          </tbody>
+        </LabelModalTable>
+        <SubmitButton onClick={selectedLabel ? pushLabel : postLabel}>ADD LABEL!</SubmitButton>
       </LabelModal>
     );
   };
@@ -174,6 +190,7 @@ export const LabelModalTable = styled.table`
   tr,
   th,
   td {
+    padding: 0rem;
     height: 2.3rem;
     text-align: right;
     align-items: center;
@@ -181,8 +198,7 @@ export const LabelModalTable = styled.table`
     font-weight: normal;
   }
   th: nth-child(1) {
-    width: 8rem;
-    padding: 0rem 0.2rem 0rem 0.5rem;
+    width: 9rem;
     text-align: left;
     justify-content: space-between;
 
@@ -206,14 +222,13 @@ const ModalInputTitle = styled.div`
   align-items: center;
 `;
 
-const InputBar = styled.input`
+const InputBar = styled.input<{ align: string }>`
   background: none;
   border: 0px;
-  width: 12rem;
-  text-align: right;
+  width: ${(props) => props.width || '11rem'};
+  text-align: ${(props) => props.align || 'right'};
   height: 2.3rem;
-  padding-right: 1rem;
-
+  padding: 0rem 1rem 0rem 1rem;
   ::placeholder {
     color: var(--color-gray5);
   }
@@ -248,7 +263,7 @@ const LabelListItem = styled.div<{ delete: boolean }>`
   color: white;
   background-color: ${(props) => props.color || 'var(--color-gray5)'};
   cursor: pointer;
-  margin: 3px;
+  margin: ${(props) => (props.delete ? '3px' : '0px 0px 0px 10px')};
   height: 2rem;
   display: flex;
   justify-content: center;
