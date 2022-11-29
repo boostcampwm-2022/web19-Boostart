@@ -2,31 +2,50 @@ import React, { useState, useEffect, useRef } from 'react';
 import DateSelector from './DateSelector';
 import TaskList from './TaskItem';
 import { Task, CompletionCheckBoxStatus } from 'GlobalType';
-import { dummyTaskList } from '../common/dummy';
 import * as S from './Log.style';
+import axios from 'axios';
+import { HOST } from '../../constants';
+import useCurrentDate from '../../hooks/useCurrentDate';
+import { dummyTagList } from '../common/dummy';
 
 const Log = () => {
-  const [selectedElement, setSelectedElement] = useState<number | null>(null);
+  const [selectedTask, setSelectedTask] = useState<{ idx: number; tagIdx: number } | null>(null);
   const [mousePosition, setMousePosition] = useState<number[]>([0, 0]);
-  const [taskList, setTaskList] = useState<Task[]>(dummyTaskList);
-  const [activeTask, setActiveTag] = useState<number | null>(null);
+  const [taskList, setTaskList] = useState<Task[]>([]);
+  const [activeTask, setActiveTask] = useState<number | null>(null);
   const [timeMarkerData, setTimeMarkerData] = useState<number[]>([0, 0]);
   const [completionCheckBoxStatus, setCompletionCheckBoxStatus] = useState<CompletionCheckBoxStatus>({ complete: true, incomplete: true });
-  const selectedRef = useRef<HTMLDivElement | null>(null);
+  const selectedTaskRef = useRef<HTMLDivElement | null>(null);
   const mouseOffsetRef = useRef<number[]>([0, 0]);
   const taskContainerRef = useRef<HTMLDivElement | null>(null);
+  const { currentDate } = useCurrentDate();
 
   const TaskMap = new Map();
-  const tagList = ['부스트캠프', '육아', '일상', '생존', '테스트'];
+  const tagList = dummyTagList;
   taskList.forEach((task: Task) => {
     TaskMap.set(task.idx, task);
   });
 
-  const getFilteredTaskListbyTagName = (tag: string): Task[] => {
-    return taskList.filter(({ tag_name }) => tag_name === tag);
+  const getFilteredTaskListbyTag = (idx: number): Task[] => {
+    return taskList.filter(({ tagIdx }) => tagIdx === idx);
   };
 
-  const filteredTasks = (tag: string): Task[] => getFilteredTaskListbyTagName(tag);
+  const fetchTaskList = async () => {
+    const date = currentDate.toLocaleDateString().split('. ').join('-').substring(0, 10);
+    const response = await axios.get(`${HOST}/api/v1/task?date=${date}`);
+    const taskList = response.data;
+    return taskList.map((task: any) => {
+      const { content, date, done, ended_at, idx, importance, lat, lng, started_at, tag_idx, title, user_idx } = task;
+      const isPublic = task.public; // <- 구조 분해 할당 방해하는 주범
+      return { content, date, done, endedAt: ended_at, idx, importance, lat, lng, startedAt: started_at, tagIdx: tag_idx, title, userIdx: user_idx, isPublic };
+    });
+  };
+
+  useEffect(() => {
+    fetchTaskList().then((taskList) => {
+      setTaskList(taskList);
+    });
+  }, [currentDate]);
 
   const handleMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
     if (!(e.target instanceof HTMLDivElement)) return;
@@ -36,9 +55,9 @@ const Log = () => {
     setMousePosition([e.pageX - mouseOffsetRef.current[0], e.pageY - mouseOffsetRef.current[1]]);
     const timeout = setTimeout(() => {
       if (target.dataset.idx) {
-        setSelectedElement(parseInt(target.dataset.idx));
-        selectedRef.current = target;
-        selectedRef.current.style.visibility = 'hidden';
+        setSelectedTask({ idx: Number(target.dataset.idx), tagIdx: Number(target.dataset.tag) });
+        selectedTaskRef.current = target;
+        selectedTaskRef.current.style.visibility = 'hidden';
       }
     }, 300);
     e.target.addEventListener('mouseup', () => {
@@ -62,19 +81,19 @@ const Log = () => {
     const target = e.target;
     const activeTaskIdx = target.dataset.idx;
     if (activeTaskIdx === undefined || parseInt(activeTaskIdx) === activeTask) {
-      setActiveTag(null);
+      setActiveTask(null);
       setTimeMarkerData([0, 0]);
     } else {
       const activeIdx = parseInt(activeTaskIdx);
       const startedTime = TaskMap.get(activeIdx).startedAt;
       const endedTime = TaskMap.get(activeIdx).endedAt;
-      setActiveTag(activeIdx);
+      setActiveTask(activeIdx);
       calculateTime(startedTime, endedTime);
     }
   };
 
   const handleMouseMove = (e: MouseEvent) => {
-    if (selectedElement === null) return;
+    if (selectedTask === null) return;
 
     if (!(e.target instanceof HTMLDivElement)) return;
     const target = e.target;
@@ -87,15 +106,29 @@ const Log = () => {
       }
     }
   };
-  const handleMouseUp = (e: MouseEvent) => {
-    if (selectedElement === null || !selectedRef.current) return;
-    let target = e.target as HTMLDivElement;
-    if (target.dataset.tag) TaskMap.get(selectedElement).tag_name = target.dataset.tag;
-    setTaskList([...dummyTaskList]);
-    selectedRef.current.style.visibility = 'visible';
+  const handleMouseUp = async (e: MouseEvent) => {
+    if (selectedTask === null || !selectedTaskRef.current) return;
 
-    selectedRef.current = null;
-    setSelectedElement(null);
+    const destinationTagIndex = Number((e.target as HTMLDivElement).dataset.tag);
+    if (!destinationTagIndex) return;
+
+    const taskIdx = selectedTask.idx;
+    const sourceTagIndex = selectedTask.tagIdx;
+
+    if (sourceTagIndex !== destinationTagIndex) {
+      try {
+        await axios.patch(`${HOST}/api/v1/task/${taskIdx}`, { tagIdx: destinationTagIndex });
+        const taskList = await fetchTaskList();
+        setTaskList(taskList);
+      } catch (error) {
+        selectedTaskRef.current.style.visibility = 'visible';
+      }
+    } else {
+      selectedTaskRef.current.style.visibility = 'visible';
+    }
+
+    setSelectedTask(null);
+    selectedTaskRef.current = null;
   };
 
   const handleCheckBoxChange = (e: React.ChangeEvent, type: string) => {
@@ -115,9 +148,9 @@ const Log = () => {
 
   return (
     <>
-      {selectedElement !== null && (
+      {selectedTask !== null && (
         <S.SelectedItem x={mousePosition[0]} y={mousePosition[1]}>
-          <span>{TaskMap.get(selectedElement).startedAt}</span> {TaskMap.get(selectedElement).title}
+          <span>{TaskMap.get(selectedTask.idx).startedAt}</span> {TaskMap.get(selectedTask.idx).title}
         </S.SelectedItem>
       )}
       <S.LogTitle>LOG</S.LogTitle>
@@ -146,9 +179,9 @@ const Log = () => {
           <S.SlideObserver data-direction="left" direction="left"></S.SlideObserver>
           {tagList.map((tag) => {
             return (
-              <S.TagWrap key={tag} data-tag={tag} onClick={handleTagWrapClick} onMouseDown={handleMouseDown}>
-                <S.TagTitle data-tag={tag}>#{tag}</S.TagTitle>
-                <TaskList taskList={filteredTasks(tag)} activeTask={activeTask} completionFilter={completionCheckBoxStatus} />
+              <S.TagWrap key={tag.idx} data-tag={tag.idx} onClick={handleTagWrapClick} onMouseDown={handleMouseDown}>
+                <S.TagTitle data-tag={tag.idx}>#{tag.title}</S.TagTitle>
+                <TaskList taskList={getFilteredTaskListbyTag(tag.idx)} activeTask={activeTask} completionFilter={completionCheckBoxStatus} />
               </S.TagWrap>
             );
           })}

@@ -5,7 +5,7 @@ import * as S from './FriendsBar.style';
 
 const FriendsBar = () => {
   const [friendsList, setFriendsList] = useState<FriendsList[]>(dummyFriendList);
-  const plusIcon = './plus.svg';
+  const plusIcon = '/plus.svg';
   return (
     <>
       <S.FriendsBarContainer>
