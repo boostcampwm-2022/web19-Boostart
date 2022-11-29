@@ -24,8 +24,7 @@ declare module 'GlobalType' {
     lng: number;
     location: string;
     isPublic: boolean;
-    tag_idx: number;
-    tag_name: string;
+    tagIdx: number;
     content: string;
     done: boolean;
     labels: LabelData[];
@@ -56,12 +55,50 @@ declare module 'GlobalType' {
     angle: number;
     scaleX: number;
     scaleY: number;
+    id: string;
+  }
+  interface FabricText {
+    type: string;
+    text: string;
+    left: number;
+    top: number;
+    fontSize: number;
+    fill: string;
+    angle: number;
+    scaleX: number;
+    scaleY: number;
+    id: string;
+  }
+  interface FabricLine {
+    type: string;
+    path: Point[] | undefined;
+    left: number | undefined;
+    top: number | undefined;
+    fill: string | Pattern | undefined;
+    stroke: string | undefined;
+    strokeWidth: number | undefined;
+    angle: number | undefined;
+    scaleX: number | undefined;
+    scaleY: number | undefined;
+    strokeLineCap: string | undefined;
+    strokeLineJoin: string | undefined;
+    id: string;
+  }
+  interface DiaryObjects {
+    [key: string]: fabric.Rect | fabric.Triangle | fabric.Ellipse | fabric.IText | fabric.Path;
   }
 
   interface Location {
     location: string;
     lat: number;
     lng: number;
+  }
+  type ShapeType = 'rect' | 'triangle' | 'circle';
+  interface ObjectData {
+    [key: string]: FabricLine | FabricText | Shape;
+  }
+  interface FabricObject extends fabric.Object {
+    id: string;
   }
 }
 

@@ -6,7 +6,6 @@ interface FriendsBarProps {
   myProfile: Friend | null;
   friendsList: Friend[] | null;
 }
-
 const FriendsBar = ({ myProfile, friendsList }: FriendsBarProps) => {
   const plusIcon = '/plus.svg';
 
