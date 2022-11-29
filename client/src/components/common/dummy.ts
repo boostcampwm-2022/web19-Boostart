@@ -1,10 +1,8 @@
-import { Task } from 'GlobalType';
-
 export const dummyReceivedFriendRequests = [
   {
     userId: 'mikaniz',
     username: '믹',
-    profileImg: 'https://avatars.githubusercontent.com/u/92143119?s=60&v=4',
+    profile_img: 'https://avatars.githubusercontent.com/u/92143119?s=60&v=4',
   },
 ];
 
