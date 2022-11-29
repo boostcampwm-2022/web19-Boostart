@@ -47,6 +47,12 @@ const TaskBodyDefaultValues = {
 
 type TaskBodyKeys = typeof TaskBodyKeys[keyof typeof TaskBodyKeys];
 
+class ValidationError extends Error {
+  constructor(message: string) {
+    super(message);
+  }
+}
+
 interface Label {
   labelIdx: number;
   amount: number;
@@ -107,8 +113,6 @@ const validate = (key: string, value: string | number | boolean | Label[]) => {
     }
   }
 };
-
-class ValidationError extends Error {}
 
 router.post('/', authenticateToken, async (req: AuthorizedRequest, res) => {
   const { userIdx } = req.user;
