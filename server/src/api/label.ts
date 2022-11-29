@@ -26,7 +26,7 @@ router.post('/', authenticateToken, async (req: AuthorizedRequest, res) => {
   if (existLabel) return res.status(409).json({ msg: '이미 존재하는 라벨이에요.' });
 
   const { insertId } = (await executeSql('insert into label (title, color, unit, user_idx) values (?, ?, ?, ?)', [title, color, unit, userIdx])) as OkPacket;
-  res.status(200).send({ idx: insertId });
+  res.status(201).send({ idx: insertId });
 });
 
 export default router;
