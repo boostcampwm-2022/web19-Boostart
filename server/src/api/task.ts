@@ -149,14 +149,14 @@ router.patch('/:task_idx', authenticateToken, async (req: AuthorizedRequest, res
   try {
     const [task] = (await executeSql('select * from task where idx = ?', [taskIdx])) as RowDataPacket[];
 
-    if (!task) return res.sendStatus(404);
-    if (task.user_idx !== userIdx) return res.sendStatus(403);
+    if (!task) return res.status(404).json({ msg: '해당 태스크를 찾을 수 있어요.' });
+    if (task.user_idx !== userIdx) return res.status(403).json({ msg: '자신의 태스크만 수정할 수 있어요.' });
 
     let status = 409;
     if (tagIdx) {
       const [tag] = (await executeSql('select idx from tag where user_idx = ?', [userIdx.toString()])) as RowDataPacket[];
-      if (tag) return res.sendStatus(403);
-      if (task.tag_idx === tagIdx) return res.sendStatus(409);
+      if (tag) return res.status(403).json({ msg: '태그 변경은 자신의 태그로만 가능해요.' });
+      if (task.tag_idx === tagIdx) return res.status(409).json({ msg: '이미 해당 태그에요.' });
       await executeSql('update task set tag_idx = ? where idx = ?', [tagIdx, taskIdx] as any); // TODO: executeSql 함수 매개변수 타입 수정 후 타입 캐스팅 삭제
       status = 206;
     }
