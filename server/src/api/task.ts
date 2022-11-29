@@ -168,7 +168,7 @@ router.post('/', authenticateToken, async (req: AuthorizedRequest, res) => {
         executeSql('insert into task_label (task_idx, label_idx, amount) value (?, ?, ?)', [taskIdx, labelIdx, amount]);
       })
     );
-    res.sendStatus(200);
+    res.sendStatus(201);
   } catch (error) {
     res.sendStatus(500);
   }
