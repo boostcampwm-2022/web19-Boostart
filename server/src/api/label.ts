@@ -21,12 +21,15 @@ router.get('/', authenticateToken, async (req: AuthorizedRequest, res) => {
 router.post('/', authenticateToken, async (req: AuthorizedRequest, res) => {
   const { userIdx } = req.user;
   const { title, color, unit } = req.body;
+  try {
+    const existLabel = ((await executeSql('select idx from label where user_idx = ? and title = ?', [userIdx, title])) as RowDataPacket).length > 0;
+    if (existLabel) return res.status(409).json({ msg: '이미 존재하는 라벨이에요.' });
 
-  const existLabel = ((await executeSql('select idx from label where user_idx = ? and title = ?', [userIdx, title])) as RowDataPacket).length > 0;
-  if (existLabel) return res.status(409).json({ msg: '이미 존재하는 라벨이에요.' });
-
-  const { insertId } = (await executeSql('insert into label (title, color, unit, user_idx) values (?, ?, ?, ?)', [title, color, unit, userIdx])) as OkPacket;
-  res.status(201).send({ idx: insertId });
+    const { insertId } = (await executeSql('insert into label (title, color, unit, user_idx) values (?, ?, ?, ?)', [title, color, unit, userIdx])) as OkPacket;
+    res.status(201).send({ idx: insertId });
+  } catch {
+    res.sendStatus(500);
+  }
 });
 
 export default router;
