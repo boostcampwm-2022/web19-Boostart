@@ -10,7 +10,7 @@ router.get('/', authenticateToken, async (req: AuthorizedRequest, res) => {
   const { userIdx } = req.user;
   const { date } = req.query;
   if (!date) return res.status(400).send({ msg: '날짜를 지정해주세요.' });
-  const rows = await executeSql('select * from task where user_idx = ? and date = ?', [userIdx, date]);
+  const rows = await executeSql('select content, done, ended_at as endedAt, idx, importance, lat, lng, started_at as startedAt, tag_idx as tagIdx, title, public as isPublic from task where user_idx = ? and date = ?', [userIdx, date]);
   res.json(rows);
 });
 
@@ -158,13 +158,13 @@ router.patch('/:task_idx', authenticateToken, async (req: AuthorizedRequest, res
       if (!tag) return res.status(404).json({ msg: '해당 태그를 찾을 수 없어요.' });
       if (tag.user_idx !== userIdx) return res.status(403).json({ msg: '태그 변경은 자신의 태그로만 가능해요.' });
       if (task.tag_idx === tagIdx) return res.status(409).json({ msg: '이미 해당 태그에요.' });
-      await executeSql('update task set tag_idx = ? where idx = ?', [tagIdx, taskIdx] as any); // TODO: executeSql 함수 매개변수 타입 수정 후 타입 캐스팅 삭제
+      await executeSql('update task set tag_idx = ? where idx = ?', [tagIdx, taskIdx]);
       status = 206;
     }
 
     if (done) {
       if (task.done === done) return res.sendStatus(status);
-      await executeSql('update task set done = ? where idx = ?', [done, taskIdx] as any); // TODO: executeSql 함수 매개변수 타입 수정 후 타입 캐스팅 삭제
+      await executeSql('update task set done = ? where idx = ?', [done, taskIdx]);
     }
     res.sendStatus(200);
   } catch (error) {

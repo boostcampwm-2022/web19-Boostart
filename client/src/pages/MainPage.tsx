@@ -38,12 +38,10 @@ const MainPage = () => {
       console.log(error);
     }
   };
-
   const handleFriendSearchFormDimmedClick = () => {
     setIsFriendSearchFormOpen(false);
     setSelectedFriend(null);
   };
-
   const sendFriendRequest = async () => {
     try {
       const response = await axios.put(`${HOST}/api/v1/friend/request/${selectedFriend}`);
@@ -99,7 +97,7 @@ const MainPage = () => {
           left={MODAL_CENTER_LEFT}
           transform={MODAL_CENTER_TRANSFORM}
           zIndex={FRIEND_SEARCH_MODAL_ZINDEX}
-          handleDimmedClick={() => setIsFriendSearchFormOpen(false)}
+          handleDimmedClick={() => handleFriendSearchFormDimmedClick()}
         />
       )}
     </RecoilRoot>
