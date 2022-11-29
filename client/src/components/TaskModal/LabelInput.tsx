@@ -32,6 +32,7 @@ const LabelInput = ({ labelArray, setLabelArray }: LabelInputProps) => {
     const getLabelList = async () => {
       try {
         const result = await axios.get(`${HOST}/api/v1/label`);
+        console.log(result.data);
         const list = result.data.sort((a: Label, b: Label) => b.count! - a.count!);
         setLabelList(list);
       } catch (error) {
@@ -76,7 +77,6 @@ const LabelInput = ({ labelArray, setLabelArray }: LabelInputProps) => {
       e.preventDefault();
       try {
         await axios.post(`${HOST}/api/v1/label`, newLabel).then((res) => {
-          console.log(res.status);
           if (res.status === 201) {
             setLabelArray((prev) => [...prev, { ...newLabel, amount: Number(amount), idx: res.data.idx } as Label]);
             setIsLabelModalOpen(false);
@@ -132,17 +132,20 @@ const LabelInput = ({ labelArray, setLabelArray }: LabelInputProps) => {
     setSelectedLabel(item);
   };
 
-  //DELET LABEL
-  const deleteLabel = async (e: React.MouseEvent<HTMLDivElement>) => {
+  //DELETE LABEL
+  const deleteLabel = async (e: React.MouseEvent<SVGElement>) => {
+    const LabelIdx = e.currentTarget!.dataset.idx;
+    popLabelItem(Number(LabelIdx));
     e.stopPropagation();
     try {
-      await axios.delete(`${HOST}/api/v1/label/${e.currentTarget!.dataset.idx}`).then((res) => {
+      await axios.delete(`${HOST}/api/v1/label/${LabelIdx}`).then((res) => {
         if (res.status == 200) setReload(reload + 1);
       });
     } catch (error) {
       alert('태그 삭제에 실패했습니다.');
     }
   };
+
   // 전체 라벨
   const LabelList = () => {
     return (
@@ -151,9 +154,9 @@ const LabelInput = ({ labelArray, setLabelArray }: LabelInputProps) => {
         {labelList &&
           labelList.map((item: Label) => {
             return (
-              <LabelListItem delete={true} key={item.idx} color={item.color} onClick={(e) => openAddLabelModal(item)}>
-                {item.title}
-                {item.count! === 0 && <DeleteButton />}
+              <LabelListItem delete={item.count === 0} key={item.idx} color={item.color} onClick={(e) => openAddLabelModal(item)}>
+                <span>{item.title}</span>
+                {item.count === 0 && <DeleteButton data-idx={item.idx} type="button" onClick={deleteLabel} />}
               </LabelListItem>
             );
           })}
@@ -176,7 +179,9 @@ const LabelInput = ({ labelArray, setLabelArray }: LabelInputProps) => {
           labelArray.map(({ idx, color, title, unit, amount }: Label) => {
             return (
               <LabelListItem delete={true} key={idx} color={color}>
-                {title} {amount} {unit}
+                <span>
+                  {title} {amount} {unit}
+                </span>
                 <DeleteButton onClick={(e) => popLabelItem(idx)} />
               </LabelListItem>
             );
@@ -209,7 +214,7 @@ export const LabelModalTable = styled.table`
   table-layout: fixed;
   box-shadow: 0 0 0 1px var(--color-gray3);
   font-size: 0.8rem;
-
+  margin: 0.5rem;
   tr,
   th,
   td {
@@ -261,8 +266,7 @@ const LabelListContainer = styled.div`
   border: 1px solid var(--color-gray3);
   background-color: var(--color-gray0);
   border-radius: 20px;
-  height: 2rem;
-
+  height: 2.2rem;
   width: 23.6rem;
   font-size: 0.8rem;
   display: flex;
@@ -281,23 +285,24 @@ const SelectedLabelListContainer = styled.div`
 
 const LabelListItem = styled.div<{ delete: boolean }>`
   flex: 0 0 auto;
-
   color: white;
   background-color: ${(props) => props.color || 'var(--color-gray5)'};
   cursor: pointer;
   margin: ${(props) => (props.delete ? '3px' : '0px 0px 0px 10px')};
-  height: 2rem;
+  padding: ${(props) => (!props.delete ? '2px 15px 2px 19px' : '2px 6px 2px 19px')};
+  height: 19px;
+  line-height: 19px;
   display: flex;
   justify-content: center;
   align-items: center;
-
-  padding: ${(props) => (!props.delete ? '2px 15px 2px 15px' : '2px 12px 2px 15px')};
   border-radius: 20px;
-  height: 19px;
-  line-height: 19px;
+
+  span {
+    padding-right: 8px;
+  }
 
   :hover {
-    filter: contrast(110%);
+    filter: contrast(105%);
   }
 `;
 
@@ -314,9 +319,8 @@ const LabelModal = styled.div`
 const DeleteButton = styled(RiCloseLine)`
   width: 10px;
   height: 10px;
+  padding: 3px;
   display: inline-block;
-  padding-left: 10px;
-
   cursor: pointer;
 `;
 
