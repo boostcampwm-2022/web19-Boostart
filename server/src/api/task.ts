@@ -45,19 +45,21 @@ const TaskBodyDefaultValues = {
 
 type TaskBodyKeys = typeof TaskBodyKeys[keyof typeof TaskBodyKeys];
 
-const validate = (key, value) => {
+interface Label {
+  labelIdx: number;
+  amount: number;
+}
+
+const validate = (key: string, value: string | number | boolean | Label[]) => {
   switch (key) {
     case TaskBodyKeys.title: {
-      if (typeof value !== 'string') {
-        throw new ValidationError('올바른 제목을 입력해주세요.');
-      }
+      if (typeof value !== 'string') throw new ValidationError('올바른 제목을 입력해주세요.');
       return true;
     }
     case TaskBodyKeys.date: {
+      if (typeof value !== 'string') throw new ValidationError('올바른 날짜를 입력해주세요.');
       const regex = /^\d{4}-(0[1-9]|1[012])-(0[1-9]|[12][0-9]|3[01])$/;
-      if (!regex.test(value)) {
-        throw new ValidationError('올바른 날짜를 입력해주세요.');
-      }
+      if (!regex.test(value)) throw new ValidationError('올바른 날짜를 입력해주세요.');
       return true;
     }
     case TaskBodyKeys.importance: {
@@ -74,10 +76,9 @@ const validate = (key, value) => {
     }
     case TaskBodyKeys.startedAt:
     case TaskBodyKeys.endedAt: {
+      if (typeof value !== 'string') throw new ValidationError('올바른 시간을 입력해주세요.');
       const regex = /^([01][0-9]|2[0-3]):([0-5][0-9])$/;
-      if (!regex.test(value)) {
-        throw new ValidationError();
-      }
+      if (!regex.test(value)) throw new ValidationError('올바른 시간을 입력해주세요.');
       return true;
     }
     case TaskBodyKeys.tagIdx: {
@@ -87,6 +88,7 @@ const validate = (key, value) => {
       return typeof value === 'boolean';
     }
     case TaskBodyKeys.labels: {
+      if (!(value instanceof Array)) return false;
       value.forEach((label) => {
         if (!label.labelIdx || !label.amount) throw new ValidationError('올바른 라벨 정보를 입력해주세요.');
       });
@@ -96,7 +98,7 @@ const validate = (key, value) => {
       return typeof value === 'string';
     }
     default: {
-      throw new ValidationError();
+      throw new ValidationError('잘못된 정보가 입력되었어요.');
     }
   }
 };
@@ -116,22 +118,24 @@ router.post('/', authenticateToken, async (req: AuthorizedRequest, res) => {
 
   const { title, date, importance, startedAt, endedAt, lat, lng, isPublic, tagIdx, content, done, labels } = req.body;
 
-  let labelCheckSql = 'select idx from label where user_idx = ? and ';
-  const labelCheckValue = [userIdx];
-
-  labels.forEach(async (label, idx) => {
-    if (idx === 0) labelCheckSql += '(';
-    else labelCheckSql += ' or ';
-    labelCheckSql += 'idx = ?';
-    if (idx === labels.length - 1) labelCheckSql += ')';
-
-    const { labelIdx } = label;
-    labelCheckValue.push(labelIdx);
-  });
-
   try {
-    const notExistLabel = ((await executeSql(labelCheckSql, labelCheckValue)) as RowDataPacket).length != labels.length;
-    if (notExistLabel) return res.status(404).json({ msg: '존재하지 않는 라벨이에요.' });
+    if (labels.length > 0) {
+      let labelCheckSql = 'select idx from label where user_idx = ? and ';
+      const labelCheckValue = [userIdx];
+
+      labels.forEach(async (label: Label, idx: number) => {
+        if (idx === 0) labelCheckSql += '(';
+        else labelCheckSql += ' or ';
+        labelCheckSql += 'idx = ?';
+        if (idx === labels.length - 1) labelCheckSql += ')';
+
+        const { labelIdx } = label;
+        labelCheckValue.push(labelIdx);
+      });
+
+      const notExistLabel = ((await executeSql(labelCheckSql, labelCheckValue)) as RowDataPacket).length != labels.length;
+      if (notExistLabel) return res.status(404).json({ msg: '존재하지 않는 라벨이에요.' });
+    }
 
     const result = (await executeSql('insert into task (title, importance, date, started_at, ended_at, lat, lng, content, done, public, tag_idx, user_idx) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', [
       title,
@@ -156,7 +160,7 @@ router.post('/', authenticateToken, async (req: AuthorizedRequest, res) => {
     );
     res.sendStatus(200);
   } catch (error) {
-    res.sendStatus(400);
+    res.sendStatus(500);
   }
 });
 
