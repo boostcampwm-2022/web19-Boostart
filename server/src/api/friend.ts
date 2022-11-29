@@ -9,11 +9,10 @@ const router = Router();
 router.get('/', authenticateToken, async (req: AuthorizedRequest, res) => {
   const { userIdx } = req.user;
   try {
-    const users = await executeSql('select idx, user_id, username, profile_img from user inner join friendship on idx = sender_idx or idx = receiver_idx where idx != ? and (receiver_idx = ? or sender_idx = ?) and accepted = true', [
-      userIdx,
-      userIdx,
-      userIdx,
-    ]);
+    const users = await executeSql(
+      'select idx, user_id as userId, username, profile_img as profileImg from user inner join friendship on idx = sender_idx or idx = receiver_idx where idx != ? and (receiver_idx = ? or sender_idx = ?) and accepted = true',
+      [userIdx, userIdx, userIdx]
+    );
     res.json(users);
   } catch {
     res.sendStatus(500);
@@ -23,7 +22,7 @@ router.get('/', authenticateToken, async (req: AuthorizedRequest, res) => {
 router.get('/request', authenticateToken, async (req: AuthorizedRequest, res) => {
   const { userIdx } = req.user;
   try {
-    const users = await executeSql('select idx, user_id, username, profile_img from user inner join friendship on idx = sender_idx where receiver_idx = ? and accepted = false', [userIdx]);
+    const users = await executeSql('select idx, user_id as userId, username, profile_img as profileImg from user inner join friendship on idx = sender_idx where receiver_idx = ? and accepted = false', [userIdx]);
     res.json(users);
   } catch {
     res.sendStatus(500);
