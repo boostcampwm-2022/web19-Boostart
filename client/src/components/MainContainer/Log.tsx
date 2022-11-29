@@ -6,7 +6,13 @@ import * as S from './Log.style';
 import axios from 'axios';
 import { HOST } from '../../constants';
 import useCurrentDate from '../../hooks/useCurrentDate';
-import { dummyTagList } from '../common/dummy';
+
+interface Tag {
+  idx: number;
+  title: string;
+  color: string;
+  count: number;
+}
 
 const Log = () => {
   const [selectedTask, setSelectedTask] = useState<{ idx: number; tagIdx: number } | null>(null);
@@ -19,15 +25,21 @@ const Log = () => {
   const mouseOffsetRef = useRef<number[]>([0, 0]);
   const taskContainerRef = useRef<HTMLDivElement | null>(null);
   const { currentDate } = useCurrentDate();
+  const [tagList, setTagList] = useState<Tag[]>([]);
 
   const TaskMap = new Map();
-  const tagList = dummyTagList;
   taskList.forEach((task: Task) => {
     TaskMap.set(task.idx, task);
   });
 
   const getFilteredTaskListbyTag = (idx: number): Task[] => {
     return taskList.filter(({ tagIdx }) => tagIdx === idx);
+  };
+
+  const fetchTagList = async () => {
+    const response = await axios.get(`${HOST}/api/v1/tag`);
+    const tagList = response.data;
+    return tagList;
   };
 
   const fetchTaskList = async () => {
@@ -40,6 +52,13 @@ const Log = () => {
       return { content, date, done, endedAt: ended_at, idx, importance, lat, lng, startedAt: started_at, tagIdx: tag_idx, title, userIdx: user_idx, isPublic };
     });
   };
+
+  useEffect(() => {
+    fetchTagList().then((tagList) => {
+      setTagList(tagList);
+      console.log(tagList);
+    });
+  }, []);
 
   useEffect(() => {
     fetchTaskList().then((taskList) => {
@@ -180,7 +199,9 @@ const Log = () => {
           {tagList.map((tag) => {
             return (
               <S.TagWrap key={tag.idx} data-tag={tag.idx} onClick={handleTagWrapClick} onMouseDown={handleMouseDown}>
-                <S.TagTitle data-tag={tag.idx}>#{tag.title}</S.TagTitle>
+                <S.TagTitle color={tag.color} data-tag={tag.idx}>
+                  #{tag.title}
+                </S.TagTitle>
                 <TaskList taskList={getFilteredTaskListbyTag(tag.idx)} activeTask={activeTask} completionFilter={completionCheckBoxStatus} />
               </S.TagWrap>
             );
