@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { RecoilRoot } from 'recoil';
-import axios, { Axios, AxiosStatic } from 'axios';
-import { HOST, FRIEND_REQUEST_ACTION } from '../constants';
+import axios, { AxiosStatic } from 'axios';
+import { HOST } from '../constants';
 import { Friend } from 'GlobalType';
 import FriendsBar from '../components/FriendsBar/FriendsBar';
 import MainContents from '../components/MainContainer/MainContainer';
@@ -23,13 +23,13 @@ const MainPage = () => {
   //API Requests
   const getFriendsList = async () => {
     try {
-      setFriendsList(null);
       const response = await axios.get(`${HOST}/api/v1/friend`);
       setFriendsList(response.data);
     } catch (error) {
       console.log(error);
     }
   };
+
   const getMyProfile = async () => {
     try {
       const response = await axios.get(`${HOST}/api/v1/user/me`);
@@ -38,10 +38,7 @@ const MainPage = () => {
       console.log(error);
     }
   };
-  const handleFriendSearchFormDimmedClick = () => {
-    setIsFriendSearchFormOpen(false);
-    setSelectedFriend(null);
-  };
+
   const sendFriendRequest = async () => {
     try {
       const response = await axios.put(`${HOST}/api/v1/friend/request/${selectedFriend}`);
@@ -49,23 +46,20 @@ const MainPage = () => {
     } catch (error: any) {
       alert(error.response.data.msg);
     }
-    setSelectedFriend(null);
-    setIsFriendSearchFormOpen(false);
+    resetFriendSearchForm();
   };
 
   const getFriendRequests = async () => {
     try {
       const response = await axios.get(`${HOST}/api/v1/friend/request`);
-      console.log(response.data);
       setFriendRequests(response.data);
     } catch (error) {
       console.log(error);
     }
   };
 
-  const handleFriendRequests = (idx: number) => {
-    const userIdx = idx;
-    return async function (action: AxiosStatic) {
+  const handleFriendRequests = (action: AxiosStatic) => {
+    return async function (userIdx: number) {
       try {
         const response = await action(`${HOST}/api/v1/friend/accept/${userIdx}`);
         alert(response.status);
@@ -75,6 +69,12 @@ const MainPage = () => {
       getFriendsList();
       getFriendRequests();
     };
+  };
+
+  //Event Handler
+  const resetFriendSearchForm = () => {
+    setIsFriendSearchFormOpen(false);
+    setSelectedFriend(null);
   };
 
   useEffect(() => {
@@ -97,7 +97,7 @@ const MainPage = () => {
           left={MODAL_CENTER_LEFT}
           transform={MODAL_CENTER_TRANSFORM}
           zIndex={FRIEND_SEARCH_MODAL_ZINDEX}
-          handleDimmedClick={() => handleFriendSearchFormDimmedClick()}
+          handleDimmedClick={() => resetFriendSearchForm()}
         />
       )}
     </RecoilRoot>

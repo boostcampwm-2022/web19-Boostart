@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { dummyNotifications, dummyReceivedFriendRequests } from '../common/dummy';
+import { dummyNotifications } from '../common/dummy';
 import { PROFILE_EDIT_FORM_Z_INDEX, PROFILE_EDIT_FORM_TOP, PROFILE_EDIT_FORM_LEFT, PROFILE_EDIT_FORM_TRANFORM } from './Drawer.style';
 import { FRIEND_REQUEST_ACTION, HOST } from '../../constants';
 import Modal from '../common/Modal';
@@ -22,6 +22,9 @@ interface ReceivedFriendRequestProps {
   profileImg: string;
   handleFriendRequests: Function;
 }
+interface ProfileSectionProps {
+  handleProfileEditButtonClick: React.MouseEventHandler;
+}
 
 const Drawer = ({ isOpen, friendRequests, handleFriendRequests }: DrawerProps) => {
   const [isProfileEditModalOpen, setIsProfileEditModalOpen] = useState(false);
@@ -31,7 +34,7 @@ const Drawer = ({ isOpen, friendRequests, handleFriendRequests }: DrawerProps) =
   };
 
   const handleLogoutButtonClick = () => {
-    console.log('LogoutButtonClicked');
+    console.log('LogoutButtonClicked(추후 로그아웃 API 추가)');
   };
 
   return (
@@ -74,10 +77,6 @@ const ProfileEditForm = () => {
   );
 };
 
-interface ProfileSectionProps {
-  handleProfileEditButtonClick: React.MouseEventHandler;
-}
-
 const ProfileSection = ({ handleProfileEditButtonClick }: ProfileSectionProps) => {
   return (
     <S.ProfileSection>
@@ -109,6 +108,8 @@ const ReceivedFriendRequestSection = ({ friendRequests, handleFriendRequests }: 
 };
 
 const ReceivedFriendRequest = ({ idx, userId, username, profileImg, handleFriendRequests }: ReceivedFriendRequestProps) => {
+  const rejectFriendRequest = handleFriendRequests(FRIEND_REQUEST_ACTION.REJECT);
+  const acceptFriendRequest = handleFriendRequests(FRIEND_REQUEST_ACTION.ACCEPT);
   return (
     <S.ReceivedFriendRequest>
       <S.ProfileImage size="4rem" padding="1rem" src={HOST + '/' + profileImg} />
@@ -117,8 +118,8 @@ const ReceivedFriendRequest = ({ idx, userId, username, profileImg, handleFriend
         <S.UserId>@{userId}</S.UserId>
       </S.ReceivedFriendRequestInfo>
       <S.ReceivedFriendRequestHandlingButtonSection>
-        <S.RecievedFriendRequestRejectButton onClick={() => handleFriendRequests(idx)(FRIEND_REQUEST_ACTION.REJECT)} />
-        <S.RecievedFriendRequestAcceptButton onClick={() => handleFriendRequests(idx)(FRIEND_REQUEST_ACTION.ACCEPT)} />
+        <S.RecievedFriendRequestRejectButton onClick={() => rejectFriendRequest(idx)} />
+        <S.RecievedFriendRequestAcceptButton onClick={() => acceptFriendRequest(idx)} />
       </S.ReceivedFriendRequestHandlingButtonSection>
     </S.ReceivedFriendRequest>
   );
