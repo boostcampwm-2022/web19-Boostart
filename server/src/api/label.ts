@@ -22,7 +22,7 @@ router.post('/', authenticateToken, async (req: AuthorizedRequest, res) => {
   const { userIdx } = req.user;
   const { title, color, unit } = req.body;
   const result = (await executeSql('insert into label (title, color, unit, user_idx) values (?, ?, ?, ?)', [title, color, unit, userIdx])) as OkPacket;
-  res.status(200).send({ idx: result.insertId });
+  res.status(201).send({ idx: result.insertId });
 });
 
 export default router;
