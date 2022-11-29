@@ -39,7 +39,7 @@ const Log = () => {
   const fetchTagList = async () => {
     const response = await axios.get(`${HOST}/api/v1/tag`);
     const tagList = response.data;
-    return tagList;
+    setTagList(tagList);
   };
 
   const fetchTaskList = async () => {
@@ -54,10 +54,7 @@ const Log = () => {
   };
 
   useEffect(() => {
-    fetchTagList().then((tagList) => {
-      setTagList(tagList);
-      console.log(tagList);
-    });
+    fetchTagList();
   }, []);
 
   useEffect(() => {
