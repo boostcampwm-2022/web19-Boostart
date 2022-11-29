@@ -23,6 +23,7 @@ const TaskBodyKeys = {
   importance: 'importance',
   lat: 'lat',
   lng: 'lng',
+  location: 'location',
   isPublic: 'isPublic',
   startedAt: 'startedAt',
   endedAt: 'endedAt',
@@ -36,6 +37,7 @@ const TaskBodyDefaultValues = {
   [TaskBodyKeys.importance]: (MIN_IMPORTANCE + MAX_IMPORTANCE) / 2,
   [TaskBodyKeys.lat]: null,
   [TaskBodyKeys.lng]: null,
+  [TaskBodyKeys.location]: null,
   [TaskBodyKeys.isPublic]: true,
   [TaskBodyKeys.tagIdx]: 1,
   [TaskBodyKeys.done]: false,
@@ -70,6 +72,9 @@ const validate = (key: string, value: string | number | boolean | Label[]) => {
     }
     case TaskBodyKeys.lng: {
       return typeof value === 'number' && value >= -180 && value <= 180;
+    }
+    case TaskBodyKeys.location: {
+      return typeof value === 'string';
     }
     case TaskBodyKeys.isPublic: {
       return typeof value === 'boolean';
@@ -116,7 +121,7 @@ router.post('/', authenticateToken, async (req: AuthorizedRequest, res) => {
     return res.status(400).send({ msg: error.message });
   }
 
-  const { title, date, importance, startedAt, endedAt, lat, lng, isPublic, tagIdx, content, done, labels } = req.body;
+  const { title, date, importance, startedAt, endedAt, lat, lng, location, isPublic, tagIdx, content, done, labels } = req.body;
 
   try {
     if (labels.length > 0) {
@@ -137,7 +142,7 @@ router.post('/', authenticateToken, async (req: AuthorizedRequest, res) => {
       if (notExistLabel) return res.status(404).json({ msg: '존재하지 않는 라벨이에요.' });
     }
 
-    const result = (await executeSql('insert into task (title, importance, date, started_at, ended_at, lat, lng, content, done, public, tag_idx, user_idx) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', [
+    const result = (await executeSql('insert into task (title, importance, date, started_at, ended_at, lat, lng, location, content, done, public, tag_idx, user_idx) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', [
       title,
       importance,
       date,
@@ -145,6 +150,7 @@ router.post('/', authenticateToken, async (req: AuthorizedRequest, res) => {
       endedAt,
       lat,
       lng,
+      location,
       content,
       done,
       isPublic,
