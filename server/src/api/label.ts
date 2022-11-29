@@ -3,6 +3,7 @@ import { RowDataPacket } from 'mysql2';
 import { executeSql } from '../db';
 import { AuthorizedRequest } from '../types';
 import { authenticateToken } from '../utils/auth';
+import { OkPacket } from 'mysql2';
 
 const router = Router();
 
@@ -21,8 +22,8 @@ router.get('/', authenticateToken, async (req: AuthorizedRequest, res) => {
 router.post('/', authenticateToken, async (req: AuthorizedRequest, res) => {
   const { userIdx } = req.user;
   const { title, color, unit } = req.body;
-  await executeSql('insert into label (title, color, unit, user_idx) values (?, ?, ?, ?)', [title, color, unit, userIdx]);
-  res.sendStatus(200);
+  const result = (await executeSql('insert into label (title, color, unit, user_idx) values (?, ?, ?, ?)', [title, color, unit, userIdx])) as OkPacket;
+  res.status(201).send({ idx: result.insertId });
 });
 
 router.delete('/:label_idx', authenticateToken, async (req: AuthorizedRequest, res) => {
