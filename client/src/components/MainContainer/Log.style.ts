@@ -104,7 +104,7 @@ export const TagWrap = styled.div`
   flex-direction: column;
   z-index: 5;
 `;
-export const TagTitle = styled.div`
+export const TagTitle = styled.div<{ color: string }>`
   width: 11rem;
   height: 2rem;
   margin: 0.25rem 0.25rem;
@@ -113,7 +113,7 @@ export const TagTitle = styled.div`
   align-items: center;
   color: #616161;
   font-size: 0.75rem;
-  background: #ffcece;
+  ${(props) => props.color && `background: ${props.color};`}
   border: 1px solid gray;
   border-radius: 0.25rem;
 `;
