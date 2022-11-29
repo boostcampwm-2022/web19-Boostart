@@ -3,7 +3,7 @@ declare module 'GlobalType' {
     idx: number;
     userId: string;
     username: string;
-    profile_img: string;
+    profileImg: string;
   }
 
   interface LabelData {

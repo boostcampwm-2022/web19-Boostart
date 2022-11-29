@@ -38,6 +38,10 @@ export const RoutePath: RoutePathType = {
   DIARY: '/main/diary',
 };
 
+export const MODAL_CENTER_TOP = '50%';
+export const MODAL_CENTER_LEFT = '50%';
+export const MODAL_CENTER_TRANSFORM = 'translate(-50%, -50%)';
+
 export const DEFAULT_OBJECT_VALUE = {
   top: 10,
   left: 10,
