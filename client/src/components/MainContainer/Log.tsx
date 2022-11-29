@@ -7,6 +7,9 @@ import axios from 'axios';
 import { HOST } from '../../constants';
 import useCurrentDate from '../../hooks/useCurrentDate';
 import { dummyTagList } from '../common/dummy';
+import Modal from '../common/Modal';
+import TaskModal from '../TaskModal/TaskModal';
+import { NewTaskButton } from './MainContainer.style';
 
 const Log = () => {
   const [selectedTask, setSelectedTask] = useState<{ idx: number; tagIdx: number } | null>(null);
@@ -34,17 +37,17 @@ const Log = () => {
     const date = currentDate.toLocaleDateString().split('. ').join('-').substring(0, 10);
     const response = await axios.get(`${HOST}/api/v1/task?date=${date}`);
     const taskList = response.data;
-    return taskList.map((task: any) => {
-      const { content, date, done, ended_at, idx, importance, lat, lng, started_at, tag_idx, title, user_idx } = task;
-      const isPublic = task.public; // <- 구조 분해 할당 방해하는 주범
-      return { content, date, done, endedAt: ended_at, idx, importance, lat, lng, startedAt: started_at, tagIdx: tag_idx, title, userIdx: user_idx, isPublic };
-    });
+    setTaskList(
+      taskList.map((task: any) => {
+        const { content, date, done, ended_at, idx, importance, lat, lng, started_at, tag_idx, title, user_idx } = task;
+        const isPublic = task.public; // <- 구조 분해 할당 방해하는 주범
+        return { content, date, done, endedAt: ended_at, idx, importance, lat, lng, startedAt: started_at, tagIdx: tag_idx, title, userIdx: user_idx, isPublic };
+      })
+    );
   };
 
   useEffect(() => {
-    fetchTaskList().then((taskList) => {
-      setTaskList(taskList);
-    });
+    fetchTaskList();
   }, [currentDate]);
 
   const handleMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
@@ -91,6 +94,11 @@ const Log = () => {
       calculateTime(startedTime, endedTime);
     }
   };
+  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+
+  const handleCloseButtonClick = () => {
+    setIsModalOpen(false);
+  };
 
   const handleMouseMove = (e: MouseEvent) => {
     if (selectedTask === null) return;
@@ -118,8 +126,7 @@ const Log = () => {
     if (sourceTagIndex !== destinationTagIndex) {
       try {
         await axios.patch(`${HOST}/api/v1/task/${taskIdx}`, { tagIdx: destinationTagIndex });
-        const taskList = await fetchTaskList();
-        setTaskList(taskList);
+        await fetchTaskList();
       } catch (error) {
         selectedTaskRef.current.style.visibility = 'visible';
       }
@@ -188,6 +195,8 @@ const Log = () => {
           <S.SlideObserver data-direction="right" direction="right"></S.SlideObserver>
         </S.LogMainSection>
       </S.LogContainer>
+      <NewTaskButton onClick={() => setIsModalOpen(true)}>+</NewTaskButton>
+      {isModalOpen && <Modal component={<TaskModal handleCloseButtonClick={handleCloseButtonClick} fetchTaskList={fetchTaskList} />} zIndex={1001} top="50%" left="50%" transform="translate(-50%, -50%)" handleDimmedClick={() => {}} />}
     </>
   );
 };

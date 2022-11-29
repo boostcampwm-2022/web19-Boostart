@@ -7,29 +7,60 @@ import LocationSearchInput from './LocationSearchInput';
 import { Location, Tag, Label } from 'GlobalType';
 import useCurrentDate from '../../hooks/useCurrentDate';
 import LabelInput from './LabelInput';
+import { FieldValues, useForm } from 'react-hook-form';
+import { yupResolver } from '@hookform/resolvers/yup';
+import * as yup from 'yup';
+import axios from 'axios';
+import { HOST } from '../../constants';
 
 interface Props {
-  setIsModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  handleCloseButtonClick: () => void;
+  fetchTaskList: () => Promise<void>;
 }
 
-const TaskModal = (props: Props) => {
+const formatDate = (date: Date) => {
+  return date.toLocaleDateString().split('. ').join('-').substring(0, 10);
+};
+
+const DEFAULT_IMPORTANCE = 3;
+const TaskModal = ({ handleCloseButtonClick, fetchTaskList }: Props) => {
   const [tagObject, setTagObject] = useState<Tag | null>(null);
   const [locationObject, setLocationObject] = useState<Location | null>(null); // { location, lng, lat }
   const [labelArray, setLabelArray] = useState<Label[]>([]);
+  const { currentDate } = useCurrentDate();
 
   const [isDetailOpen, setIsDetailOpen] = useState(false);
 
   const { getMonth, getDate } = useCurrentDate();
+
+  const [importance, setImportance] = useState(DEFAULT_IMPORTANCE);
 
   const contents = {
     close: '닫기 ▲',
     readMore: '더보기  ▼',
   };
 
-  useEffect(() => {
-    console.log(tagObject);
-    console.log(locationObject);
-  }, [tagObject, locationObject]);
+  const schema = yup.object().shape({
+    title: yup.string().required(),
+    tagIdx: yup.number().required(),
+    startedAt: yup.string().required(),
+    endedAt: yup.string().required(),
+    importance: yup.number().required(),
+    isPublic: yup.bool(),
+    location: yup.string(),
+    lat: yup.number(),
+    lng: yup.number(),
+    content: yup.string(),
+  });
+  const {
+    register,
+    handleSubmit,
+    setValue,
+    formState: { errors },
+  } = useForm({
+    resolver: yupResolver(schema),
+  });
+
   type ColumnTitle = '제목' | '태그' | '시간' | '라벨' | '중요도' | '공개' | '위치' | '메모';
 
   const Row = ({ title, content }: { title: ColumnTitle; content: JSX.Element }) => {
@@ -41,32 +72,63 @@ const TaskModal = (props: Props) => {
     );
   };
 
+  const createTask = async (body: FieldValues) => {
+    console.log(JSON.stringify(body).split(',').join('\n'));
+    await httpPostTask({ ...body, date: formatDate(currentDate) });
+    await fetchTaskList();
+    handleCloseButtonClick();
+  };
+
+  const httpPostTask = async (body: FieldValues) => {
+    await axios.post(`${HOST}/api/v1/task`, body);
+  };
+
+  useEffect(() => {
+    if (!locationObject) return;
+    const { lat, lng, location } = locationObject;
+    setValue('lat', lat);
+    setValue('lng', lng);
+    setValue('location', location);
+  }, [locationObject]);
+
+  useEffect(() => {
+    setValue('importance', importance);
+  }, [importance]);
+
+  useEffect(() => {
+    if (!tagObject) return;
+    const tagIdx = tagObject.idx;
+    setValue('tagIdx', tagIdx);
+  }, [tagObject]);
+
+  // k-th star clicked
+  const handleStarClick = (k: number) => () => {
+    setImportance(k);
+  };
+
   return (
     <S.ModalContainer isDetailOpen={isDetailOpen}>
-      <S.CloseButton onClick={(e) => props.setIsModalOpen(false)} />
+      <S.CloseButton onClick={handleCloseButtonClick} />
       <S.Date>{`• ${getMonth() + 1}.${getDate()} •`}</S.Date>
-      <S.TaskForm>
+      <S.TaskForm onSubmit={handleSubmit(createTask)}>
         <S.FormTable>
           <tbody>
-            <Row title="제목" content={<S.InputBar />} />
-            <tr>
-              <td>태그</td>
-              <td>
-                <TagInput tagObject={tagObject} setTagObject={setTagObject} />
-              </td>
-            </tr>
+            <Row title="제목" content={<S.InputBar {...register('title')} />} />
+            <input type="number" {...register('tagIdx')} hidden={true} />
+            <Row title="태그" content={<TagInput tagObject={tagObject} setTagObject={setTagObject} />} />
             <Row
               title="시간"
               content={
                 <>
-                  <S.InputTimeBar type="time" />
+                  <S.InputTimeBar type="time" {...register('startedAt')} />
                   {' ~ '}
-                  <S.InputTimeBar type="time" />
+                  <S.InputTimeBar type="time" {...register('endedAt')} />
                 </>
               }
             />
-            <Row title="중요도" content={<ImportanceInput />} />
-            <Row title="공개" content={<input type="checkbox" />} />
+            <input type="number" {...register('importance')} hidden={true} />
+            <Row title="중요도" content={<ImportanceInput importance={importance} handleStarClick={handleStarClick} />} />
+            <Row title="공개" content={<input type="checkbox" {...register('isPublic')} />} />
           </tbody>
         </S.FormTable>
         <S.DetailButton onClick={() => setIsDetailOpen(!isDetailOpen)}>
@@ -77,18 +139,20 @@ const TaskModal = (props: Props) => {
         {isDetailOpen && (
           <S.FormTable>
             <tbody>
+              <input {...register('lat')} hidden={true} />
+              <input {...register('lng')} hidden={true} />
+              <input {...register('location')} hidden={true} />
               <Row title="위치" content={<LocationSearchInput locationObject={locationObject} setLocationObject={setLocationObject} />} />
               <S.LagreTr>
                 <td>라벨</td>
                 <td>{<LabelInput labelArray={labelArray} setLabelArray={setLabelArray} />}</td>
               </S.LagreTr>
-
-              <Row title="메모" content={<S.InputArea />} />
+              <Row title="메모" content={<S.InputArea {...register('content')} />} />
             </tbody>
           </S.FormTable>
         )}
+        <S.SubmitButton>NEW TASK!</S.SubmitButton>
       </S.TaskForm>
-      <S.SubmitButton>NEW TASK!</S.SubmitButton>
     </S.ModalContainer>
   );
 };
