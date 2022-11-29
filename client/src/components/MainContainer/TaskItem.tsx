@@ -15,10 +15,10 @@ const TaskList = ({ taskList, activeTask, completionFilter }: taskListProps) => 
   };
   return (
     <>
-      {taskList.map(({ tag_name, idx, title, startedAt, endedAt, importance, location, content, done, isPublic }) => {
+      {taskList.map(({ tagIdx, idx, title, startedAt, endedAt, importance, location, content, done, isPublic }) => {
         return (
           !isTaskFiltered(done) && (
-            <S.TaskItem key={'task' + idx} data-idx={idx} data-tag={tag_name} data-active={idx === activeTask} done={done}>
+            <S.TaskItem key={'task' + idx} data-idx={idx} data-tag={tagIdx} data-active={idx === activeTask} done={done}>
               <S.TaskMainInfos>
                 <S.TaskTime>{startedAt}</S.TaskTime>
                 <S.TaskTitle>{title}</S.TaskTitle>

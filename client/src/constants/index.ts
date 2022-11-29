@@ -41,3 +41,17 @@ export const RoutePath: RoutePathType = {
 export const MODAL_CENTER_TOP = '50%';
 export const MODAL_CENTER_LEFT = '50%';
 export const MODAL_CENTER_TRANSFORM = 'translate(-50%, -50%)';
+
+export const DEFAULT_OBJECT_VALUE = {
+  top: 10,
+  left: 10,
+  rx: 50,
+  ry: 50,
+  width: 100,
+  height: 100,
+  angle: 0,
+  scaleX: 1,
+  scaleY: 1,
+  text: '텍스트를 입력하세요',
+  fontSize: 24,
+};

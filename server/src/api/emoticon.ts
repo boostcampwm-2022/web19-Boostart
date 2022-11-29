@@ -14,7 +14,7 @@ router.get('/task/:task_idx', authenticateToken, async (req: AuthorizedRequest, 
     if (notExistTask) return res.status(404).json({ msg: '존재하지 않는 일정이에요.' });
 
     const emoticons = await executeSql(
-      'select task_social_action.idx, emoticon.value as emoticon, user.user_id as author_name from task_social_action inner join emoticon on task_social_action.emoticon_idx = emoticon.idx inner join user on task_social_action.author_idx = user.idx where task_idx = ?',
+      'select task_social_action.idx, emoticon.value as emoticon, user.user_id as authorName from task_social_action inner join emoticon on task_social_action.emoticon_idx = emoticon.idx inner join user on task_social_action.author_idx = user.idx where task_idx = ?',
       [taskIdx]
     );
     res.json(emoticons);
