@@ -6,14 +6,19 @@ export const TopBarContainer = styled.div`
   margin: 0 auto;
   display: flex;
   justify-content: space-between;
-  align-items: baseline;
+  z-index: 999;
 `;
 
-export const MainTitle = styled.span`
+export const TopBarElement = styled.div<{ align: string }>`
+  width: 20rem;
+  display: flex;
+  justify-content: ${(props) => props.align};
+`;
+
+export const MainTitle = styled.div`
   color: white;
   font-size: 5.5rem;
   font-family: 'Baumans', cursive;
-  z-index: 1;
 `;
 
 export const MenuIcon = styled.img`
