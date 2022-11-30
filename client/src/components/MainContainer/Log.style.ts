@@ -37,13 +37,19 @@ export const TimeBarSection = styled.div`
   align-items: center;
   grid-area: time;
   cursor: default;
+
+  img {
+    width: 22px;
+    height: 22px;
+    filter: opacity(0.7);
+  }
 `;
 
 export const TimeBar = styled.div`
-  width: 0.8rem;
+  width: 13px;
   height: 31.2rem;
   position: relative;
-  margin: 0.75rem 0 0;
+  margin: 0.5rem 0 0 0;
   border: 2px solid #e3e3e3;
   border-radius: 0.5rem;
 `;
@@ -51,7 +57,9 @@ export const TimeMarker = styled.div<{
   startedAt: number;
   duration: number;
 }>`
-  width: 0.85rem;
+  margin-left: 2px;
+  width: 0.55rem;
+  border-radius: 5rem;
   height: ${(props) => props.duration * 1.3}rem;
   position: absolute;
   background: var(--color-main);
@@ -89,7 +97,7 @@ export const SortOptionSelect = styled.select`
 
 export const LogMainSection = styled.div`
   width: 100%;
-  height: fit-content;
+  height: 100%;
   display: flex;
   flex-wrap: no-wrap;
   overflow-x: scroll;
