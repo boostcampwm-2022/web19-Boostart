@@ -82,27 +82,25 @@ const TaskModal = ({ handleCloseButtonClick, fetchTaskList }: Props) => {
     await axios.post(`${HOST}/api/v1/task`, body);
   };
 
-  useEffect(() => {
-    if (!locationObject) return;
-    const { lat, lng, location } = locationObject;
-    setValue('lat', lat);
-    setValue('lng', lng);
-    setValue('location', location);
-  }, [locationObject]);
-
-  useEffect(() => {
-    setValue('importance', importance);
-  }, [importance]);
-
-  useEffect(() => {
-    if (!tagObject) return;
-    const tagIdx = tagObject.idx;
-    setValue('tagIdx', tagIdx);
-  }, [tagObject]);
-
   // k-th star clicked
   const handleStarClick = (k: number) => () => {
     setImportance(k);
+  };
+
+  const setValues = () => {
+    if (locationObject) {
+      const { lat, lng, location } = locationObject;
+      setValue('lat', lat);
+      setValue('lng', lng);
+      setValue('location', location);
+    }
+
+    setValue('importance', importance);
+
+    if (tagObject) {
+      const tagIdx = tagObject.idx;
+      setValue('tagIdx', tagIdx);
+    }
   };
 
   return (
@@ -150,7 +148,7 @@ const TaskModal = ({ handleCloseButtonClick, fetchTaskList }: Props) => {
             </tbody>
           </S.FormTable>
         )}
-        <S.SubmitButton>NEW TASK!</S.SubmitButton>
+        <S.SubmitButton onClick={setValues}>NEW TASK!</S.SubmitButton>
       </S.TaskForm>
     </S.ModalContainer>
   );
