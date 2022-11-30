@@ -30,6 +30,39 @@ router.get('/', authenticateToken, async (req: AuthorizedRequest, res) => {
   }
 });
 
+router.get('/:user_id', authenticateToken, async (req: AuthorizedRequest, res) => {
+  const { userIdx } = req.user;
+  const { user_id: friendId } = req.params;
+  const { date } = req.query;
+  if (!date) return res.status(400).send({ msg: '날짜를 지정해주세요.' });
+
+  try {
+    const friend = (await executeSql('select idx from user where user_id = ?', [friendId])) as RowDataPacket;
+    if (friend.length === 0) return res.status(404).send({ msg: '존재하지 않는 사용자예요.' });
+
+    const { idx: friendIdx } = friend[0];
+    const isNotFriend = ((await executeSql('select * from friendship where (sender_idx = ? and receiver_idx = ?) or (sender_idx = ? and receiver_idx = ?)', [userIdx, friendIdx, friendIdx, userIdx])) as RowDataPacket).length === 0;
+    if (isNotFriend) return res.status(403).send({ msg: '친구가 아닌 사용자의 태스크를 조회할 수 없어요.' });
+
+    const tasks = (await executeSql(
+      'select task.idx, task.title, task.importance, task.started_at as startedAt, task.ended_at as endedAt, task.lat, task.lng, task.location, task.public as isPublic, task.tag_idx as tagIdx, tag.title as tagName, task.content, task.done from task left join tag on task.tag_idx = tag.idx where task.user_idx = ? and task.date = ? and public = true',
+      [friendIdx, date]
+    )) as RowDataPacket;
+
+    const result = await Promise.all(
+      tasks.map(async (task: RowDataPacket) => {
+        const { idx: taskIdx } = task;
+        const labels = await executeSql('select label.idx as labelIdx, label.title, label.color, label.unit, task_label.amount from task_label inner join label on task_label.label_idx = label.idx where task_idx = ?', [taskIdx]);
+        task.labels = labels;
+        return task;
+      })
+    );
+    res.json(result);
+  } catch {
+    res.sendStatus(500);
+  }
+});
+
 const MIN_IMPORTANCE = 1;
 const MAX_IMPORTANCE = 5;
 
