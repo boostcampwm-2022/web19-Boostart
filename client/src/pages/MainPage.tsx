@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Navigate } from 'react-router-dom';
 import { RecoilRoot } from 'recoil';
 import axios, { AxiosStatic } from 'axios';
 import { HOST } from '../constants';
@@ -10,7 +11,7 @@ import TopBar from '../components/TopBar/TopBar';
 import Modal, { Dimmed } from '../components/common/Modal';
 import FriendSearchForm, { FRIEND_SEARCH_MODAL_ZINDEX } from '../components/FriendsBar/FriendSearchForm';
 import { DRAWER_Z_INDEX } from '../components/Drawer/Drawer.style';
-import { MODAL_CENTER_TOP, MODAL_CENTER_LEFT, MODAL_CENTER_TRANSFORM } from '../constants';
+import { MODAL_CENTER_TOP, MODAL_CENTER_LEFT, MODAL_CENTER_TRANSFORM, RoutePath } from '../constants';
 
 const MainPage = () => {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
@@ -71,6 +72,16 @@ const MainPage = () => {
     };
   };
 
+  const requestLogout = async () => {
+    try {
+      await axios.get(`${HOST}/api/v1/auth/logout`);
+      alert('로그아웃되었습니다');
+      window.location.href = '/';
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   //Event Handler
   const resetFriendSearchForm = () => {
     setIsFriendSearchFormOpen(false);
@@ -89,7 +100,7 @@ const MainPage = () => {
       <FriendsBar myProfile={myProfile} friendsList={friendsList} handlePlusButtonClick={() => setIsFriendSearchFormOpen(true)} />
       <MainContents />
       {isDrawerOpen && <Dimmed zIndex={DRAWER_Z_INDEX - 1} onClick={() => setIsDrawerOpen(false)} />}
-      <Drawer isOpen={isDrawerOpen} friendRequests={friendRequests} handleFriendRequests={handleFriendRequests} />
+      <Drawer isOpen={isDrawerOpen} friendRequests={friendRequests} handleFriendRequests={handleFriendRequests} handleLogoutButtonClick={() => requestLogout()} />
       {isFriendSearchFormOpen && (
         <Modal
           component={<FriendSearchForm selectedFriend={selectedFriend} setSelectedFriend={setSelectedFriend} handleRequestButtonClick={() => sendFriendRequest()} />}
