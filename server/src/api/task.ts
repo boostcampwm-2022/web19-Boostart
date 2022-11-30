@@ -49,6 +49,21 @@ const TaskBodyKeys = {
   content: 'content',
 } as const;
 
+const TaskColumnKeys = {
+  title: 'title',
+  date: 'date',
+  importance: 'importance',
+  lat: 'lat',
+  lng: 'lng',
+  location: 'location',
+  isPublic: 'public',
+  startedAt: 'started_at',
+  endedAt: 'ended_at',
+  tagIdx: 'tag_idx',
+  done: 'done',
+  content: 'content',
+} as const;
+
 const TaskBodyDefaultValues = {
   [TaskBodyKeys.importance]: (MIN_IMPORTANCE + MAX_IMPORTANCE) / 2,
   [TaskBodyKeys.lat]: null,
@@ -62,6 +77,7 @@ const TaskBodyDefaultValues = {
 } as const;
 
 type TaskBodyKeys = typeof TaskBodyKeys[keyof typeof TaskBodyKeys];
+type TaskColumnKeys = typeof TaskColumnKeys[keyof typeof TaskColumnKeys];
 
 class ValidationError extends Error {
   constructor(message: string) {
@@ -191,24 +207,39 @@ router.post('/', authenticateToken, async (req: AuthorizedRequest, res) => {
 });
 
 router.put('/:task_idx', authenticateToken, async (req: AuthorizedRequest, res) => {
+  const bodyKeysCount = Object.keys(req.body).length;
+  if (bodyKeysCount === 0) return res.status(200).send({ msg: '수정할 사항이 없어요.' });
+
   const { userIdx } = req.user;
   const { task_idx: taskIdx } = req.params;
+  const { labels } = req.body;
+
+  const willUpdateTask = bodyKeysCount > 1 || (bodyKeysCount === 1 && !labels);
+
+  let updateSql = 'update task set';
+  const updateValue = [];
 
   try {
     Object.values(TaskBodyKeys).forEach((key) => {
+      if (!req.body[key]) return;
       if (!validate(key, req.body[key])) req.body[key] = TaskBodyDefaultValues[key];
+
+      if (key === TaskBodyKeys.labels) return;
+      if (updateValue.length > 0) updateSql += ',';
+      updateSql += ` ${TaskColumnKeys[key]} = ? `;
+      updateValue.push(req.body[key]);
     });
+    updateSql += 'where idx = ?';
+    updateValue.push(taskIdx);
   } catch (error) {
     return res.status(400).send({ msg: error.message });
   }
-
-  const { title, importance, startedAt, endedAt, lat, lng, location, isPublic, tagIdx, content, labels } = req.body;
 
   try {
     const notExistTask = ((await executeSql('select idx from task where user_idx = ? and idx = ?', [userIdx, taskIdx])) as RowDataPacket).length === 0;
     if (notExistTask) return res.status(404).json({ msg: '존재하지 않는 태스크예요.' });
 
-    if (labels.length > 0) {
+    if (labels?.length > 0) {
       let labelCheckSql = 'select idx from label where user_idx = ? and ';
       const labelCheckValue = [userIdx];
 
@@ -226,27 +257,29 @@ router.put('/:task_idx', authenticateToken, async (req: AuthorizedRequest, res) 
       if (notExistLabel) return res.status(404).json({ msg: '존재하지 않는 라벨이에요.' });
     }
 
-    const result = await executeSql('update task set title = ?, importance = ?, started_at = ?, ended_at = ?, lat = ?, lng = ?, location = ?, content = ?, public = ?, tag_idx = ? where idx = ?', [
-      title,
-      importance,
-      startedAt,
-      endedAt,
-      lat,
-      lng,
-      location,
-      content,
-      isPublic,
-      tagIdx,
-      taskIdx,
-    ]);
+    if (willUpdateTask) await executeSql(updateSql, updateValue);
 
-    await Promise.all(
-      labels.map(async ({ labelIdx, amount }) => {
-        const taskLabel = (await executeSql('select * from task_label where task_idx = ? and label_idx = ?', [taskIdx, labelIdx])) as RowDataPacket;
-        if (taskLabel.length === 0) return await executeSql('insert into task_label (task_idx, label_idx, amount) value (?, ?, ?)', [taskIdx, labelIdx, amount]);
-        if (taskLabel[0].amount != amount) await executeSql('update task_label set amount = ? where task_idx = ? and label_idx = ?', [amount, taskIdx, labelIdx]);
-      })
-    );
+    if (labels) {
+      const taskLabels = (await executeSql('select * from task_label where task_idx = ?', [taskIdx])) as RowDataPacket;
+      await Promise.all(
+        taskLabels.map(async ({ label_idx: labelIdx, amount }) => {
+          const updateLabelIdx = labels.findIndex((label: Label) => labelIdx === label.labelIdx);
+          if (updateLabelIdx === -1) return await executeSql('delete from task_label where task_idx = ? and label_idx = ?', [taskIdx, labelIdx]);
+
+          const { amount: updateAmount } = labels[updateLabelIdx];
+          if (amount != updateAmount) await executeSql('update task_label set amount = ? where task_idx = ? and label_idx = ?', [updateAmount, taskIdx, labelIdx]);
+          labels.splice(updateLabelIdx, 1);
+        })
+      );
+
+      if (labels.length > 0) {
+        await Promise.all(
+          labels.map(async ({ labelIdx, amount }) => {
+            await executeSql('insert into task_label (task_idx, label_idx, amount) value (?, ?, ?)', [taskIdx, labelIdx, amount]);
+          })
+        );
+      }
+    }
     res.sendStatus(200);
   } catch (error) {
     res.sendStatus(500);
