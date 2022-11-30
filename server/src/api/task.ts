@@ -207,6 +207,9 @@ router.post('/', authenticateToken, async (req: AuthorizedRequest, res) => {
 });
 
 router.put('/:task_idx', authenticateToken, async (req: AuthorizedRequest, res) => {
+  if (req.body.date != undefined) return res.status(409).send({ msg: '날짜는 수정할 수 없어요.' });
+  if (req.body.done != undefined) return res.status(409).send({ msg: '완료 상태를 수정할 수 없어요.' });
+
   const bodyKeysCount = Object.keys(req.body).length;
   if (bodyKeysCount === 0) return res.status(200).send({ msg: '수정할 사항이 없어요.' });
 
