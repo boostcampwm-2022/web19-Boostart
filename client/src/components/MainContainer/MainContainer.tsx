@@ -4,9 +4,10 @@ import Modal from '../common/Modal';
 import TaskModal from '../TaskModal/TaskModal';
 import Calendar from './Calendar';
 import Diary from './Diary';
-import GoalManagerWithContainer from './GoalManager';
+import GoalManager from './GoalManager';
 import Log from './Log';
 import * as S from './MainContainer.style';
+import SubContainer from './SubContainer';
 
 const MainContents = () => {
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
@@ -30,7 +31,7 @@ const MainContents = () => {
               }
             />
             <Route path="diary/" element={<Diary />} />
-            <Route path="goal" element={<GoalManagerWithContainer />} />
+            <Route path="goal" element={<SubContainer title="GOAL" element={<GoalManager />} />} />
           </Routes>
         </S.RightSection>
       </S.MainContentContainer>

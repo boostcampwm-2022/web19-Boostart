@@ -1,10 +1,6 @@
 import SubContainer from './SubContainer';
 import * as S from './GoalManager.style';
 
-const GoalManagerWithContainer = () => {
-  return <SubContainer title="GOAL" element={<GoalManager />} />;
-};
-
 const GoalManager = () => {
   return (
     <>
