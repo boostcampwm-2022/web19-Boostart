@@ -28,7 +28,7 @@ code {
   background-color: rgba(0, 0, 0, 0);
   width: 16px;
   height: 16px;
-  z-index: 999999;
+  z-index: 800;
 }
 
 /* background of the scrollbar except button or resizer */
