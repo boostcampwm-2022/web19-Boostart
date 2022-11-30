@@ -207,17 +207,14 @@ router.post('/', authenticateToken, async (req: AuthorizedRequest, res) => {
 });
 
 router.put('/:task_idx', authenticateToken, async (req: AuthorizedRequest, res) => {
-  if (req.body.date != undefined) return res.status(409).send({ msg: '날짜는 수정할 수 없어요.' });
-  if (req.body.done != undefined) return res.status(409).send({ msg: '완료 상태를 수정할 수 없어요.' });
-
   const bodyKeysCount = Object.keys(req.body).length;
   if (bodyKeysCount === 0) return res.status(200).send({ msg: '수정할 사항이 없어요.' });
 
   const { userIdx } = req.user;
   const { task_idx: taskIdx } = req.params;
-  const { labels } = req.body;
+  const { date, done, labels } = req.body;
 
-  const willUpdateTask = bodyKeysCount > 1 || (bodyKeysCount === 1 && !labels);
+  const willUpdateTask = bodyKeysCount > 1 || (bodyKeysCount === 1 && !date && done === undefined && !labels);
 
   let updateSql = 'update task set';
   const updateValue = [];
@@ -225,6 +222,7 @@ router.put('/:task_idx', authenticateToken, async (req: AuthorizedRequest, res) 
   try {
     Object.values(TaskBodyKeys).forEach((key) => {
       if (!req.body[key]) return;
+      if (key === TaskBodyKeys.date || key === TaskBodyKeys.done) return;
       if (!validate(key, req.body[key])) req.body[key] = TaskBodyDefaultValues[key];
 
       if (key === TaskBodyKeys.labels) return;
