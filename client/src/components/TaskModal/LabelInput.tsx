@@ -269,6 +269,7 @@ const LabelListContainer = styled.div`
   display: flex;
   align-items: center;
   overflow-x: scroll;
+  overflow: overlay;
 `;
 
 const SelectedLabelListContainer = styled.div`
