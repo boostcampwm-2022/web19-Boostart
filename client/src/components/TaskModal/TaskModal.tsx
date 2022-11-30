@@ -26,10 +26,6 @@ const TaskModal = (props: Props) => {
     readMore: '더보기  ▼',
   };
 
-  useEffect(() => {
-    console.log(tagObject);
-    console.log(locationObject);
-  }, [tagObject, locationObject]);
   type ColumnTitle = '제목' | '태그' | '시간' | '라벨' | '중요도' | '공개' | '위치' | '메모';
 
   const Row = ({ title, content }: { title: ColumnTitle; content: JSX.Element }) => {

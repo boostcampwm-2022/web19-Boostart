@@ -101,17 +101,19 @@ declare module 'GlobalType' {
     unit: string;
     count: number?;
     amount: number?;
-}
+  }
 
-type ShapeType = 'rect' | 'triangle' | 'circle';
+  type ShapeType = 'rect' | 'triangle' | 'circle';
   interface ObjectData {
     [key: string]: FabricLine | FabricText | Shape;
   }
-  
+
   interface FabricObject extends fabric.Object {
     id: string;
   }
 }
+
+type FreindRequestAction = 'accept' | 'deny';
 
 interface ModalProps {
   component: JSX.Element;
