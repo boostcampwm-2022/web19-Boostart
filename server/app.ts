@@ -46,7 +46,6 @@ io.on('connection', (socket) => {
     visitingRoom.delete(socket.id);
   });
   socket.on('requestCurrentObjects', () => {
-    console.log('requested');
     const roomName = visitingRoom.get(socket.id);
     if (!diaryObjects[roomName]) diaryObjects[roomName] = {};
     const targetObjects = diaryObjects[roomName];

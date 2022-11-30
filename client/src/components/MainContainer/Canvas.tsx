@@ -237,7 +237,6 @@ const Canvas = () => {
 
   const updateModifiedObject = (objectData: FabricLine | FabricText | Shape) => {
     const objectId = objectData.id;
-    console.log('draw', objectId);
     const objectType = objectData.type;
     const targetObject = diaryObjects.get(objectId);
     if (!canvasRef.current) return;
@@ -258,6 +257,20 @@ const Canvas = () => {
 
   const dispatchCanvasChange = (objectData: FabricLine | FabricText | Shape) => {
     globalSocket.emit('sendModifiedObject', objectData);
+  };
+
+  const setCanvasBackground = () => {
+    fabric.Image.fromURL('/canvasBackground.png', function (img) {
+      img.set({
+        top: 0,
+        left: 0,
+        evented: false,
+      });
+      img.scaleToWidth(660);
+      img.setCoords();
+      if (!canvasRef.current) return;
+      canvasRef.current.add(img);
+    });
   };
 
   globalSocket.once('offerCurrentObjects', (objectdataMap) => {
@@ -282,6 +295,7 @@ const Canvas = () => {
       globalSocket.off('applyObjectRemoving', removeObject);
       window.removeEventListener('keydown', handleKeydown);
       canvasRef.current.clear();
+      setCanvasBackground();
     };
   });
 
