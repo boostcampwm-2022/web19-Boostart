@@ -89,7 +89,7 @@ const MainPage = () => {
       <FriendsBar myProfile={myProfile} friendsList={friendsList} handlePlusButtonClick={() => setIsFriendSearchFormOpen(true)} />
       <MainContents />
       {isDrawerOpen && <Dimmed zIndex={DRAWER_Z_INDEX - 1} onClick={() => setIsDrawerOpen(false)} />}
-      <Drawer isOpen={isDrawerOpen} friendRequests={friendRequests} handleFriendRequests={handleFriendRequests} />
+      <Drawer isOpen={isDrawerOpen} myProfile={myProfile} friendRequests={friendRequests} handleFriendRequests={handleFriendRequests} />
       {isFriendSearchFormOpen && (
         <Modal
           component={<FriendSearchForm selectedFriend={selectedFriend} setSelectedFriend={setSelectedFriend} handleRequestButtonClick={() => sendFriendRequest()} />}
