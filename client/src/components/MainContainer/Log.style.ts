@@ -1,4 +1,5 @@
 import styled from 'styled-components';
+import { FiPlus } from 'react-icons/fi';
 
 export const LogTitle = styled.span`
   display: inline-block;
@@ -9,16 +10,15 @@ export const LogTitle = styled.span`
   z-index: 1;
 `;
 
+export const Container = styled.div``;
+
 export const LogContainer = styled.div`
-  width: 100%;
+  display: grid;
+  padding: 0.5rem;
   height: 36rem;
   background: white;
   border-radius: 1rem;
-  margin-top: 0rem;
-  margin-bottom: 1rem;
-  padding: 0.5rem;
   position: relative;
-  display: grid;
   grid-template-areas:
     'time nav'
     'time main';
@@ -72,7 +72,7 @@ export const LogNavBarSection = styled.div`
 `;
 
 export const SortOptionSelect = styled.select`
-  margin-right: 1.25rem;
+  width: 5rem;
   border-radius: 0.5rem;
   margin-left: 1rem;
   color: #616161;
@@ -80,6 +80,7 @@ export const SortOptionSelect = styled.select`
   text-align: center;
   font-family: 'Noto Sans KR', sans-serif;
   option {
+    width: 3rem;
     color: #616161;
     font-size: 0.625rem;
     font-family: 'Noto Sans KR', sans-serif;
@@ -182,7 +183,7 @@ export const SlideObserver = styled.div<{
   direction: string;
 }>`
   width: 3rem;
-  height: 100%;
+  height: 33rem;
   position: absolute;
   z-index: 7;
   ${(props) => (props.direction === 'right' ? 'right: 0;' : 'left: 0;')}
@@ -225,4 +226,20 @@ export const CheckBox = styled.input`
 
 export const DateArrow = styled.div`
   cursor: pointer;
+`;
+
+export const PlusButton = styled(FiPlus)`
+  cursor: pointer;
+  position: absolute;
+  color: white;
+  font-size: 1.6rem;
+  left: 40.5rem;
+  bottom: 1rem;
+  padding: 0.5rem;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 20rem;
+  background-color: var(--color-main);
+  box-shadow: 0px 0px 5px 3px rgba(175, 175, 175, 0.2);
+  z-index: 999;
 `;

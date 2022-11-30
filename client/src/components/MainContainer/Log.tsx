@@ -166,42 +166,44 @@ const Log = () => {
         </S.SelectedItem>
       )}
       <S.LogTitle>LOG</S.LogTitle>
-      <S.LogContainer>
-        <S.TimeBarSection>
-          <img src="/timebar-clock.svg" alt="TimeBar" />
-          <S.TimeBar>
-            <S.TimeMarker startedAt={timeMarkerData[0]} duration={timeMarkerData[1]}></S.TimeMarker>
-          </S.TimeBar>
-        </S.TimeBarSection>
-        <S.LogNavBarSection>
-          <S.SortOptionSelect>
-            <option value="tag">태그순</option>
-            <option value="time">시간순</option>
-            <option value="importance">중요도순</option>
-          </S.SortOptionSelect>
-          <DateSelector />
-          <S.CheckBoxContainer>
-            <S.CheckBoxLabel htmlFor="complete">완료</S.CheckBoxLabel>
-            <S.CheckBox type="checkbox" id="complete" defaultChecked={completionCheckBoxStatus.complete} onChange={(e) => handleCheckBoxChange(e, 'complete')} />
-            <S.CheckBoxLabel htmlFor="incomplete">미완료</S.CheckBoxLabel>
-            <S.CheckBox type="checkbox" id="incomplete" defaultChecked={completionCheckBoxStatus.incomplete} onChange={(e) => handleCheckBoxChange(e, 'incomplete')} />
-          </S.CheckBoxContainer>
-        </S.LogNavBarSection>
-        <S.LogMainSection ref={taskContainerRef}>
-          <S.SlideObserver data-direction="left" direction="left"></S.SlideObserver>
-          {tagList.map((tag) => {
-            return (
-              <S.TagWrap key={tag.idx} data-tag={tag.idx} onClick={handleTagWrapClick} onMouseDown={handleMouseDown}>
-                <S.TagTitle color={tag.color} data-tag={tag.idx}>
-                  #{tag.title}
-                </S.TagTitle>
-                <TaskList taskList={getFilteredTaskListbyTag(tag.idx)} activeTask={activeTask} completionFilter={completionCheckBoxStatus} />
-              </S.TagWrap>
-            );
-          })}
-          <S.SlideObserver data-direction="right" direction="right"></S.SlideObserver>
-        </S.LogMainSection>
-      </S.LogContainer>
+      <S.Container>
+        <S.LogContainer>
+          <S.TimeBarSection>
+            <img src="/timebar-clock.svg" alt="TimeBar" />
+            <S.TimeBar>
+              <S.TimeMarker startedAt={timeMarkerData[0]} duration={timeMarkerData[1]}></S.TimeMarker>
+            </S.TimeBar>
+          </S.TimeBarSection>
+          <S.LogNavBarSection>
+            <S.SortOptionSelect>
+              <option value="tag">태그순</option>
+              <option value="time">시간순</option>
+              <option value="importance">중요도순</option>
+            </S.SortOptionSelect>
+            <DateSelector />
+            <S.CheckBoxContainer>
+              <S.CheckBoxLabel htmlFor="complete">완료</S.CheckBoxLabel>
+              <S.CheckBox type="checkbox" id="complete" defaultChecked={completionCheckBoxStatus.complete} onChange={(e) => handleCheckBoxChange(e, 'complete')} />
+              <S.CheckBoxLabel htmlFor="incomplete">미완료</S.CheckBoxLabel>
+              <S.CheckBox type="checkbox" id="incomplete" defaultChecked={completionCheckBoxStatus.incomplete} onChange={(e) => handleCheckBoxChange(e, 'incomplete')} />
+            </S.CheckBoxContainer>
+          </S.LogNavBarSection>
+          <S.LogMainSection ref={taskContainerRef}>
+            <S.SlideObserver data-direction="left" direction="left"></S.SlideObserver>
+            {tagList.map((tag) => {
+              return (
+                <S.TagWrap key={tag.idx} data-tag={tag.idx} onClick={handleTagWrapClick} onMouseDown={handleMouseDown}>
+                  <S.TagTitle color={tag.color} data-tag={tag.idx}>
+                    #{tag.title}
+                  </S.TagTitle>
+                  <TaskList taskList={getFilteredTaskListbyTag(tag.idx)} activeTask={activeTask} completionFilter={completionCheckBoxStatus} />
+                </S.TagWrap>
+              );
+            })}
+            <S.SlideObserver data-direction="right" direction="right"></S.SlideObserver>
+          </S.LogMainSection>
+        </S.LogContainer>
+      </S.Container>
     </>
   );
 };

@@ -9,8 +9,9 @@ export const DiaryTitle = styled.span`
   z-index: 1;
 `;
 
+export const Container = styled.div``;
+
 export const DiaryContainer = styled.div`
-  width: 100%;
   height: 36rem;
   background: white;
   border-radius: 1rem;

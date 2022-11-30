@@ -24,7 +24,6 @@ const MainContents = () => {
               element={
                 <>
                   <Log />
-                  <S.NewTaskButton onClick={() => setIsModalOpen(true)}>+</S.NewTaskButton>
                 </>
               }
             />
