@@ -23,7 +23,7 @@ export enum Days {
   '금',
   '토',
 }
-export const Menus = ['LOG', 'DIARY', 'PLAN', 'MAP'];
+export const Menus = ['LOG', 'DIARY', 'GOAL', 'MAP'];
 
 export const WEEK_LENGTH = Object.keys(Days).length / 2;
 interface RoutePathType {
@@ -36,6 +36,7 @@ export const RoutePath: RoutePathType = {
   MAIN: '/main/*',
   LOG: '/main/log',
   DIARY: '/main/diary',
+  GOAL: '/main/goal',
 };
 
 export const MODAL_CENTER_TOP = '50%';

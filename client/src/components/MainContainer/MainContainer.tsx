@@ -4,6 +4,7 @@ import Modal from '../common/Modal';
 import TaskModal from '../TaskModal/TaskModal';
 import Calendar from './Calendar';
 import Diary from './Diary';
+import GoalManagerWithContainer from './GoalManager';
 import Log from './Log';
 import * as S from './MainContainer.style';
 
@@ -29,6 +30,7 @@ const MainContents = () => {
               }
             />
             <Route path="diary/" element={<Diary />} />
+            <Route path="goal" element={<GoalManagerWithContainer />} />
           </Routes>
         </S.RightSection>
       </S.MainContentContainer>
