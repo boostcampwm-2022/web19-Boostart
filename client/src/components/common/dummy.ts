@@ -1,11 +1,3 @@
-export const dummyReceivedFriendRequests = [
-  {
-    userId: 'mikaniz',
-    username: '믹',
-    profile_img: 'https://avatars.githubusercontent.com/u/92143119?s=60&v=4',
-  },
-];
-
 export const dummyNotifications = [
   {
     idx: 330,
