@@ -32,22 +32,43 @@ app.get('*', (req, res) => {
 });
 
 const diaryObjects = {};
+const visitingRoom = new Map();
 
 io.on('connection', (socket) => {
+  socket.on('joinToNewRoom', (destId, date) => {
+    const roomName = destId + date;
+    socket.join(roomName);
+    visitingRoom.set(socket.id, roomName);
+  });
+  socket.on('leaveCurrentRoom', (destId, date) => {
+    const roomName = destId + date;
+    socket.leave(roomName);
+    visitingRoom.delete(socket.id);
+  });
   socket.on('requestCurrentObjects', () => {
-    io.to(socket.id).emit('offerCurrentObjects', diaryObjects);
+    console.log('requested');
+    const roomName = visitingRoom.get(socket.id);
+    if (!diaryObjects[roomName]) diaryObjects[roomName] = {};
+    const targetObjects = diaryObjects[roomName];
+    io.to(socket.id).emit('offerCurrentObjects', targetObjects);
   });
   socket.on('sendModifiedObject', (objectData) => {
+    const roomName = visitingRoom.get(socket.id);
+    const targetObjects = diaryObjects[roomName];
     const objectId = objectData.id;
-    diaryObjects[objectId] = objectData;
-    socket.broadcast.emit('updateModifiedObject', objectData);
+    targetObjects[objectId] = objectData;
+    socket.to(roomName).emit('updateModifiedObject', objectData);
   });
   socket.on('sendRemovedObjectId', (objectId) => {
-    delete diaryObjects[objectId];
-    socket.broadcast.emit('applyObjectRemoving', objectId);
+    const roomName = visitingRoom.get(socket.id);
+    const targetObjects = diaryObjects[roomName];
+    delete targetObjects[objectId];
+    socket.to(roomName).emit('applyObjectRemoving', objectId);
   });
 
-  socket.on('disconnect', () => {});
+  socket.on('disconnect', () => {
+    visitingRoom.delete(socket.id);
+  });
 });
 
 httpServer.listen(PORT, () => {

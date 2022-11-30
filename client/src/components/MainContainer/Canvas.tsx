@@ -1,14 +1,11 @@
 import { useEffect, useRef } from 'react';
-import { useRecoilState, useRecoilValue } from 'recoil';
 import globalSocket from '../common/Socket';
 import { DEFAULT_OBJECT_VALUE } from '../../constants';
 import { Shape, FabricText, FabricLine, ShapeType, FabricObject } from 'GlobalType';
 import { fabric } from 'fabric';
 import { v4 } from 'uuid';
-import { visitState } from '../common/atoms';
 
 const Canvas = () => {
-  const currentVisit = useRecoilValue(visitState);
   const canvasRef = useRef<fabric.Canvas | null>(null);
   const colorRef = useRef<HTMLInputElement | null>(null);
   const canvasBackground = '/canvasBackground.png';
@@ -240,6 +237,7 @@ const Canvas = () => {
 
   const updateModifiedObject = (objectData: FabricLine | FabricText | Shape) => {
     const objectId = objectData.id;
+    console.log('draw', objectId);
     const objectType = objectData.type;
     const targetObject = diaryObjects.get(objectId);
     if (!canvasRef.current) return;
@@ -262,13 +260,7 @@ const Canvas = () => {
     globalSocket.emit('sendModifiedObject', objectData);
   };
 
-  globalSocket.on('updateModifiedObject', (objectData) => {
-    updateModifiedObject(objectData);
-  });
-  globalSocket.on('applyObjectRemoving', (objectId) => {
-    removeObject(objectId);
-  });
-  globalSocket.on('offerCurrentObjects', (objectdataMap) => {
+  globalSocket.once('offerCurrentObjects', (objectdataMap) => {
     Object.values(objectdataMap).forEach((objectData) => {
       updateModifiedObject(objectData);
     });
@@ -278,15 +270,16 @@ const Canvas = () => {
     if (!canvasRef.current) canvasRef.current = initCanvas();
     canvasRef.current.on('path:created', dispatchCreatedLine);
     canvasRef.current.on('object:modified', dispatchModifiedObject);
-    canvasRef.current.on('object:moving', dispatchModifiedObject);
+    globalSocket.on('updateModifiedObject', updateModifiedObject);
+    globalSocket.on('applyObjectRemoving', removeObject);
     window.addEventListener('keydown', handleKeydown);
-    globalSocket.emit('requestCurrentObjects');
 
     return () => {
       if (!canvasRef.current) return;
       canvasRef.current.off('path:created', dispatchCreatedLine);
       canvasRef.current.off('object:modified', dispatchModifiedObject);
-      canvasRef.current.off('object:moving', dispatchModifiedObject);
+      globalSocket.off('updateModifiedObject', updateModifiedObject);
+      globalSocket.off('applyObjectRemoving', removeObject);
       window.removeEventListener('keydown', handleKeydown);
       canvasRef.current.clear();
     };
