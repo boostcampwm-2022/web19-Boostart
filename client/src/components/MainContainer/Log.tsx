@@ -11,6 +11,13 @@ import Modal from '../common/Modal';
 import TaskModal from '../TaskModal/TaskModal';
 import { NewTaskButton } from './MainContainer.style';
 
+interface Tag {
+  idx: number;
+  title: string;
+  color: string;
+  count: number;
+}
+
 const Log = () => {
   const [selectedTask, setSelectedTask] = useState<{ idx: number; tagIdx: number } | null>(null);
   const [mousePosition, setMousePosition] = useState<number[]>([0, 0]);
@@ -22,15 +29,21 @@ const Log = () => {
   const mouseOffsetRef = useRef<number[]>([0, 0]);
   const taskContainerRef = useRef<HTMLDivElement | null>(null);
   const { currentDate } = useCurrentDate();
+  const [tagList, setTagList] = useState<Tag[]>([]);
 
   const TaskMap = new Map();
-  const tagList = dummyTagList;
   taskList.forEach((task: Task) => {
     TaskMap.set(task.idx, task);
   });
 
   const getFilteredTaskListbyTag = (idx: number): Task[] => {
     return taskList.filter(({ tagIdx }) => tagIdx === idx);
+  };
+
+  const fetchTagList = async () => {
+    const response = await axios.get(`${HOST}/api/v1/tag`);
+    const tagList = response.data;
+    setTagList(tagList);
   };
 
   const fetchTaskList = async () => {
@@ -40,6 +53,10 @@ const Log = () => {
     setTaskList(taskList);
   };
 
+  useEffect(() => {
+    fetchTagList();
+  }, []);
+  
   useEffect(() => {
     fetchTaskList();
   }, [currentDate]);
@@ -181,7 +198,9 @@ const Log = () => {
           {tagList.map((tag) => {
             return (
               <S.TagWrap key={tag.idx} data-tag={tag.idx} onClick={handleTagWrapClick} onMouseDown={handleMouseDown}>
-                <S.TagTitle data-tag={tag.idx}>#{tag.title}</S.TagTitle>
+                <S.TagTitle color={tag.color} data-tag={tag.idx}>
+                  #{tag.title}
+                </S.TagTitle>
                 <TaskList taskList={getFilteredTaskListbyTag(tag.idx)} activeTask={activeTask} completionFilter={completionCheckBoxStatus} />
               </S.TagWrap>
             );
