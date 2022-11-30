@@ -56,8 +56,8 @@ const LabelInput = ({ labelArray, setLabelArray }: LabelInputProps) => {
         alert('올바른 값을 입력하세요');
         return;
       }
-      let found = labelArray.find((label) => label.title === selectedLabel!.title);
-      if (found) found.amount! = Number(found.amount!) + Number(amount!);
+      let foundLabel = labelArray.find((label) => label.title === selectedLabel!.title);
+      if (foundLabel) foundLabel.amount! = Number(foundLabel.amount!) + Number(amount!);
       else setLabelArray((prev) => [...prev, { ...selectedLabel, amount: Number(amount) } as Label]);
       setSelectedLabel(null);
       setIsLabelModalOpen(false);
@@ -128,15 +128,18 @@ const LabelInput = ({ labelArray, setLabelArray }: LabelInputProps) => {
 
   //DELETE LABEL
   const deleteLabel = async (e: React.MouseEvent<SVGElement>) => {
-    const LabelIdx = e.currentTarget!.dataset.idx;
-    popLabelItem(Number(LabelIdx));
     e.stopPropagation();
-    try {
-      await axios.delete(`${HOST}/api/v1/label/${LabelIdx}`).then((res) => {
-        if (res.status == 200) setReload(reload + 1);
-      });
-    } catch (error) {
-      alert('태그 삭제에 실패했습니다.');
+
+    if (window.confirm('라벨을 삭제하시겠습니까?')) {
+      const LabelIdx = e.currentTarget!.dataset.idx;
+      popLabelItem(Number(LabelIdx));
+      try {
+        await axios.delete(`${HOST}/api/v1/label/${LabelIdx}`).then((res) => {
+          if (res.status == 200) setReload(reload + 1);
+        });
+      } catch (error) {
+        alert('라벨 삭제에 실패했습니다.');
+      }
     }
   };
 
