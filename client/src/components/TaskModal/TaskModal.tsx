@@ -27,11 +27,10 @@ const TaskModal = ({ handleCloseButtonClick, fetchTaskList }: Props) => {
   const [tagObject, setTagObject] = useState<Tag | null>(null);
   const [locationObject, setLocationObject] = useState<Location | null>(null); // { location, lng, lat }
   const [labelArray, setLabelArray] = useState<Label[]>([]);
-  const { currentDate } = useCurrentDate();
 
   const [isDetailOpen, setIsDetailOpen] = useState(false);
 
-  const { getMonth, getDate } = useCurrentDate();
+  const { currentDate, getMonth, getDate } = useCurrentDate();
 
   const [importance, setImportance] = useState(DEFAULT_IMPORTANCE);
 
