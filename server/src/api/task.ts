@@ -3,6 +3,7 @@ import { OkPacket, RowDataPacket } from 'mysql2';
 import { executeSql } from '../db';
 import { AuthorizedRequest } from '../types';
 import { authenticateToken } from '../utils/auth';
+import { API_VERSION } from '../constants';
 
 const router = Router();
 
@@ -41,6 +42,8 @@ router.get('/:user_id', authenticateToken, async (req: AuthorizedRequest, res) =
     if (friend.length === 0) return res.status(404).send({ msg: '존재하지 않는 사용자예요.' });
 
     const { idx: friendIdx } = friend[0];
+    if (userIdx === friendIdx) return res.redirect(`/api/${API_VERSION}/task?date=${date}`);
+
     const isNotFriend = ((await executeSql('select * from friendship where (sender_idx = ? and receiver_idx = ?) or (sender_idx = ? and receiver_idx = ?)', [userIdx, friendIdx, friendIdx, userIdx])) as RowDataPacket).length === 0;
     if (isNotFriend) return res.status(403).send({ msg: '친구가 아닌 사용자의 태스크를 조회할 수 없어요.' });
 
