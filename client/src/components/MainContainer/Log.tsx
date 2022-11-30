@@ -6,6 +6,10 @@ import * as S from './Log.style';
 import axios from 'axios';
 import { HOST } from '../../constants';
 import useCurrentDate from '../../hooks/useCurrentDate';
+import { dummyTagList } from '../common/dummy';
+import Modal from '../common/Modal';
+import TaskModal from '../TaskModal/TaskModal';
+import { NewTaskButton } from './MainContainer.style';
 
 interface Tag {
   idx: number;
@@ -46,17 +50,15 @@ const Log = () => {
     const date = currentDate.toLocaleDateString().split('. ').join('-').substring(0, 10);
     const response = await axios.get(`${HOST}/api/v1/task?date=${date}`);
     const taskList = response.data;
-    return taskList;
+    setTaskList(taskList);
   };
 
   useEffect(() => {
     fetchTagList();
   }, []);
-
+  
   useEffect(() => {
-    fetchTaskList().then((taskList) => {
-      setTaskList(taskList);
-    });
+    fetchTaskList();
   }, [currentDate]);
 
   const handleMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
@@ -103,6 +105,11 @@ const Log = () => {
       calculateTime(startedTime, endedTime);
     }
   };
+  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+
+  const handleCloseButtonClick = () => {
+    setIsModalOpen(false);
+  };
 
   const handleMouseMove = (e: MouseEvent) => {
     if (selectedTask === null) return;
@@ -130,8 +137,7 @@ const Log = () => {
     if (sourceTagIndex !== destinationTagIndex) {
       try {
         await axios.patch(`${HOST}/api/v1/task/${taskIdx}`, { tagIdx: destinationTagIndex });
-        const taskList = await fetchTaskList();
-        setTaskList(taskList);
+        await fetchTaskList();
       } catch (error) {
         selectedTaskRef.current.style.visibility = 'visible';
       }
@@ -202,6 +208,8 @@ const Log = () => {
           <S.SlideObserver data-direction="right" direction="right"></S.SlideObserver>
         </S.LogMainSection>
       </S.LogContainer>
+      <NewTaskButton onClick={() => setIsModalOpen(true)}>+</NewTaskButton>
+      {isModalOpen && <Modal component={<TaskModal handleCloseButtonClick={handleCloseButtonClick} fetchTaskList={fetchTaskList} />} zIndex={1001} top="50%" left="50%" transform="translate(-50%, -50%)" handleDimmedClick={() => {}} />}
     </>
   );
 };
