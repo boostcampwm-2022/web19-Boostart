@@ -37,13 +37,7 @@ const Log = () => {
     const date = currentDate.toLocaleDateString().split('. ').join('-').substring(0, 10);
     const response = await axios.get(`${HOST}/api/v1/task?date=${date}`);
     const taskList = response.data;
-    setTaskList(
-      taskList.map((task: any) => {
-        const { content, date, done, ended_at, idx, importance, lat, lng, started_at, tag_idx, title, user_idx } = task;
-        const isPublic = task.public; // <- 구조 분해 할당 방해하는 주범
-        return { content, date, done, endedAt: ended_at, idx, importance, lat, lng, startedAt: started_at, tagIdx: tag_idx, title, userIdx: user_idx, isPublic };
-      })
-    );
+    setTaskList(taskList);
   };
 
   useEffect(() => {
