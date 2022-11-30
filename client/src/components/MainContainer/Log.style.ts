@@ -228,7 +228,7 @@ export const DateArrow = styled.div`
   cursor: pointer;
 `;
 
-export const PlusButton = styled(FiPlus)`
+export const NewTaskButton = styled(FiPlus)`
   cursor: pointer;
   position: absolute;
   color: white;

@@ -16,7 +16,7 @@ const unselectable = `
   user-select: none;
 `;
 
-export const Drawer = styled.div<{ open: boolean }>`
+export const Drawer = styled.div<{ isOpen: boolean }>`
   position: fixed;
   display: flex;
   flex-direction: column;
@@ -28,7 +28,7 @@ export const Drawer = styled.div<{ open: boolean }>`
   padding: 0 ${DRAWER_HORIZON_PADDING};
   background-color: #ffffff;
   transition: all ease 1s;
-  ${(props) => props.open && `transform: translateX(${DRAWER_RIGHT});`}
+  ${(props) => props.isOpen && `transform: translateX(${DRAWER_RIGHT});`}
   img {
     ${unselectable}
   }

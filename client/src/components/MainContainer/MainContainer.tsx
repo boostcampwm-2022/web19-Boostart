@@ -1,32 +1,20 @@
 import { useState } from 'react';
 import { Route, Routes } from 'react-router-dom';
-import Modal from '../common/Modal';
-import TaskModal from '../TaskModal/TaskModal';
 import Calendar from './Calendar';
 import Diary from './Diary';
 import Log from './Log';
 import * as S from './MainContainer.style';
 
 const MainContents = () => {
-  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
-
   return (
     <S.Container>
-      {isModalOpen && <Modal component={<TaskModal setIsModalOpen={setIsModalOpen} />} zIndex={1001} top={'50%'} left={'50%'} transform={'translate(-50%, -50%)'} handleDimmedClick={() => {}} />}
       <S.MainContentContainer>
         <S.LeftSection>
-          <Calendar></Calendar>
+          <Calendar />
         </S.LeftSection>
         <S.RightSection>
           <Routes>
-            <Route
-              path="log/"
-              element={
-                <>
-                  <Log />
-                </>
-              }
-            />
+            <Route path="log/" element={<Log />} />
             <Route path="diary/" element={<Diary />} />
           </Routes>
         </S.RightSection>
