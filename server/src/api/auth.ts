@@ -1,5 +1,5 @@
 import express from 'express';
-import { CLIENT, GITHUB_CLIENT_ID, GITHUB_CLIENT_SECRET, KAKAO_CLIENT_ID, KAKAO_REDIRECT_URI, OAUTH_TYPES, TOKEN_SECRET } from '../constants';
+import { CLIENT, GITHUB_CLIENT_ID, GITHUB_CLIENT_SECRET, KAKAO_CLIENT_ID, KAKAO_REDIRECT_URI, OAUTH_TYPES, TOKEN_SECRET, DEFAULT_PROFILE } from '../constants';
 import axios from 'axios';
 import qs from 'qs';
 import { authenticateToken, generateAccessToken } from '../utils/auth';
@@ -129,7 +129,8 @@ router.get('/login/:oauth_type/callback', async (req, res) => {
 router.post('/signup', async (req: SignupRequest, res) => {
   const { userId, password, username } = req.body;
   let profileImgFilename = '';
-  if (req.files) {
+  if (!req.files) profileImgFilename = DEFAULT_PROFILE;
+  else {
     const { profileImg } = req.files;
     profileImgFilename = profileImg.name; // TODO: 해시하기
     profileImg.mv('./uploads/' + profileImgFilename);
