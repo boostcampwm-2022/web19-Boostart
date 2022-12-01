@@ -19,7 +19,11 @@ interface Props {
 }
 
 const formatDate = (date: Date) => {
-  return date.toLocaleDateString().split('. ').join('-').substring(0, 10);
+  const [y, m, d] = date
+    .toLocaleDateString()
+    .split('.')
+    .map((str) => str.trim().padStart(2, '0'));
+  return [y.padStart(4, '0'), m.padStart(2, '0'), d.padStart(2, '0')].join('-');
 };
 
 const DEFAULT_IMPORTANCE = 3;
