@@ -182,8 +182,8 @@ export const TaskItem = styled.div<{
 }>`
   width: 12.5rem;
   min-height: 2.1rem;
-  max-height: 2.6rem;
-  transition: all 0.5s ease-out;
+  max-height: 3rem;
+  transition: all 0.4s ease-out;
 
   margin: 0.25rem 0.25rem;
   display: flex;

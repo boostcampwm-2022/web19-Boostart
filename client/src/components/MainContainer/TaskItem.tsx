@@ -41,7 +41,7 @@ const TaskList = ({ taskList, activeTask, completionFilter, fetchTaskList }: tas
     //코멘트 조회
 
     return (
-      <>
+      <S.Container>
         <hr />
         <S.TaskDetailInfos>
           <S.TaskDetailInfosCol>
@@ -50,7 +50,7 @@ const TaskList = ({ taskList, activeTask, completionFilter, fetchTaskList }: tas
           </S.TaskDetailInfosCol>
           <S.TaskDetailInfosCol>
             <S.ImportanceIcon />
-            {[1, 2, 3, 4, 5].map((d) => d >= task.importance && <>{'⭐️ '}</>)}
+            {[1, 2, 3, 4, 5].map((d, index) => d >= task.importance && <div key={index}>{'⭐️ '}</div>)}
           </S.TaskDetailInfosCol>
           {task.location && (
             <S.TaskDetailInfosCol>
@@ -72,9 +72,8 @@ const TaskList = ({ taskList, activeTask, completionFilter, fetchTaskList }: tas
             <hr />
             <S.TaskDetailInfos flex="row">
               {task.labels.map((label) => {
-                // amount color title unit
                 return (
-                  <S.LabelListItem color={label.color}>
+                  <S.LabelListItem key={label.title} color={label.color}>
                     {label.title} {label.amount} {label.unit}
                   </S.LabelListItem>
                 );
@@ -102,7 +101,7 @@ const TaskList = ({ taskList, activeTask, completionFilter, fetchTaskList }: tas
             </S.TaskDetailIcon>
           </S.TaskDetailInfosCol>
         </S.TaskDetailInfos>
-      </>
+      </S.Container>
     );
   };
 
