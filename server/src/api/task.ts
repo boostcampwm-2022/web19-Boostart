@@ -206,7 +206,7 @@ router.post('/', authenticateToken, async (req: AuthorizedRequest, res) => {
   }
 });
 
-router.put('/:task_idx', authenticateToken, async (req: AuthorizedRequest, res) => {
+router.patch('/:task_idx', authenticateToken, async (req: AuthorizedRequest, res) => {
   const bodyKeysCount = Object.keys(req.body).length;
   if (bodyKeysCount === 0) return res.status(200).send({ msg: '수정할 사항이 없어요.' });
 
