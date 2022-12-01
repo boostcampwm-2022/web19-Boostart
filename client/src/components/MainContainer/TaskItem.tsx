@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { Task, CompletionCheckBoxStatus } from 'GlobalType';
+import { useEffect } from 'react';
 import { HOST } from '../../constants';
 import * as S from './Log.style';
 
@@ -28,7 +29,17 @@ const TaskList = ({ taskList, activeTask, completionFilter, fetchTaskList }: tas
     }
   };
 
+  const CalcHeight = (task: Task) => {
+    let count = 0;
+    if (task.location) count++;
+    if (task.content && task.content !== '') count += 4.6; // 2.3;
+    if (task.labels.length !== 0) count += Math.ceil(task.labels.length / 2) * 1.5 + 0.8;
+    return count;
+  };
+
   const DetailInfo = ({ task }: { task: Task }) => {
+    //코멘트 조회
+
     return (
       <>
         <hr />
@@ -52,10 +63,26 @@ const TaskList = ({ taskList, activeTask, completionFilter, fetchTaskList }: tas
           <>
             <hr />
             <S.TaskDetailInfos>
-              <S.TaskDetailInfosCol height={'content-fit'}>{task.content}</S.TaskDetailInfosCol>
+              <S.TaskDetailInfosCol height={'3.5rem'}>{task.content}</S.TaskDetailInfosCol>
             </S.TaskDetailInfos>
           </>
         )}
+        {task.labels.length !== 0 && (
+          <>
+            <hr />
+            <S.TaskDetailInfos flex="row">
+              {task.labels.map((label) => {
+                // amount color title unit
+                return (
+                  <S.LabelListItem color={label.color}>
+                    {label.title} {label.amount} {label.unit}
+                  </S.LabelListItem>
+                );
+              })}
+            </S.TaskDetailInfos>
+          </>
+        )}
+
         {/* 해당 메뉴는 나의 Task 조회시에만 표시*/}
         <hr />
         <S.TaskDetailInfos>
@@ -85,7 +112,7 @@ const TaskList = ({ taskList, activeTask, completionFilter, fetchTaskList }: tas
       {taskList.map((task: Task) => {
         return (
           !isTaskFiltered(task.done) && (
-            <S.TaskItem key={'task' + task.idx} data-idx={task.idx} data-tag={task.tagIdx} data-active={task.idx === activeTask} done={Number(task.done)}>
+            <S.TaskItem key={'task' + task.idx} data-idx={task.idx} data-tag={task.tagIdx} data-active={task.idx === activeTask} done={Number(task.done)} cols={CalcHeight(task)}>
               <S.TaskMainInfos>
                 <S.TaskTime>{task.startedAt}</S.TaskTime>
                 <S.TaskTitle>{task.title}</S.TaskTitle>

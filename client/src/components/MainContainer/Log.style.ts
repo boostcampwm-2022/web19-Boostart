@@ -178,6 +178,7 @@ export const TagTitle = styled.div<{ color: string }>`
 
 export const TaskItem = styled.div<{
   done: number;
+  cols: number;
 }>`
   width: 12.5rem;
   min-height: 2.1rem;
@@ -196,7 +197,7 @@ export const TaskItem = styled.div<{
   box-shadow: 0px 0px 2px 1.5px rgba(190, 190, 190, 0.1);
 
   &[data-active='true'] {
-    min-height: 9rem;
+    min-height: calc(7.8rem + ${(props) => props.cols}rem);
     flex-direction: column;
   }
   & hr {
@@ -207,10 +208,11 @@ export const TaskItem = styled.div<{
   }
 `;
 
-export const TaskDetailInfos = styled.div`
+export const TaskDetailInfos = styled.div<{ flex?: string }>`
   padding: 0.375rem 0.75rem;
   display: flex;
-  flex-direction: column;
+  flex-wrap: wrap;
+  flex-direction: ${(props) => props.flex || 'column'};
 `;
 export const TaskDetailInfosCol = styled.div<{ height?: string }>`
   height: ${(props) => props.height || '1.2rem'};
@@ -326,4 +328,16 @@ export const NewTaskButton = styled(FiPlus)`
   background-color: var(--color-main);
   box-shadow: 0px 0px 5px 3px rgba(175, 175, 175, 0.2);
   z-index: 999;
+`;
+
+export const LabelListItem = styled.div`
+  color: white;
+  background-color: ${(props) => props.color || 'var(--color-gray5)'};
+  padding: 1px 10px;
+  height: 18px;
+  justify-content: center;
+  align-items: center;
+  border-radius: 20px;
+  font-size: 0.7rem;
+  margin: 2px 3px;
 `;
