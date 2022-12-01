@@ -32,4 +32,22 @@ router.post('/', authenticateToken, async (req: AuthorizedRequest, res) => {
   }
 });
 
+router.delete('/:label_idx', authenticateToken, async (req: AuthorizedRequest, res) => {
+  const { userIdx } = req.user;
+  const labelIdx = req.params.label_idx;
+
+  try {
+    const notExistLabel = ((await executeSql('select idx from label where user_idx = ? and idx = ?', [userIdx, labelIdx])) as RowDataPacket).length === 0;
+    if (notExistLabel) return res.status(404).json({ msg: '존재하지 않는 라벨이에요.' });
+
+    const { labelUsageCount } = ((await executeSql('select count(ifnull(label_idx, 0)) as labelUsageCount from task_label where label_idx = ?', [labelIdx])) as RowDataPacket)[0];
+    if (labelUsageCount > 0) return res.status(409).json({ msg: '사용 중인 라벨은 삭제할 수 없어요.' });
+
+    await executeSql('delete from label where user_idx = ? and idx = ?', [userIdx, labelIdx]);
+    res.sendStatus(200);
+  } catch (error) {
+    res.sendStatus(500);
+  }
+});
+
 export default router;

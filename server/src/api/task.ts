@@ -3,6 +3,7 @@ import { OkPacket, RowDataPacket } from 'mysql2';
 import { executeSql } from '../db';
 import { AuthorizedRequest } from '../types';
 import { authenticateToken } from '../utils/auth';
+import { API_VERSION } from '../constants';
 
 const router = Router();
 
@@ -14,6 +15,41 @@ router.get('/', authenticateToken, async (req: AuthorizedRequest, res) => {
     const tasks = (await executeSql(
       'select task.idx, task.title, task.importance, task.started_at as startedAt, task.ended_at as endedAt, task.lat, task.lng, task.location, task.public as isPublic, task.tag_idx as tagIdx, tag.title as tagName, task.content, task.done from task left join tag on task.tag_idx = tag.idx where task.user_idx = ? and task.date = ?',
       [userIdx, date]
+    )) as RowDataPacket;
+
+    const result = await Promise.all(
+      tasks.map(async (task: RowDataPacket) => {
+        const { idx: taskIdx } = task;
+        const labels = await executeSql('select label.idx as labelIdx, label.title, label.color, label.unit, task_label.amount from task_label inner join label on task_label.label_idx = label.idx where task_idx = ?', [taskIdx]);
+        task.labels = labels;
+        return task;
+      })
+    );
+    res.json(result);
+  } catch {
+    res.sendStatus(500);
+  }
+});
+
+router.get('/:user_id', authenticateToken, async (req: AuthorizedRequest, res) => {
+  const { userIdx } = req.user;
+  const { user_id: friendId } = req.params;
+  const { date } = req.query;
+  if (!date) return res.status(400).send({ msg: '날짜를 지정해주세요.' });
+
+  try {
+    const friend = (await executeSql('select idx from user where user_id = ?', [friendId])) as RowDataPacket;
+    if (friend.length === 0) return res.status(404).send({ msg: '존재하지 않는 사용자예요.' });
+
+    const { idx: friendIdx } = friend[0];
+    if (userIdx === friendIdx) return res.redirect(`/api/${API_VERSION}/task?date=${date}`);
+
+    const isNotFriend = ((await executeSql('select * from friendship where (sender_idx = ? and receiver_idx = ?) or (sender_idx = ? and receiver_idx = ?)', [userIdx, friendIdx, friendIdx, userIdx])) as RowDataPacket).length === 0;
+    if (isNotFriend) return res.status(403).send({ msg: '친구가 아닌 사용자의 태스크를 조회할 수 없어요.' });
+
+    const tasks = (await executeSql(
+      'select task.idx, task.title, task.importance, task.started_at as startedAt, task.ended_at as endedAt, task.lat, task.lng, task.location, task.public as isPublic, task.tag_idx as tagIdx, tag.title as tagName, task.content, task.done from task left join tag on task.tag_idx = tag.idx where task.user_idx = ? and task.date = ? and public = true',
+      [friendIdx, date]
     )) as RowDataPacket;
 
     const result = await Promise.all(
@@ -49,6 +85,21 @@ const TaskBodyKeys = {
   content: 'content',
 } as const;
 
+const TaskColumnKeys = {
+  title: 'title',
+  date: 'date',
+  importance: 'importance',
+  lat: 'lat',
+  lng: 'lng',
+  location: 'location',
+  isPublic: 'public',
+  startedAt: 'started_at',
+  endedAt: 'ended_at',
+  tagIdx: 'tag_idx',
+  done: 'done',
+  content: 'content',
+} as const;
+
 const TaskBodyDefaultValues = {
   [TaskBodyKeys.importance]: (MIN_IMPORTANCE + MAX_IMPORTANCE) / 2,
   [TaskBodyKeys.lat]: null,
@@ -62,6 +113,7 @@ const TaskBodyDefaultValues = {
 } as const;
 
 type TaskBodyKeys = typeof TaskBodyKeys[keyof typeof TaskBodyKeys];
+type TaskColumnKeys = typeof TaskColumnKeys[keyof typeof TaskColumnKeys];
 
 class ValidationError extends Error {
   constructor(message: string) {
@@ -190,7 +242,88 @@ router.post('/', authenticateToken, async (req: AuthorizedRequest, res) => {
   }
 });
 
-router.patch('/:task_idx', authenticateToken, async (req: AuthorizedRequest, res) => {
+router.patch('/update/:task_idx', authenticateToken, async (req: AuthorizedRequest, res) => {
+  const bodyKeysCount = Object.keys(req.body).length;
+  if (bodyKeysCount === 0) return res.status(200).send({ msg: '수정할 사항이 없어요.' });
+
+  const { userIdx } = req.user;
+  const { task_idx: taskIdx } = req.params;
+  const { date, done, labels } = req.body;
+
+  const willUpdateTask = bodyKeysCount > 1 || (bodyKeysCount === 1 && !date && done === undefined && !labels);
+
+  let updateSql = 'update task set';
+  const updateValue = [];
+
+  try {
+    Object.values(TaskBodyKeys).forEach((key) => {
+      if (!req.body[key]) return;
+      if (key === TaskBodyKeys.date || key === TaskBodyKeys.done) return;
+      if (!validate(key, req.body[key])) req.body[key] = TaskBodyDefaultValues[key];
+
+      if (key === TaskBodyKeys.labels) return;
+      if (updateValue.length > 0) updateSql += ',';
+      updateSql += ` ${TaskColumnKeys[key]} = ? `;
+      updateValue.push(req.body[key]);
+    });
+    updateSql += 'where idx = ?';
+    updateValue.push(taskIdx);
+  } catch (error) {
+    return res.status(400).send({ msg: error.message });
+  }
+
+  try {
+    const notExistTask = ((await executeSql('select idx from task where user_idx = ? and idx = ?', [userIdx, taskIdx])) as RowDataPacket).length === 0;
+    if (notExistTask) return res.status(404).json({ msg: '존재하지 않는 태스크예요.' });
+
+    if (labels?.length > 0) {
+      let labelCheckSql = 'select idx from label where user_idx = ? and ';
+      const labelCheckValue = [userIdx];
+
+      labels.forEach(async (label: Label, idx: number) => {
+        if (idx === 0) labelCheckSql += '(';
+        else labelCheckSql += ' or ';
+        labelCheckSql += 'idx = ?';
+        if (idx === labels.length - 1) labelCheckSql += ')';
+
+        const { labelIdx } = label;
+        labelCheckValue.push(labelIdx);
+      });
+
+      const notExistLabel = ((await executeSql(labelCheckSql, labelCheckValue)) as RowDataPacket).length != labels.length;
+      if (notExistLabel) return res.status(404).json({ msg: '존재하지 않는 라벨이에요.' });
+    }
+
+    if (willUpdateTask) await executeSql(updateSql, updateValue);
+
+    if (labels) {
+      const taskLabels = (await executeSql('select * from task_label where task_idx = ?', [taskIdx])) as RowDataPacket;
+      await Promise.all(
+        taskLabels.map(async ({ label_idx: labelIdx, amount }) => {
+          const updateLabelIdx = labels.findIndex((label: Label) => labelIdx === label.labelIdx);
+          if (updateLabelIdx === -1) return await executeSql('delete from task_label where task_idx = ? and label_idx = ?', [taskIdx, labelIdx]);
+
+          const { amount: updateAmount } = labels[updateLabelIdx];
+          if (amount != updateAmount) await executeSql('update task_label set amount = ? where task_idx = ? and label_idx = ?', [updateAmount, taskIdx, labelIdx]);
+          labels.splice(updateLabelIdx, 1);
+        })
+      );
+
+      if (labels.length > 0) {
+        await Promise.all(
+          labels.map(async ({ labelIdx, amount }) => {
+            await executeSql('insert into task_label (task_idx, label_idx, amount) value (?, ?, ?)', [taskIdx, labelIdx, amount]);
+          })
+        );
+      }
+    }
+    res.sendStatus(200);
+  } catch (error) {
+    res.sendStatus(500);
+  }
+});
+
+router.patch('/status/:task_idx', authenticateToken, async (req: AuthorizedRequest, res) => {
   const { userIdx } = req.user;
   const taskIdx = req.params.task_idx;
   const { done, tagIdx } = req.body;
@@ -211,7 +344,7 @@ router.patch('/:task_idx', authenticateToken, async (req: AuthorizedRequest, res
       status = 206;
     }
 
-    if (done) {
+    if (done !== undefined) {
       if (task.done === done) return res.sendStatus(status);
       await executeSql('update task set done = ? where idx = ?', [done, taskIdx]);
     }

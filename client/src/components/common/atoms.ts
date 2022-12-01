@@ -4,3 +4,7 @@ export const dateState = atom({
   key: 'currentDate',
   default: new Date(),
 });
+export const visitState = atom({
+  key: 'currentVisiting',
+  default: '',
+});

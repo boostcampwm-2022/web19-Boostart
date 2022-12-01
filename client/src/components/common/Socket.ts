@@ -12,6 +12,8 @@ interface ClientToServerEvents {
   sendModifiedObject: (objectData: FabricLine | FabricText | Shape) => void;
   sendRemovedObjectId: (objectId: string) => void;
   requestCurrentObjects: () => void;
+  joinToNewRoom: (destId: string, date: string) => void;
+  leaveCurrentRoom: (destId: string, date: string) => void;
 }
 
 class GlobalSocket {

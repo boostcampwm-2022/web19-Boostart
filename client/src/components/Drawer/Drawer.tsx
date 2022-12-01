@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { dummyNotifications } from '../common/dummy';
 import { PROFILE_EDIT_FORM_Z_INDEX, PROFILE_EDIT_FORM_TOP, PROFILE_EDIT_FORM_LEFT, PROFILE_EDIT_FORM_TRANFORM } from './Drawer.style';
 import { FRIEND_REQUEST_ACTION, HOST } from '../../constants';
@@ -8,8 +8,10 @@ import * as S from './Drawer.style';
 
 interface DrawerProps {
   isOpen: boolean;
+  myProfile: Friend | null;
   friendRequests: Friend[] | null;
   handleFriendRequests: Function;
+  handleLogoutButtonClick: React.MouseEventHandler;
 }
 interface ReceivedFriendRequestSectionProps {
   friendRequests: Friend[] | null;
@@ -24,23 +26,20 @@ interface ReceivedFriendRequestProps {
 }
 interface ProfileSectionProps {
   handleProfileEditButtonClick: React.MouseEventHandler;
+  myProfile: Friend | null;
 }
 
-const Drawer = ({ isOpen, friendRequests, handleFriendRequests }: DrawerProps) => {
+const Drawer = ({ isOpen, myProfile, friendRequests, handleFriendRequests, handleLogoutButtonClick }: DrawerProps) => {
   const [isProfileEditModalOpen, setIsProfileEditModalOpen] = useState(false);
 
   const handleProfileEditButtonClick = () => {
     setIsProfileEditModalOpen(true);
   };
 
-  const handleLogoutButtonClick = () => {
-    console.log('LogoutButtonClicked(추후 로그아웃 API 추가)');
-  };
-
   return (
     <>
       <S.Drawer isOpen={isOpen}>
-        <ProfileSection handleProfileEditButtonClick={handleProfileEditButtonClick} />
+        <ProfileSection handleProfileEditButtonClick={handleProfileEditButtonClick} myProfile={myProfile} />
         <S.HorizontalRule />
         <ReceivedFriendRequestSection friendRequests={friendRequests} handleFriendRequests={handleFriendRequests} />
         <S.HorizontalRule />
@@ -77,22 +76,26 @@ const ProfileEditForm = () => {
   );
 };
 
-const ProfileSection = ({ handleProfileEditButtonClick }: ProfileSectionProps) => {
+const ProfileSection = ({ handleProfileEditButtonClick, myProfile }: ProfileSectionProps) => {
   return (
-    <S.ProfileSection>
-      <S.ProfileEditButton onClick={handleProfileEditButtonClick} href="#">
-        프로필 수정
-      </S.ProfileEditButton>
-      <S.Profile>
-        <S.ProfileImage size="5rem" padding="1rem" src="https://avatars.githubusercontent.com/u/55306894?s=80&u=aedb7854f1fd10d8eb6dc1272f1583dbb255f5b8&v=4" />
-        <S.ProfileInfo>
-          <S.SizedText fontSize="1.1rem">
-            <S.Username>모작</S.Username>님 반갑습니다
-          </S.SizedText>
-          <S.UserId>@mojac</S.UserId>
-        </S.ProfileInfo>
-      </S.Profile>
-    </S.ProfileSection>
+    <>
+      {myProfile && (
+        <S.ProfileSection>
+          <S.ProfileEditButton onClick={handleProfileEditButtonClick} href="#">
+            프로필 수정
+          </S.ProfileEditButton>
+          <S.Profile>
+            <S.ProfileImage size="5rem" padding="1rem" src={HOST + '/' + myProfile.profileImg} />
+            <S.ProfileInfo>
+              <S.SizedText fontSize="1.1rem">
+                <S.Username>{myProfile.username}</S.Username>님 반갑습니다
+              </S.SizedText>
+              <S.UserId>@{myProfile.userId}</S.UserId>
+            </S.ProfileInfo>
+          </S.Profile>
+        </S.ProfileSection>
+      )}
+    </>
   );
 };
 
