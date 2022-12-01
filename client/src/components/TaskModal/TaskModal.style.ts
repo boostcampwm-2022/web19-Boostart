@@ -43,7 +43,7 @@ export const FormTable = styled.table`
   }
 `;
 export const LagreTr = styled.tr`
-  height: 5.6rem;
+  height: 5.8rem;
 
   td:nth-child(1) {
     width: 4.5rem;

@@ -259,13 +259,21 @@ const Canvas = () => {
     globalSocket.emit('sendModifiedObject', objectData);
   };
 
-  globalSocket.on('updateModifiedObject', (objectData) => {
-    updateModifiedObject(objectData);
-  });
-  globalSocket.on('applyObjectRemoving', (objectId) => {
-    removeObject(objectId);
-  });
-  globalSocket.on('offerCurrentObjects', (objectdataMap) => {
+  const setCanvasBackground = () => {
+    fabric.Image.fromURL('/canvasBackground.png', function (img) {
+      img.set({
+        top: 0,
+        left: 0,
+        evented: false,
+      });
+      img.scaleToWidth(660);
+      img.setCoords();
+      if (!canvasRef.current) return;
+      canvasRef.current.add(img);
+    });
+  };
+
+  globalSocket.once('offerCurrentObjects', (objectdataMap) => {
     Object.values(objectdataMap).forEach((objectData) => {
       updateModifiedObject(objectData);
     });
@@ -275,17 +283,19 @@ const Canvas = () => {
     if (!canvasRef.current) canvasRef.current = initCanvas();
     canvasRef.current.on('path:created', dispatchCreatedLine);
     canvasRef.current.on('object:modified', dispatchModifiedObject);
-    canvasRef.current.on('object:moving', dispatchModifiedObject);
+    globalSocket.on('updateModifiedObject', updateModifiedObject);
+    globalSocket.on('applyObjectRemoving', removeObject);
     window.addEventListener('keydown', handleKeydown);
-    globalSocket.emit('requestCurrentObjects');
 
     return () => {
       if (!canvasRef.current) return;
       canvasRef.current.off('path:created', dispatchCreatedLine);
       canvasRef.current.off('object:modified', dispatchModifiedObject);
-      canvasRef.current.off('object:moving', dispatchModifiedObject);
+      globalSocket.off('updateModifiedObject', updateModifiedObject);
+      globalSocket.off('applyObjectRemoving', removeObject);
       window.removeEventListener('keydown', handleKeydown);
       canvasRef.current.clear();
+      setCanvasBackground();
     };
   });
 
