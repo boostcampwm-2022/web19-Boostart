@@ -47,8 +47,14 @@ const TaskModal = ({ handleCloseButtonClick, fetchTaskList }: Props) => {
     importance: yup.number().required(),
     isPublic: yup.bool(),
     location: yup.string(),
-    lat: yup.number(),
-    lng: yup.number(),
+    lat: yup
+      .number()
+      .transform((value) => (isNaN(value) ? undefined : value))
+      .nullable(),
+    lng: yup
+      .number()
+      .transform((value) => (isNaN(value) ? undefined : value))
+      .nullable(),
     content: yup.string(),
   });
   const {
@@ -72,7 +78,6 @@ const TaskModal = ({ handleCloseButtonClick, fetchTaskList }: Props) => {
   };
 
   const createTask = async (body: FieldValues) => {
-    console.log(JSON.stringify(body).split(',').join('\n'));
     await httpPostTask({ ...body, date: formatDate(currentDate) });
     await fetchTaskList();
     handleCloseButtonClick();
