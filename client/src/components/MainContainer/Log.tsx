@@ -89,6 +89,8 @@ const Log = () => {
   };
 
   const handleTagWrapClick = (e: React.MouseEvent<HTMLDivElement>) => {
+    e.stopPropagation();
+
     if (!(e.target instanceof HTMLDivElement)) return;
     const target = e.target;
     const activeTaskIdx = target.dataset.idx;
@@ -200,7 +202,7 @@ const Log = () => {
                   <S.TagTitle color={tag.color} data-tag={tag.idx}>
                     #{tag.title}
                   </S.TagTitle>
-                  <TaskList taskList={getFilteredTaskListbyTag(tag.idx)} activeTask={activeTask} completionFilter={completionCheckBoxStatus} />
+                  <TaskList taskList={getFilteredTaskListbyTag(tag.idx)} activeTask={activeTask} completionFilter={completionCheckBoxStatus} fetchTaskList={fetchTaskList} />
                 </S.TagWrap>
               );
             })}
