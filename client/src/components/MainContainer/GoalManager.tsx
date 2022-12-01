@@ -111,4 +111,4 @@ const Goal = ({ goal }: GoalProps) => {
   );
 };
 
-export default GoalManagerWithContainer;
+export default GoalManager;
