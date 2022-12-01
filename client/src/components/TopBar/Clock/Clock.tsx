@@ -31,11 +31,9 @@ const Clock = () => {
     };
   }, []);
   return (
-    <>
-      <S.DigitalClock>
-        {clockInfo.hour}:{clockInfo.minute}
-      </S.DigitalClock>
-    </>
+    <S.DigitalClock>
+      {clockInfo.hour}:{clockInfo.minute}
+    </S.DigitalClock>
   );
 };
 

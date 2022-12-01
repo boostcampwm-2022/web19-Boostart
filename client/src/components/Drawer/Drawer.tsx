@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { dummyNotifications } from '../common/dummy';
 import { PROFILE_EDIT_FORM_Z_INDEX, PROFILE_EDIT_FORM_TOP, PROFILE_EDIT_FORM_LEFT, PROFILE_EDIT_FORM_TRANFORM } from './Drawer.style';
 import { FRIEND_REQUEST_ACTION, HOST } from '../../constants';
@@ -11,6 +11,7 @@ interface DrawerProps {
   myProfile: Friend | null;
   friendRequests: Friend[] | null;
   handleFriendRequests: Function;
+  handleLogoutButtonClick: React.MouseEventHandler;
 }
 interface ReceivedFriendRequestSectionProps {
   friendRequests: Friend[] | null;
@@ -28,15 +29,11 @@ interface ProfileSectionProps {
   myProfile: Friend | null;
 }
 
-const Drawer = ({ isOpen, myProfile, friendRequests, handleFriendRequests }: DrawerProps) => {
+const Drawer = ({ isOpen, myProfile, friendRequests, handleFriendRequests, handleLogoutButtonClick }: DrawerProps) => {
   const [isProfileEditModalOpen, setIsProfileEditModalOpen] = useState(false);
 
   const handleProfileEditButtonClick = () => {
     setIsProfileEditModalOpen(true);
-  };
-
-  const handleLogoutButtonClick = () => {
-    console.log('LogoutButtonClicked(추후 로그아웃 API 추가)');
   };
 
   return (

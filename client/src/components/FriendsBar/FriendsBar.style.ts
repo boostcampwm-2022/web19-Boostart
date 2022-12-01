@@ -2,7 +2,7 @@ import styled from 'styled-components';
 import { HOST } from '../../constants';
 
 export const FriendsBarContainer = styled.div`
-  width: 69rem;
+  width: 70.5rem;
   height: 3rem;
   background: white;
   border-radius: 0.8rem;

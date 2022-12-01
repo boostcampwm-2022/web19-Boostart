@@ -269,6 +269,8 @@ const LabelListContainer = styled.div`
   display: flex;
   align-items: center;
   overflow-x: scroll;
+  overflow: overlay;
+  margin-top: 2px;
 `;
 
 const SelectedLabelListContainer = styled.div`
@@ -277,7 +279,8 @@ const SelectedLabelListContainer = styled.div`
   font-size: 0.8rem;
   display: flex;
   align-items: center;
-  overflow: scroll;
+  overflow-x: scroll;
+  overflow: overlay;
 `;
 
 const LabelListItem = styled.div<{ delete: boolean }>`
