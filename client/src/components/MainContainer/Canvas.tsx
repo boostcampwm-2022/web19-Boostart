@@ -1,9 +1,10 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import globalSocket from '../common/Socket';
 import { DEFAULT_OBJECT_VALUE } from '../../constants';
-import { Shape, FabricText, FabricLine, ShapeType, FabricObject } from 'GlobalType';
+import { Shape, FabricText, FabricLine, ShapeType, FabricObject, ObjectData } from 'GlobalType';
 import { fabric } from 'fabric';
 import { v4 } from 'uuid';
+import styled from 'styled-components';
 
 const Canvas = () => {
   const canvasRef = useRef<fabric.Canvas | null>(null);
@@ -14,7 +15,7 @@ const Canvas = () => {
   const initCanvas = (): fabric.Canvas => {
     const canvas = new fabric.Canvas('canvas', {
       height: 400,
-      width: 680,
+      width: 674,
       selection: false,
     });
     return canvas;
@@ -258,6 +259,12 @@ const Canvas = () => {
     globalSocket.emit('sendModifiedObject', objectData);
   };
 
+  const presentPresetObjects = (objectDataMap: ObjectData) => {
+    Object.values(objectDataMap).forEach((objectData) => {
+      updateModifiedObject(objectData);
+    });
+    console.log('objects');
+  };
   const setCanvasBackground = () => {
     fabric.Image.fromURL(canvasBackground, function (img) {
       img.set({
@@ -268,29 +275,27 @@ const Canvas = () => {
       img.scaleToWidth(674);
       img.setCoords();
       if (!canvasRef.current) return;
+      console.log('img');
       canvasRef.current.add(img);
+      globalSocket.emit('requestCurrentObjects');
     });
   };
 
-  globalSocket.once('offerCurrentObjects', (objectdataMap) => {
-    Object.values(objectdataMap).forEach((objectData) => {
-      updateModifiedObject(objectData);
-    });
-  });
-
   useEffect(() => {
     if (!canvasRef.current) canvasRef.current = initCanvas();
+    setCanvasBackground();
     canvasRef.current.on('path:created', dispatchCreatedLine);
     canvasRef.current.on('object:modified', dispatchModifiedObject);
+    globalSocket.on('offerCurrentObjects', presentPresetObjects);
     globalSocket.on('updateModifiedObject', updateModifiedObject);
     globalSocket.on('applyObjectRemoving', removeObject);
     window.addEventListener('keydown', handleKeydown);
-    setCanvasBackground();
 
     return () => {
       if (!canvasRef.current) return;
       canvasRef.current.off('path:created', dispatchCreatedLine);
       canvasRef.current.off('object:modified', dispatchModifiedObject);
+      globalSocket.off('offerCurrentObjects', presentPresetObjects);
       globalSocket.off('updateModifiedObject', updateModifiedObject);
       globalSocket.off('applyObjectRemoving', removeObject);
       window.removeEventListener('keydown', handleKeydown);
@@ -298,19 +303,84 @@ const Canvas = () => {
     };
   });
 
+  const [isJoined, setIsJoined] = useState(false);
   return (
     <>
+      <ForeignerScreen isActive={isJoined}></ForeignerScreen>
       <canvas id="canvas" />
-      <span onClick={() => enterDrawingMode(3)}>연필</span>
-      <span onClick={() => enterDrawingMode(10)}>형광펜</span>
-      <span onClick={() => enterDrawingMode(20)}>브러쉬</span>
-      <img src="/rect.svg" onClick={() => createNewShape('rect')} alt="" />
-      <img src="/triangle.svg" onClick={() => createNewShape('triangle')} alt="" />
-      <img src="/circle.svg" onClick={() => createNewShape('circle')} alt="" />
-      <img src="/textIcon.svg" onClick={() => createNewText()} alt="" />
-      <input type="color" ref={colorRef} onChange={changeBrushColor} />
+      <ControlBar>
+        <Palette isActive={isJoined}>
+          <span onClick={() => enterDrawingMode(3)}>연필</span>
+          <span onClick={() => enterDrawingMode(10)}>형광펜</span>
+          <span onClick={() => enterDrawingMode(20)}>브러쉬</span>
+          <img src="/rect.svg" onClick={() => createNewShape('rect')} alt="" />
+          <img src="/triangle.svg" onClick={() => createNewShape('triangle')} alt="" />
+          <img src="/circle.svg" onClick={() => createNewShape('circle')} alt="" />
+          <img src="/textIcon.svg" onClick={() => createNewText()} alt="" />
+          <input type="color" ref={colorRef} onChange={changeBrushColor} />
+        </Palette>
+        <JoinButton onClick={() => setIsJoined((isJoined) => !isJoined)}>{isJoined ? 'DRAW' : 'JOIN'}</JoinButton>
+      </ControlBar>
     </>
   );
 };
 
 export default Canvas;
+
+const ControlBar = styled.div`
+  width: 100%;
+  height: 3rem;
+  margin-top: 0.5rem;
+  display: flex;
+  position: relative;
+`;
+const ForeignerScreen = styled.div<{
+  isActive: boolean;
+}>`
+  width: 100%;
+  height: 25rem;
+  position: absolute;
+  top: 3.5rem;
+  left: 0;
+  background: rgba(0, 0, 0, 0);
+  z-index: 1000;
+  display: ${(props) => (props.isActive ? 'none' : 'block')};
+`;
+
+const Palette = styled.div<{
+  isActive: boolean;
+}>`
+  width: ${(props) => (props.isActive ? '28rem' : '1px')};
+  height: 3rem;
+  padding: ${(props) => (props.isActive ? '0 1rem 0 4rem' : '0')};
+  border-radius: 2rem;
+  background: var(--color-gray1);
+  position: absolute;
+  display: flex;
+  flex-wrap: nowrap;
+  justify-content: space-around;
+  align-items: center;
+  top: 0;
+  left: 3rem;
+  overflow: hidden;
+  box-sizing: border-box;
+  transition: all 0.5s;
+  & img {
+    height: 1.5rem;
+  }
+  & span {
+    white-space: nowrap;
+  }
+`;
+const JoinButton = styled.div`
+  width: 6.5rem;
+  height: 3rem;
+  position: absolute;
+  border-radius: 2rem;
+  color: white;
+  background: var(--color-main);
+  font-size: 1rem;
+  font-family: 'Press Start 2P', cursive;
+  text-align: center;
+  line-height: 3rem;
+`;
