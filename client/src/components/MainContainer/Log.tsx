@@ -140,7 +140,7 @@ const Log = () => {
 
     if (sourceTagIndex !== destinationTagIndex) {
       try {
-        await axios.patch(`${HOST}/api/v1/task/${taskIdx}`, { tagIdx: destinationTagIndex });
+        await axios.patch(`${HOST}/api/v1/task/status/${taskIdx}`, { tagIdx: destinationTagIndex });
         await fetchTaskList();
       } catch (error) {
         selectedTaskRef.current.style.visibility = 'visible';
