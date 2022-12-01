@@ -354,4 +354,20 @@ router.patch('/status/:task_idx', authenticateToken, async (req: AuthorizedReque
   }
 });
 
+router.delete('/:task_idx', authenticateToken, async (req: AuthorizedRequest, res) => {
+  const { userIdx } = req.user;
+  const { task_idx: taskIdx } = req.params;
+
+  try {
+    const notExistTask = ((await executeSql('select idx from task where user_idx = ? and idx = ?', [userIdx, taskIdx])) as RowDataPacket).length === 0;
+    if (notExistTask) return res.status(404).json({ msg: '존재하지 않는 태스크예요.' });
+
+    await executeSql('delete from task_label where task_idx = ?', [taskIdx]);
+    await executeSql('delete from task where user_idx = ? and idx = ?', [userIdx, taskIdx]);
+    res.sendStatus(200);
+  } catch (error) {
+    res.sendStatus(500);
+  }
+});
+
 export default router;
