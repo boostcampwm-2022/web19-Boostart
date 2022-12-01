@@ -1,5 +1,36 @@
 import styled from 'styled-components';
 import { FiPlus } from 'react-icons/fi';
+import { MdTimer, MdOutlineSentimentSatisfiedAlt, MdLocationPin } from 'react-icons/md';
+
+export const Comment = styled.img`
+  & svg {
+    fill: red;
+    background-color: red;
+    color: red;
+  }
+`;
+
+export const TimeIcon = styled(MdTimer)`
+  width: 14px;
+  height: 14px;
+  margin: 0px 5px 0px 0px;
+  color: var(--color-gray5);
+  align-self: center;
+`;
+export const ImportanceIcon = styled(MdOutlineSentimentSatisfiedAlt)`
+  width: 14px;
+  height: 14px;
+  margin: 0px 5px 0px 0px;
+  color: var(--color-gray5);
+  align-self: center;
+`;
+export const LocationIcon = styled(MdLocationPin)`
+  width: 14px;
+  height: 14px;
+  margin: 0px 5px 0px 0px;
+  color: var(--color-gray5);
+  align-self: center;
+`;
 
 export const LogTitle = styled.span`
   display: inline-block;
@@ -97,63 +128,81 @@ export const SortOptionSelect = styled.select`
 
 export const LogMainSection = styled.div`
   width: 100%;
-  height: 100%;
+  height: 32rem;
   display: flex;
-  flex-wrap: no-wrap;
-  overflow-x: scroll;
   font-family: 'Noto Sans KR', sans-serif;
   grid-area: main;
   cursor: default;
+  overflow-x: scroll;
 `;
 
 export const TagWrap = styled.div`
-  height: 29rem;
   display: flex;
-  margin: 0 0.25rem;
+  margin: 0 0.2rem;
   flex-direction: column;
   z-index: 5;
+  min-width: fit-content;
+  overflow-y: scroll;
+  height: 31rem;
+  overflow: overlay;
 `;
 export const TagTitle = styled.div<{ color: string }>`
   width: 11rem;
-  height: 2rem;
-  margin: 0.25rem 0.25rem;
+  min-height: 2rem;
+  margin: 0.25rem;
   padding: 0 0.75rem;
   display: flex;
   align-items: center;
-  color: #616161;
+  color: var(--color-gray7);
   font-size: 0.75rem;
   ${(props) => props.color && `background: ${props.color};`}
-  border: 1px solid gray;
+  border: 1px solid var(--color-gray4);
+  box-shadow: 0px 0px 2px 1px rgba(190, 190, 190, 0.15);
   border-radius: 0.25rem;
 `;
 
 export const TaskItem = styled.div<{
-  done: boolean;
+  done: number;
 }>`
   width: 12.5rem;
-  height: 2rem;
+  min-height: 2.1rem;
+  max-height: 2.6rem;
+  transition: all 0.5s ease-out;
+
   margin: 0.25rem 0.25rem;
-  padding: 0.375rem 0.75rem;
   display: flex;
   align-items: flex-start;
   justify-content: flex-start;
   font-size: 0.75rem;
-  background: ${(props) => (props.done === true ? '#DDE4EF' : 'white')};
-  border: 1px solid gray;
+  background: ${(props) => (props.done === 1 ? '#F0F4FB' : 'white')};
   border-radius: 0.25rem;
-  transition: height 0.5s;
   box-sizing: border-box;
+  border: 1px solid var(--color-gray2);
+  box-shadow: 0px 0px 2px 1.5px rgba(190, 190, 190, 0.1);
+
   &[data-active='true'] {
-    height: 10rem;
+    min-height: 13rem;
+    //max-height: 6rem;
     flex-direction: column;
-    overflow: hidden;
   }
   & hr {
-    width: 10rem;
+    margin: 0 auto;
+    margin-top: 2px;
+    width: 10.6rem;
+    border: solid 0.1px var(--color-gray2);
   }
-  & * {
-    pointer-events: none;
-  }
+`;
+
+export const TaskDetailInfos = styled.div`
+  padding: 0.375rem 0.75rem;
+  display: flex;
+  flex-direction: column;
+`;
+export const TaskDetailInfosCol = styled.div<{ height?: string }>`
+  height: ${(props) => props.height || '1.2rem'};
+  display: flex;
+  line-height: 1.2rem;
+  white-space: pre;
 `;
 
 export const TaskTime = styled.span`
@@ -180,7 +229,8 @@ export const SelectedItem = styled.div<{
   border-radius: 0.25rem;
   z-index: 6;
   pointer-events: none;
-
+  border: 1px solid var(--color-gray2);
+  box-shadow: 0px 0px 2px 1px rgba(190, 190, 190, 0.15);
   & span {
     margin: 0 0.25rem 0 0;
     color: #959595;
@@ -212,6 +262,9 @@ export const LockerImage = styled.img`
 export const TaskMainInfos = styled.div`
   display: flex;
   align-items: center;
+  padding: 0.375rem 0.75rem;
+
+  pointer-events: none;
 `;
 
 export const CheckBoxContainer = styled.div`
