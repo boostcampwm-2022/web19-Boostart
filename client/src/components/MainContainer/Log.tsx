@@ -35,7 +35,11 @@ const Log = () => {
   });
 
   const getFilteredTaskListbyTag = (idx: number): Task[] => {
-    return taskList.filter(({ tagIdx }) => tagIdx === idx);
+    return taskList
+      .filter(({ tagIdx }) => tagIdx === idx)
+      .sort((a: Task, b: Task) => {
+        return a.startedAt.slice(0, 2) !== b.startedAt.slice(0, 2) ? Number(a.startedAt!.slice(0, 2)) - Number(b.startedAt!.slice(0, 2)) : Number(a.startedAt!.slice(3, 5)) - Number(b.startedAt!.slice(3, 5));
+      });
   };
 
   const fetchTagList = async () => {
