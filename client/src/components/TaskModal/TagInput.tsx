@@ -27,6 +27,17 @@ const TagInput = ({ tagObject, setTagObject }: TagInputProps) => {
     setTagInput('');
   };
 
+  const handleWindowClick = () => {
+    setIsTagInputFocused(false);
+  };
+
+  useEffect(() => {
+    window.addEventListener('click', handleWindowClick);
+    return () => {
+      window.removeEventListener('click', handleWindowClick);
+    };
+  });
+
   //TAG GET
   useEffect(() => {
     const getTagList = async () => {
@@ -75,7 +86,6 @@ const TagInput = ({ tagObject, setTagObject }: TagInputProps) => {
         alert('태그 삭제에 실패했습니다.');
       }
     }
-    setIsTagInputFocused(true);
   };
 
   const onChangeTagColor = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -125,9 +135,14 @@ const TagInput = ({ tagObject, setTagObject }: TagInputProps) => {
     );
   };
 
+  const handleTagInputClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setIsTagInputFocused(true);
+  };
+
   return tagObject === null ? (
     <TagContainer>
-      <InputBar value={tagInput} onChange={onChangeTagInput} onFocus={(e) => setIsTagInputFocused(true)} onBlur={(e) => setIsTagInputFocused(false)} />
+      <InputBar value={tagInput} onChange={onChangeTagInput} onClick={handleTagInputClick} />
       {isTagInputFocused && <SearchedTagList />}
     </TagContainer>
   ) : (
