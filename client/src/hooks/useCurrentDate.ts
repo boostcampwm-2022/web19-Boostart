@@ -46,6 +46,9 @@ const useCurrentDate = () => {
   const getDate = () => {
     return currentDate.getDate();
   };
+  const dateToString = (date: Date = currentDate) => {
+    return `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}-${date.getDate().toString().padStart(2, '0')}`;
+  };
 
   return {
     currentDate,
@@ -59,6 +62,7 @@ const useCurrentDate = () => {
     getMonth,
     getYear,
     getDate,
+    dateToString,
   };
 };
 export default useCurrentDate;
