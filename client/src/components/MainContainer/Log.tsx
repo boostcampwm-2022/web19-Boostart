@@ -197,14 +197,15 @@ const Log = () => {
           <S.LogMainSection ref={taskContainerRef}>
             <S.SlideObserver data-direction="left" direction="left"></S.SlideObserver>
             {tagList.map((tag) => {
-              return (
-                <S.TagWrap key={tag.idx} data-tag={tag.idx} onClick={handleTagWrapClick} onMouseDown={handleMouseDown}>
-                  <S.TagTitle color={tag.color} data-tag={tag.idx}>
-                    #{tag.title}
-                  </S.TagTitle>
-                  <TaskList taskList={getFilteredTaskListbyTag(tag.idx)} activeTask={activeTask} completionFilter={completionCheckBoxStatus} fetchTaskList={fetchTaskList} />
-                </S.TagWrap>
-              );
+              if (taskList.find((t) => t.tagIdx === tag.idx))
+                return (
+                  <S.TagWrap key={tag.idx} data-tag={tag.idx} onClick={handleTagWrapClick} onMouseDown={handleMouseDown}>
+                    <S.TagTitle color={tag.color} data-tag={tag.idx}>
+                      #{tag.title}
+                    </S.TagTitle>
+                    <TaskList taskList={getFilteredTaskListbyTag(tag.idx)} activeTask={activeTask} completionFilter={completionCheckBoxStatus} fetchTaskList={fetchTaskList} />
+                  </S.TagWrap>
+                );
             })}
             <S.SlideObserver data-direction="right" direction="right"></S.SlideObserver>
           </S.LogMainSection>
