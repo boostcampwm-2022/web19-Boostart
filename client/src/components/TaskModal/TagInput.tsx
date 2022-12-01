@@ -11,9 +11,17 @@ axios.defaults.withCredentials = true; // withCredentials 전역 설정
 interface TagInputProps {
   tagObject: Tag | null;
   setTagObject: React.Dispatch<React.SetStateAction<Tag | null>>;
+  tagList: Tag[];
+  syncTagList: (tagList: Tag[]) => void;
 }
 
-const TagInput = ({ tagObject, setTagObject }: TagInputProps) => {
+const httpGetTagList = async () => {
+  const response = await axios.get(`${HOST}/api/v1/tag`);
+  const tagList = response.data;
+  return tagList;
+};
+
+const TagInput = ({ tagObject, setTagObject, syncTagList }: TagInputProps) => {
   const [isTagInputFocused, setIsTagInputFocused] = useState(false);
   const [tagInput, onChangeTagInput, setTagInput] = useInput('');
   const [tagList, setTagList] = useState<Tag[]>([]);
@@ -21,25 +29,17 @@ const TagInput = ({ tagObject, setTagObject }: TagInputProps) => {
   const [newTagColor, setNewTagColor] = useState('');
   const [reload, setReload] = useState(0);
 
+  useEffect(() => {
+    httpGetTagList().then((tagList) => {
+      setTagList(tagList);
+    });
+  }, []);
+
   //태그 선택 해제
   const unSetTagItem = () => {
     setTagObject(null);
     setTagInput('');
   };
-
-  //TAG GET
-  useEffect(() => {
-    const getTagList = async () => {
-      try {
-        const result = await axios.get(`${HOST}/api/v1/tag`);
-        const list = result.data.sort((a: Tag, b: Tag) => b.count - a.count);
-        setTagList(list);
-      } catch (error) {
-        console.log(error);
-      }
-    };
-    getTagList();
-  }, [reload]);
 
   //검색된 Tag
   useEffect(() => {
@@ -49,6 +49,12 @@ const TagInput = ({ tagObject, setTagObject }: TagInputProps) => {
   //하나의 태그 선택
   const setTagItem = (e: React.MouseEvent<HTMLDivElement>) => {
     setTagObject(searchedTagList.find((item) => item.idx.toString() === e.currentTarget!.dataset.idx) || null);
+  };
+
+  const onServerStatusChange = async () => {
+    const tagList = await httpGetTagList();
+    setTagList(tagList);
+    syncTagList(tagList);
   };
 
   //POST TAG
@@ -67,6 +73,7 @@ const TagInput = ({ tagObject, setTagObject }: TagInputProps) => {
     } catch (error) {
       alert('이미 존재하는 태그입니다.');
     }
+    onServerStatusChange();
   };
 
   //DELET TAG
@@ -82,6 +89,7 @@ const TagInput = ({ tagObject, setTagObject }: TagInputProps) => {
       }
     }
     setIsTagInputFocused(true);
+    onServerStatusChange();
   };
 
   const onChangeTagColor = (e: React.ChangeEvent<HTMLInputElement>) => {

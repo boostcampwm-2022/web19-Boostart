@@ -16,6 +16,8 @@ import { HOST } from '../../constants';
 interface Props {
   handleCloseButtonClick: () => void;
   fetchTaskList: () => Promise<void>;
+  tagList: Tag[];
+  syncTagList: (tagList: Tag[]) => void;
 }
 
 const formatDate = (date: Date) => {
@@ -23,7 +25,7 @@ const formatDate = (date: Date) => {
 };
 
 const DEFAULT_IMPORTANCE = 3;
-const TaskModal = ({ handleCloseButtonClick, fetchTaskList }: Props) => {
+const TaskModal = ({ handleCloseButtonClick, fetchTaskList, tagList, syncTagList }: Props) => {
   const [tagObject, setTagObject] = useState<Tag | null>(null);
   const [locationObject, setLocationObject] = useState<Location | null>(null); // { location, lng, lat }
   const [labelArray, setLabelArray] = useState<Label[]>([]);
@@ -117,7 +119,7 @@ const TaskModal = ({ handleCloseButtonClick, fetchTaskList }: Props) => {
           <tbody>
             <Row title="제목" content={<S.InputBar {...register('title')} />} />
             <input type="number" {...register('tagIdx')} hidden={true} />
-            <Row title="태그" content={<TagInput tagObject={tagObject} setTagObject={setTagObject} />} />
+            <Row title="태그" content={<TagInput tagObject={tagObject} setTagObject={setTagObject} tagList={tagList} syncTagList={syncTagList} />} />
             <Row
               title="시간"
               content={
