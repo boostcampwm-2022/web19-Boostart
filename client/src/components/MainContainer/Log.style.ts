@@ -1,6 +1,7 @@
 import styled from 'styled-components';
 import { FiPlus } from 'react-icons/fi';
 import { MdTimer, MdOutlineSentimentSatisfiedAlt, MdLocationPin } from 'react-icons/md';
+import { RiDeleteBin2Fill, RiEdit2Fill } from 'react-icons/ri';
 
 export const Comment = styled.img`
   & svg {
@@ -14,8 +15,9 @@ export const TimeIcon = styled(MdTimer)`
   width: 14px;
   height: 14px;
   margin: 0px 5px 0px 0px;
-  color: var(--color-gray5);
   align-self: center;
+
+  color: var(--color-gray5);
 `;
 export const ImportanceIcon = styled(MdOutlineSentimentSatisfiedAlt)`
   width: 14px;
@@ -30,6 +32,20 @@ export const LocationIcon = styled(MdLocationPin)`
   margin: 0px 5px 0px 0px;
   color: var(--color-gray5);
   align-self: center;
+`;
+export const EditIcon = styled(RiEdit2Fill)`
+  width: 15px;
+  height: 14px;
+  color: var(--color-gray5);
+  align-self: center;
+  margin: 0px 2px 0px 2px;
+`;
+export const DeleteIcon = styled(RiDeleteBin2Fill)`
+  width: 14px;
+  height: 14px;
+  color: var(--color-gray5);
+  align-self: center;
+  margin: 0px 2px 0px 2px;
 `;
 
 export const LogTitle = styled.span`
@@ -142,7 +158,6 @@ export const TagWrap = styled.div`
   flex-direction: column;
   z-index: 5;
   min-width: fit-content;
-  overflow-y: scroll;
   height: 31rem;
   overflow: overlay;
 `;
@@ -181,8 +196,7 @@ export const TaskItem = styled.div<{
   box-shadow: 0px 0px 2px 1.5px rgba(190, 190, 190, 0.1);
 
   &[data-active='true'] {
-    min-height: 13rem;
-    //max-height: 6rem;
+    min-height: 9rem;
     flex-direction: column;
   }
   & hr {
@@ -205,6 +219,15 @@ export const TaskDetailInfosCol = styled.div<{ height?: string }>`
   white-space: pre;
 `;
 
+export const TaskDetailIcon = styled.label`
+  margin: 1px 1px;
+  width: 3.3rem;
+  height: 1.2rem;
+  display: flex;
+  color: var(--color-gray7);
+  justify-content: center;
+  text-align: center;
+`;
 export const TaskTime = styled.span`
   margin: 0 0.25rem 0 0;
   color: #959595;
