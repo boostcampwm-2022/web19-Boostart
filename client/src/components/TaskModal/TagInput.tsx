@@ -47,36 +47,30 @@ const TagInput = ({ tagObject, setTagObject }: TagInputProps) => {
   }, [tagList, tagInput]);
 
   //하나의 태그 선택
-  const setTagItem = (e: React.MouseEvent<HTMLDivElement>) => {
-    setTagObject(searchedTagList.find((item) => item.idx.toString() === e.currentTarget!.dataset.idx) || null);
+  const setTagItem = (idx: number) => () => {
+    setTagObject(searchedTagList.find((tag) => tag.idx === idx) || null);
   };
 
-  //POST TAG
   const postNewTag = async () => {
+    const newTagData = {
+      title: tagInput,
+      color: newTagColor,
+    };
     try {
-      const newTagData = {
-        title: tagInput,
-        color: newTagColor,
-      } as Tag;
-      await axios.post(`${HOST}/api/v1/tag`, newTagData).then((res) => {
-        if (res.status === 200) {
-          setTagObject({ ...newTagData, idx: res.data.idx, count: 0 });
-          setReload(reload + 1);
-        }
-      });
+      const response = await axios.post(`${HOST}/api/v1/tag`, newTagData);
+      setTagObject({ ...newTagData, idx: response.data.idx, count: 0 });
+      setReload(reload + 1);
     } catch (error) {
       alert('이미 존재하는 태그입니다.');
     }
   };
 
-  //DELET TAG
-  const deleteTag = async (e: React.MouseEvent<HTMLDivElement>) => {
+  const deleteTag = async (e: React.MouseEvent<HTMLDivElement>, idx: number) => {
     e.stopPropagation();
     if (window.confirm('태그를 삭제하시겠습니까?')) {
       try {
-        await axios.delete(`${HOST}/api/v1/tag/${e.currentTarget!.dataset.idx}`).then((res) => {
-          if (res.status == 200) setReload(reload + 1);
-        });
+        await axios.delete(`${HOST}/api/v1/tag/${idx}`);
+        setReload(reload + 1);
       } catch (error) {
         alert('태그 삭제에 실패했습니다.');
       }
@@ -92,9 +86,8 @@ const TagInput = ({ tagObject, setTagObject }: TagInputProps) => {
 
   const postColorChange = async (e: React.FocusEvent<HTMLInputElement>) => {
     try {
-      const r = await axios.post(`${HOST}/api/v1/tag/color/${tagObject!.idx}`, { color: tagObject!.color }).then((res) => {
-        if (res.status == 200) setReload(reload + 1);
-      });
+      await axios.post(`${HOST}/api/v1/tag/color/${tagObject!.idx}`, { color: tagObject!.color });
+      setReload(reload + 1);
     } catch (error) {
       alert('색상 변경에 실패했습니다.');
     }
@@ -112,14 +105,10 @@ const TagInput = ({ tagObject, setTagObject }: TagInputProps) => {
       <TagList>
         {searchedTagList.map(({ idx, color, title, count }) => {
           return (
-            <TagListItem key={idx} data-idx={idx} onMouseDown={setTagItem}>
+            <TagListItem key={idx} onMouseDown={setTagItem(idx)}>
               <TagTitle color={color} create={false}>
                 <span>{title}</span>
-                {count === 0 && (
-                  <DeleteIcon data-idx={idx} onMouseDown={deleteTag}>
-                    삭제
-                  </DeleteIcon>
-                )}
+                {count === 0 && <DeleteIcon onMouseDown={(e) => deleteTag(e, idx)}>삭제</DeleteIcon>}
               </TagTitle>
             </TagListItem>
           );
