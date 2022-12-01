@@ -72,12 +72,14 @@ const TagInput = ({ tagObject, setTagObject }: TagInputProps) => {
   //DELET TAG
   const deleteTag = async (e: React.MouseEvent<HTMLDivElement>) => {
     e.stopPropagation();
-    try {
-      await axios.delete(`${HOST}/api/v1/tag/${e.currentTarget!.dataset.idx}`).then((res) => {
-        if (res.status == 200) setReload(reload + 1);
-      });
-    } catch (error) {
-      alert('태그 삭제에 실패했습니다.');
+    if (window.confirm('태그를 삭제하시겠습니까?')) {
+      try {
+        await axios.delete(`${HOST}/api/v1/tag/${e.currentTarget!.dataset.idx}`).then((res) => {
+          if (res.status == 200) setReload(reload + 1);
+        });
+      } catch (error) {
+        alert('태그 삭제에 실패했습니다.');
+      }
     }
     setIsTagInputFocused(true);
   };

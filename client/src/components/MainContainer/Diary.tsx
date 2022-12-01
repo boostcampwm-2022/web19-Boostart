@@ -24,13 +24,15 @@ const Diary = () => {
   }, [currentVisit, currentDate]);
   return (
     <>
-      <S.DiaryTitle>Diary</S.DiaryTitle>
-      <S.DiaryContainer>
-        <S.DiaryNavBarSection>
-          <DateSelector />
-        </S.DiaryNavBarSection>
-        <Canvas />
-      </S.DiaryContainer>
+      <S.DiaryTitle>DIARY</S.DiaryTitle>
+      <S.Container>
+        <S.DiaryContainer>
+          <S.DiaryNavBarSection>
+            <DateSelector />
+          </S.DiaryNavBarSection>
+          <Canvas />
+        </S.DiaryContainer>
+      </S.Container>
     </>
   );
 };

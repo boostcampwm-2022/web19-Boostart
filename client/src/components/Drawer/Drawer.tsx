@@ -1,10 +1,32 @@
 import { useState } from 'react';
-import { dummyNotifications, dummyReceivedFriendRequests } from '../common/dummy';
+import { dummyNotifications } from '../common/dummy';
 import { PROFILE_EDIT_FORM_Z_INDEX, PROFILE_EDIT_FORM_TOP, PROFILE_EDIT_FORM_LEFT, PROFILE_EDIT_FORM_TRANFORM } from './Drawer.style';
+import { FRIEND_REQUEST_ACTION, HOST } from '../../constants';
 import Modal from '../common/Modal';
+import { Friend } from 'GlobalType';
 import * as S from './Drawer.style';
 
-const Drawer = ({ open }: { open: boolean }) => {
+interface DrawerProps {
+  isOpen: boolean;
+  friendRequests: Friend[] | null;
+  handleFriendRequests: Function;
+}
+interface ReceivedFriendRequestSectionProps {
+  friendRequests: Friend[] | null;
+  handleFriendRequests: Function;
+}
+interface ReceivedFriendRequestProps {
+  idx: number;
+  userId: string;
+  username: string;
+  profileImg: string;
+  handleFriendRequests: Function;
+}
+interface ProfileSectionProps {
+  handleProfileEditButtonClick: React.MouseEventHandler;
+}
+
+const Drawer = ({ isOpen, friendRequests, handleFriendRequests }: DrawerProps) => {
   const [isProfileEditModalOpen, setIsProfileEditModalOpen] = useState(false);
 
   const handleProfileEditButtonClick = () => {
@@ -12,15 +34,15 @@ const Drawer = ({ open }: { open: boolean }) => {
   };
 
   const handleLogoutButtonClick = () => {
-    console.log('LogoutButtonClicked');
+    console.log('LogoutButtonClicked(추후 로그아웃 API 추가)');
   };
 
   return (
     <>
-      <S.Drawer open={open}>
+      <S.Drawer isOpen={isOpen}>
         <ProfileSection handleProfileEditButtonClick={handleProfileEditButtonClick} />
         <S.HorizontalRule />
-        <ReceivedFriendRequestSection />
+        <ReceivedFriendRequestSection friendRequests={friendRequests} handleFriendRequests={handleFriendRequests} />
         <S.HorizontalRule />
         <NotificationSection />
         <S.LogoutButton onClick={handleLogoutButtonClick} href="#">
@@ -55,10 +77,6 @@ const ProfileEditForm = () => {
   );
 };
 
-interface ProfileSectionProps {
-  handleProfileEditButtonClick: React.MouseEventHandler;
-}
-
 const ProfileSection = ({ handleProfileEditButtonClick }: ProfileSectionProps) => {
   return (
     <S.ProfileSection>
@@ -78,38 +96,30 @@ const ProfileSection = ({ handleProfileEditButtonClick }: ProfileSectionProps) =
   );
 };
 
-const ReceivedFriendRequestSection = () => {
+const ReceivedFriendRequestSection = ({ friendRequests, handleFriendRequests }: ReceivedFriendRequestSectionProps) => {
   return (
     <S.ReceivedFriendRequestSection>
       <S.SectionHeader>나에게 온 친구 요청</S.SectionHeader>
       <div>
-        {dummyReceivedFriendRequests.map(({ userId, username, profile_img }) => (
-          <ReceivedFriendRequest key={userId} userId={userId} username={username} profileImg={profile_img} />
-        ))}
+        {friendRequests && friendRequests.map(({ idx, userId, username, profileImg }) => <ReceivedFriendRequest key={userId} idx={idx} userId={userId} username={username} profileImg={profileImg} handleFriendRequests={handleFriendRequests} />)}
       </div>
     </S.ReceivedFriendRequestSection>
   );
 };
 
-const ReceivedFriendRequest = ({ userId, username, profileImg }: { userId: string; username: string; profileImg: string }) => {
-  const handleAcceptButtonClick = () => {
-    console.log('AcceptButtonClicked');
-  };
-
-  const handleRejectButtonClick = () => {
-    console.log('RejectButtonClicked');
-  };
-
+const ReceivedFriendRequest = ({ idx, userId, username, profileImg, handleFriendRequests }: ReceivedFriendRequestProps) => {
+  const rejectFriendRequest = handleFriendRequests(FRIEND_REQUEST_ACTION.REJECT);
+  const acceptFriendRequest = handleFriendRequests(FRIEND_REQUEST_ACTION.ACCEPT);
   return (
     <S.ReceivedFriendRequest>
-      <S.ProfileImage size="4rem" padding="1rem" src={profileImg} />
+      <S.ProfileImage size="4rem" padding="1rem" src={HOST + '/' + profileImg} />
       <S.ReceivedFriendRequestInfo>
         <S.Username>{username}</S.Username>
         <S.UserId>@{userId}</S.UserId>
       </S.ReceivedFriendRequestInfo>
       <S.ReceivedFriendRequestHandlingButtonSection>
-        <S.RecievedFriendRequestRejectButton onClick={handleRejectButtonClick} />
-        <S.RecievedFriendRequestAcceptButton onClick={handleAcceptButtonClick} />
+        <S.RecievedFriendRequestRejectButton onClick={() => rejectFriendRequest(idx)} />
+        <S.RecievedFriendRequestAcceptButton onClick={() => acceptFriendRequest(idx)} />
       </S.ReceivedFriendRequestHandlingButtonSection>
     </S.ReceivedFriendRequest>
   );

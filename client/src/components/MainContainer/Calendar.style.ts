@@ -10,15 +10,13 @@ export const CalendarTitle = styled.span`
 `;
 export const CalendarContainer = styled.div`
   width: 100%;
-  height: 36rem;
+  height: 37rem;
   background: white;
   border-radius: 1rem;
   display: flex;
   flex-direction: column;
   justify-content: center;
-  padding: 0.5rem;
   align-items: center;
-  margin-top: 0rem;
   box-shadow: 0px 0px 10px 5px rgba(175, 175, 175, 0.25);
   user-select: none;
 `;
