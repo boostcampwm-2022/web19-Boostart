@@ -13,7 +13,6 @@ const Diary = () => {
 
   useEffect(() => {
     const currentDateString = dateToString();
-    console.log(currentDateString);
     globalSocket.emit('joinToNewRoom', currentVisit, currentDateString);
     globalSocket.emit('requestCurrentObjects');
     return () => {
