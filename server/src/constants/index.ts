@@ -19,3 +19,4 @@ export const OAUTH_TYPES = {
   github: 'github',
 } as const;
 export const HOST = process.env.MODE === 'dev' ? process.env.DEV_HOST : process.env.PROD_HOST;
+export const DEFAULT_PROFILE = 'default_profile.png';
