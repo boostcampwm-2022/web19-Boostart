@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect } from 'react';
 import { useRecoilValue } from 'recoil';
 import { visitState } from '../common/atoms';
 import globalSocket from '../common/Socket';
@@ -9,13 +9,11 @@ import useCurrentDate from '../../hooks/useCurrentDate';
 
 const Diary = () => {
   const currentVisit = useRecoilValue(visitState);
-  const { currentDate, getYear, getMonth, getDate } = useCurrentDate();
-  const createDateString = () => {
-    return `${getYear()}${(getMonth() + 1).toString().padStart(2, '0')}${getDate().toString().padStart(2, '0')}`;
-  };
+  const { currentDate, DateToString } = useCurrentDate();
 
   useEffect(() => {
-    const currentDateString = createDateString();
+    const currentDateString = DateToString();
+    console.log(currentDateString);
     globalSocket.emit('joinToNewRoom', currentVisit, currentDateString);
     globalSocket.emit('requestCurrentObjects');
     return () => {
