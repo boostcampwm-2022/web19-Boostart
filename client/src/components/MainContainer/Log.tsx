@@ -28,6 +28,16 @@ const Log = () => {
   const taskContainerRef = useRef<HTMLDivElement | null>(null);
   const { currentDate } = useCurrentDate();
   const [tagList, setTagList] = useState<Tag[]>([]);
+  const [reload, setReload] = useState(0);
+
+  const onReload = async () => {
+    await fetchTagList();
+    await fetchTaskList();
+  };
+
+  useEffect(() => {
+    onReload();
+  }, [reload]);
 
   const TaskMap = new Map();
   taskList.forEach((task: Task) => {
@@ -107,6 +117,7 @@ const Log = () => {
 
   const handleCloseButtonClick = () => {
     setIsModalOpen(false);
+    setReload(reload + 1);
   };
 
   const handleMouseMove = (e: MouseEvent) => {
