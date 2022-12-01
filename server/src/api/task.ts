@@ -242,7 +242,7 @@ router.post('/', authenticateToken, async (req: AuthorizedRequest, res) => {
   }
 });
 
-router.patch('/:task_idx', authenticateToken, async (req: AuthorizedRequest, res) => {
+router.patch('/update/:task_idx', authenticateToken, async (req: AuthorizedRequest, res) => {
   const bodyKeysCount = Object.keys(req.body).length;
   if (bodyKeysCount === 0) return res.status(200).send({ msg: '수정할 사항이 없어요.' });
 
@@ -323,7 +323,7 @@ router.patch('/:task_idx', authenticateToken, async (req: AuthorizedRequest, res
   }
 });
 
-router.patch('/:task_idx', authenticateToken, async (req: AuthorizedRequest, res) => {
+router.patch('/status/:task_idx', authenticateToken, async (req: AuthorizedRequest, res) => {
   const { userIdx } = req.user;
   const taskIdx = req.params.task_idx;
   const { done, tagIdx } = req.body;
@@ -344,7 +344,7 @@ router.patch('/:task_idx', authenticateToken, async (req: AuthorizedRequest, res
       status = 206;
     }
 
-    if (done) {
+    if (done !== undefined) {
       if (task.done === done) return res.sendStatus(status);
       await executeSql('update task set done = ? where idx = ?', [done, taskIdx]);
     }
