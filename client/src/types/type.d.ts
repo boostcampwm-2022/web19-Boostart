@@ -28,6 +28,7 @@ declare module 'GlobalType' {
     content: string;
     done: boolean;
     labels: LabelData[];
+    tagName: string;
   }
 
   interface Tag {
