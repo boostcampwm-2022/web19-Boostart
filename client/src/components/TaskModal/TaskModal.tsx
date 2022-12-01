@@ -19,12 +19,16 @@ interface Props {
 }
 
 const formatDate = (date: Date) => {
-  return date.toLocaleDateString().split('. ').join('-').substring(0, 10);
+  const [y, m, d] = date
+    .toLocaleDateString()
+    .split('.')
+    .map((str) => str.trim().padStart(2, '0'));
+  return [y.padStart(4, '0'), m.padStart(2, '0'), d.padStart(2, '0')].join('-');
 };
 
 const DEFAULT_IMPORTANCE = 3;
 const TaskModal = ({ handleCloseButtonClick, fetchTaskList }: Props) => {
-  const [tagObject, setTagObject] = useState<Tag | null>(null);
+  const [tagIdx, setTagIdx] = useState<number | null>(null);
   const [locationObject, setLocationObject] = useState<Location | null>(null); // { location, lng, lat }
   const [labelArray, setLabelArray] = useState<Label[]>([]);
 
@@ -102,8 +106,7 @@ const TaskModal = ({ handleCloseButtonClick, fetchTaskList }: Props) => {
 
     setValue('importance', importance);
 
-    if (tagObject) {
-      const tagIdx = tagObject.idx;
+    if (tagIdx) {
       setValue('tagIdx', tagIdx);
     }
   };
@@ -117,7 +120,7 @@ const TaskModal = ({ handleCloseButtonClick, fetchTaskList }: Props) => {
           <tbody>
             <Row title="제목" content={<S.InputBar {...register('title')} />} />
             <input type="number" {...register('tagIdx')} hidden={true} />
-            <Row title="태그" content={<TagInput tagObject={tagObject} setTagObject={setTagObject} />} />
+            <Row title="태그" content={<TagInput tagIdx={tagIdx} setTagIdx={setTagIdx} />} />
             <Row
               title="시간"
               content={

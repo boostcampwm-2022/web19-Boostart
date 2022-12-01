@@ -29,6 +29,11 @@ const Log = () => {
   const { currentDate } = useCurrentDate();
   const [tagList, setTagList] = useState<Tag[]>([]);
 
+  const fetch = async () => {
+    await fetchTagList();
+    await fetchTaskList();
+  };
+
   const TaskMap = new Map();
   taskList.forEach((task: Task) => {
     TaskMap.set(task.idx, task);
@@ -107,6 +112,7 @@ const Log = () => {
 
   const handleCloseButtonClick = () => {
     setIsModalOpen(false);
+    fetch();
   };
 
   const handleMouseMove = (e: MouseEvent) => {
