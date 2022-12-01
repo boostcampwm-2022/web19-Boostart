@@ -11,6 +11,7 @@ import Modal, { Dimmed } from '../components/common/Modal';
 import FriendSearchForm, { FRIEND_SEARCH_MODAL_ZINDEX } from '../components/FriendsBar/FriendSearchForm';
 import { DRAWER_Z_INDEX } from '../components/Drawer/Drawer.style';
 import { MODAL_CENTER_TOP, MODAL_CENTER_LEFT, MODAL_CENTER_TRANSFORM, HOST } from '../constants';
+import styled from 'styled-components';
 
 const MainPage = () => {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
@@ -18,8 +19,8 @@ const MainPage = () => {
   const [selectedFriend, setSelectedFriend] = useState<number | null>(null);
   const [myProfile, setMyProfile] = useState<Friend | null>(null);
   const [friendsList, setFriendsList] = useState<Friend[] | null>(null);
-  const [friendRequests, setFriendRequests] = useState<Friend[] | null>(null);
   const [currentVisit, setCurrentVisit] = useRecoilState(visitState);
+  const [friendRequests, setFriendRequests] = useState<Friend[] | null>(null);
 
   //API Requests
   const getFriendsList = async () => {
@@ -81,31 +82,37 @@ const MainPage = () => {
 
   useEffect(() => {
     getFriendsList();
+    getFriendRequests();
     getMyProfile().then((userData: Friend) => {
       setCurrentVisit(userData.userId);
     });
-    getFriendRequests();
   }, []);
 
   return (
     <>
-      <TopBar handleMenuClick={() => setIsDrawerOpen(true)} />
-      <FriendsBar myProfile={myProfile} friendsList={friendsList} handlePlusButtonClick={() => setIsFriendSearchFormOpen(true)} />
-      <MainContents />
-      {isDrawerOpen && <Dimmed zIndex={DRAWER_Z_INDEX - 1} onClick={() => setIsDrawerOpen(false)} />}
-      <Drawer isOpen={isDrawerOpen} friendRequests={friendRequests} handleFriendRequests={handleFriendRequests} />
-      {isFriendSearchFormOpen && (
-        <Modal
-          component={<FriendSearchForm selectedFriend={selectedFriend} setSelectedFriend={setSelectedFriend} handleRequestButtonClick={() => sendFriendRequest()} />}
-          top={MODAL_CENTER_TOP}
-          left={MODAL_CENTER_LEFT}
-          transform={MODAL_CENTER_TRANSFORM}
-          zIndex={FRIEND_SEARCH_MODAL_ZINDEX}
-          handleDimmedClick={() => resetFriendSearchForm()}
-        />
-      )}
+      <Container>
+        <TopBar handleMenuClick={() => setIsDrawerOpen(true)} />
+        <FriendsBar myProfile={myProfile} friendsList={friendsList} handlePlusButtonClick={() => setIsFriendSearchFormOpen(true)} />
+        <MainContents />
+        {isDrawerOpen && <Dimmed zIndex={DRAWER_Z_INDEX - 1} onClick={() => setIsDrawerOpen(false)} />}
+        <Drawer isOpen={isDrawerOpen} friendRequests={friendRequests} handleFriendRequests={handleFriendRequests} />
+        {isFriendSearchFormOpen && (
+          <Modal
+            component={<FriendSearchForm selectedFriend={selectedFriend} setSelectedFriend={setSelectedFriend} handleRequestButtonClick={() => sendFriendRequest()} />}
+            top={MODAL_CENTER_TOP}
+            left={MODAL_CENTER_LEFT}
+            transform={MODAL_CENTER_TRANSFORM}
+            zIndex={FRIEND_SEARCH_MODAL_ZINDEX}
+            handleDimmedClick={() => resetFriendSearchForm()}
+          />
+        )}
+      </Container>
     </>
   );
 };
 
 export default MainPage;
+
+const Container = styled.div`
+  display: grid;
+`;
