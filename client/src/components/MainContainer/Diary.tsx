@@ -9,10 +9,10 @@ import useCurrentDate from '../../hooks/useCurrentDate';
 
 const Diary = () => {
   const currentVisit = useRecoilValue(visitState);
-  const { currentDate, DateToString } = useCurrentDate();
+  const { currentDate, dateToString } = useCurrentDate();
 
   useEffect(() => {
-    const currentDateString = DateToString();
+    const currentDateString = dateToString();
     console.log(currentDateString);
     globalSocket.emit('joinToNewRoom', currentVisit, currentDateString);
     globalSocket.emit('requestCurrentObjects');
