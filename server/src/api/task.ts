@@ -344,7 +344,7 @@ router.patch('/status/:task_idx', authenticateToken, async (req: AuthorizedReque
       status = 206;
     }
 
-    if (done) {
+    if (done != undefined) {
       if (task.done === done) return res.sendStatus(status);
       await executeSql('update task set done = ? where idx = ?', [done, taskIdx]);
     }
