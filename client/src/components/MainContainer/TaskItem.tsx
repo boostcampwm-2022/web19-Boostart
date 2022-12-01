@@ -22,7 +22,7 @@ const TaskList = ({ taskList, activeTask, completionFilter, fetchTaskList }: tas
     e.stopPropagation();
     const taskIdx = e.target.dataset.idx;
     try {
-      const a = await axios.patch(`${HOST}/api/v1/task/${taskIdx}`, { done: e.target.checked });
+      const a = await axios.patch(`${HOST}/api/v1/task/status/${taskIdx}`, { done: e.target.checked });
       fetchTaskList();
     } catch (error) {
       console.log(error);
