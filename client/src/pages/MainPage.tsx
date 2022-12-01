@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from 'react';
+import axios, { AxiosStatic } from 'axios';
 import { useRecoilState } from 'recoil';
 import { visitState } from '../components/common/atoms';
-import axios from 'axios';
-
 import { Friend } from 'GlobalType';
 import FriendsBar from '../components/FriendsBar/FriendsBar';
 import MainContents from '../components/MainContainer/MainContainer';
@@ -14,7 +13,6 @@ import { DRAWER_Z_INDEX } from '../components/Drawer/Drawer.style';
 import { MODAL_CENTER_TOP, MODAL_CENTER_LEFT, MODAL_CENTER_TRANSFORM, HOST } from '../constants';
 import styled from 'styled-components';
 
-
 const MainPage = () => {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [isFriendSearchFormOpen, setIsFriendSearchFormOpen] = useState(false);
@@ -23,7 +21,7 @@ const MainPage = () => {
   const [friendsList, setFriendsList] = useState<Friend[] | null>(null);
   const [currentVisit, setCurrentVisit] = useRecoilState(visitState);
   const [friendRequests, setFriendRequests] = useState<Friend[] | null>(null);
-  
+
   //API Requests
   const getFriendsList = async () => {
     try {
@@ -76,6 +74,16 @@ const MainPage = () => {
     };
   };
 
+  const requestLogout = async () => {
+    try {
+      await axios.get(`${HOST}/api/v1/auth/logout`);
+      alert('로그아웃되었습니다');
+      window.location.href = '/';
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   //Event Handler
   const resetFriendSearchForm = () => {
     setIsFriendSearchFormOpen(false);
@@ -97,7 +105,7 @@ const MainPage = () => {
         <FriendsBar myProfile={myProfile} friendsList={friendsList} handlePlusButtonClick={() => setIsFriendSearchFormOpen(true)} />
         <MainContents />
         {isDrawerOpen && <Dimmed zIndex={DRAWER_Z_INDEX - 1} onClick={() => setIsDrawerOpen(false)} />}
-        <Drawer isOpen={isDrawerOpen} friendRequests={friendRequests} handleFriendRequests={handleFriendRequests} />
+        <Drawer isOpen={isDrawerOpen} friendRequests={friendRequests} handleFriendRequests={handleFriendRequests} handleLogoutButtonClick={() => requestLogout()} />
         {isFriendSearchFormOpen && (
           <Modal
             component={<FriendSearchForm selectedFriend={selectedFriend} setSelectedFriend={setSelectedFriend} handleRequestButtonClick={() => sendFriendRequest()} />}
