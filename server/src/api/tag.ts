@@ -3,6 +3,7 @@ import { OkPacket, RowDataPacket } from 'mysql2';
 import { executeSql } from '../db';
 import { AuthorizedRequest } from '../types';
 import { authenticateToken } from '../utils/auth';
+import { API_VERSION } from '../constants';
 
 const router = Router();
 
@@ -10,6 +11,28 @@ router.get('/', authenticateToken, async (req: AuthorizedRequest, res) => {
   const { userIdx } = req.user;
   const tags = await executeSql('select tag.idx as idx, tag.title as title, tag.color as color, count(task.idx) as count from tag left join task on task.tag_idx = tag.idx where tag.user_idx = ? group by tag.idx', [userIdx]);
   res.json(tags);
+});
+
+router.get('/:user_id', authenticateToken, async (req: AuthorizedRequest, res) => {
+  const { userIdx } = req.user;
+  const { user_id: friendId } = req.params;
+
+  try {
+    const friend = (await executeSql('select idx from user where user_id = ?', [friendId])) as RowDataPacket;
+    if (friend.length === 0) return res.status(404).send({ msg: '존재하지 않는 사용자예요.' });
+
+    const { idx: friendIdx } = friend[0];
+    if (userIdx === friendIdx) return res.redirect(`/api/${API_VERSION}/tag`);
+
+    const isNotFriend = ((await executeSql('select * from friendship where (sender_idx = ? and receiver_idx = ?) or (sender_idx = ? and receiver_idx = ?)', [userIdx, friendIdx, friendIdx, userIdx])) as RowDataPacket).length === 0;
+    if (isNotFriend) return res.status(403).send({ msg: '친구가 아닌 사용자의 태그를 조회할 수 없어요.' });
+
+    const tags = await executeSql('select tag.idx, tag.title, tag.color, count(task.idx) as count from tag left join task on task.tag_idx = tag.idx where tag.user_idx = ? group by tag.idx', [friendIdx]);
+
+    res.json(tags);
+  } catch {
+    res.sendStatus(500);
+  }
 });
 
 router.post('/', authenticateToken, async (req: AuthorizedRequest, res) => {
