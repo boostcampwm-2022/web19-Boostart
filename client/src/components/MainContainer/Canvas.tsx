@@ -15,7 +15,6 @@ const Canvas = () => {
     const canvas = new fabric.Canvas('canvas', {
       height: 400,
       width: 680,
-      backgroundImage: canvasBackground,
       selection: false,
     });
     return canvas;
@@ -260,13 +259,13 @@ const Canvas = () => {
   };
 
   const setCanvasBackground = () => {
-    fabric.Image.fromURL('/canvasBackground.png', function (img) {
+    fabric.Image.fromURL(canvasBackground, function (img) {
       img.set({
         top: 0,
         left: 0,
         evented: false,
       });
-      img.scaleToWidth(660);
+      img.scaleToWidth(674);
       img.setCoords();
       if (!canvasRef.current) return;
       canvasRef.current.add(img);
@@ -286,6 +285,7 @@ const Canvas = () => {
     globalSocket.on('updateModifiedObject', updateModifiedObject);
     globalSocket.on('applyObjectRemoving', removeObject);
     window.addEventListener('keydown', handleKeydown);
+    setCanvasBackground();
 
     return () => {
       if (!canvasRef.current) return;
@@ -295,7 +295,6 @@ const Canvas = () => {
       globalSocket.off('applyObjectRemoving', removeObject);
       window.removeEventListener('keydown', handleKeydown);
       canvasRef.current.clear();
-      setCanvasBackground();
     };
   });
 
