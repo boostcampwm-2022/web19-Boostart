@@ -9,21 +9,34 @@ import { Tag } from 'GlobalType';
 axios.defaults.withCredentials = true; // withCredentials 전역 설정
 
 interface TagInputProps {
-  tagObject: Tag | null;
-  setTagObject: React.Dispatch<React.SetStateAction<Tag | null>>;
+  tagIdx: number | null;
+  setTagIdx: React.Dispatch<number | null>;
 }
 
-const TagInput = ({ tagObject, setTagObject }: TagInputProps) => {
+const TagInput = ({ tagIdx, setTagIdx }: TagInputProps) => {
   const [isTagInputFocused, setIsTagInputFocused] = useState(false);
   const [tagInput, onChangeTagInput, setTagInput] = useInput('');
   const [tagList, setTagList] = useState<Tag[]>([]);
   const [searchedTagList, setSearchedTagList] = useState<Tag[]>([]);
   const [newTagColor, setNewTagColor] = useState('');
-  const [reload, setReload] = useState(0);
+
+  const [title, setTitle] = useState<string>();
+  const [color, setColor] = useState<string>();
+
+  useEffect(() => {
+    if (!tagIdx) return;
+
+    const tag = tagList.find((tag) => tag.idx === tagIdx);
+    if (!tag) return;
+
+    const { title, color } = tag;
+    setTitle(title);
+    setColor(color);
+  }, [tagList]);
 
   //태그 선택 해제
   const unSetTagItem = () => {
-    setTagObject(null);
+    setTagIdx(null);
     setTagInput('');
   };
 
@@ -36,7 +49,7 @@ const TagInput = ({ tagObject, setTagObject }: TagInputProps) => {
     return () => {
       window.removeEventListener('click', handleWindowClick);
     };
-  });
+  }, []);
 
   //TAG GET
   useEffect(() => {
@@ -50,7 +63,7 @@ const TagInput = ({ tagObject, setTagObject }: TagInputProps) => {
       }
     };
     getTagList();
-  }, [reload]);
+  }, []);
 
   //검색된 Tag
   useEffect(() => {
@@ -59,7 +72,7 @@ const TagInput = ({ tagObject, setTagObject }: TagInputProps) => {
 
   //하나의 태그 선택
   const setTagItem = (idx: number) => () => {
-    setTagObject(searchedTagList.find((tag) => tag.idx === idx) || null);
+    setTagIdx(idx);
   };
 
   const postNewTag = async () => {
@@ -69,8 +82,7 @@ const TagInput = ({ tagObject, setTagObject }: TagInputProps) => {
     };
     try {
       const response = await axios.post(`${HOST}/api/v1/tag`, newTagData);
-      setTagObject({ ...newTagData, idx: response.data.idx, count: 0 });
-      setReload(reload + 1);
+      setTagIdx(response.data.idx);
     } catch (error) {
       alert('이미 존재하는 태그입니다.');
     }
@@ -81,7 +93,7 @@ const TagInput = ({ tagObject, setTagObject }: TagInputProps) => {
     if (window.confirm('태그를 삭제하시겠습니까?')) {
       try {
         await axios.delete(`${HOST}/api/v1/tag/${idx}`);
-        setReload(reload + 1);
+        setTagList((tagList) => tagList.filter((tag) => tag.idx !== idx));
       } catch (error) {
         alert('태그 삭제에 실패했습니다.');
       }
@@ -89,15 +101,13 @@ const TagInput = ({ tagObject, setTagObject }: TagInputProps) => {
   };
 
   const onChangeTagColor = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setTagObject((prev) => {
-      return { ...prev, color: e.target.value } as Tag;
-    });
+    const color = e.target.value;
+    setColor(color);
   };
 
   const postColorChange = async (e: React.FocusEvent<HTMLInputElement>) => {
     try {
-      await axios.post(`${HOST}/api/v1/tag/color/${tagObject!.idx}`, { color: tagObject!.color });
-      setReload(reload + 1);
+      await axios.post(`${HOST}/api/v1/tag/color/${tagIdx}`, { color });
     } catch (error) {
       alert('색상 변경에 실패했습니다.');
     }
@@ -108,7 +118,7 @@ const TagInput = ({ tagObject, setTagObject }: TagInputProps) => {
     let color_g = Math.floor(Math.random() * 127 + 128).toString(16);
     let color_b = Math.floor(Math.random() * 127 + 128).toString(16);
     setNewTagColor(`#${color_r + color_g + color_b}`);
-  }, [reload]);
+  }, []);
 
   const SearchedTagList = () => {
     return (
@@ -140,7 +150,7 @@ const TagInput = ({ tagObject, setTagObject }: TagInputProps) => {
     setIsTagInputFocused(true);
   };
 
-  return tagObject === null ? (
+  return tagIdx === null ? (
     <TagContainer>
       <InputBar value={tagInput} onChange={onChangeTagInput} onClick={handleTagInputClick} />
       {isTagInputFocused && <SearchedTagList />}
@@ -148,10 +158,10 @@ const TagInput = ({ tagObject, setTagObject }: TagInputProps) => {
   ) : (
     <TagContainer>
       <Bar>
-        <SelectedTag color={tagObject?.color}>
-          {tagObject!.title} <CloseButton onClick={unSetTagItem} />
+        <SelectedTag color={color}>
+          {title} <CloseButton onClick={unSetTagItem} />
         </SelectedTag>
-        <ColorPicker type="color" value={tagObject.color} onChange={onChangeTagColor} onBlur={postColorChange} />
+        <ColorPicker type="color" value={color} onChange={onChangeTagColor} onBlur={postColorChange} />
       </Bar>
     </TagContainer>
   );
