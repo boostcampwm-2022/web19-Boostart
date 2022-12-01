@@ -7,13 +7,17 @@ interface TopBarProps {
 }
 const TopBar = ({ handleMenuClick }: TopBarProps) => {
   return (
-    <>
-      <S.TopBarContainer>
+    <S.TopBarContainer>
+      <S.TopBarElement align="left">
         <Clock />
+      </S.TopBarElement>
+      <S.TopBarElement align="center">
         <S.MainTitle>Boostart</S.MainTitle>
+      </S.TopBarElement>
+      <S.TopBarElement align="right">
         <S.MenuIcon src="/menu.svg" onClick={handleMenuClick} />
-      </S.TopBarContainer>
-    </>
+      </S.TopBarElement>
+    </S.TopBarContainer>
   );
 };
 

@@ -11,16 +11,14 @@ const FriendsBar = ({ myProfile, friendsList, handlePlusButtonClick }: FriendsBa
   const plusIcon = '/plus.svg';
 
   return (
-    <>
-      <S.FriendsBarContainer>
-        {myProfile && <S.ProfileBox imgURL={myProfile.profileImg}></S.ProfileBox>}
-        {friendsList &&
-          friendsList.map(({ idx, userId, profileImg }) => {
-            return <S.ProfileBox key={userId} data-idx={idx} imgURL={profileImg}></S.ProfileBox>;
-          })}
-        <S.ProfileBox imgURL={plusIcon} onClick={handlePlusButtonClick}></S.ProfileBox>
-      </S.FriendsBarContainer>
-    </>
+    <S.FriendsBarContainer>
+      {myProfile && <S.ProfileBox imgURL={myProfile.profileImg}></S.ProfileBox>}
+      {friendsList &&
+        friendsList.map(({ idx, userId, profileImg }) => {
+          return <S.ProfileBox key={userId} data-idx={idx} imgURL={profileImg}></S.ProfileBox>;
+        })}
+      <S.ProfileBox imgURL={plusIcon} onClick={handlePlusButtonClick}></S.ProfileBox>
+    </S.FriendsBarContainer>
   );
 };
 

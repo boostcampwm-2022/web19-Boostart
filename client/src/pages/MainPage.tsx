@@ -11,6 +11,7 @@ import Modal, { Dimmed } from '../components/common/Modal';
 import FriendSearchForm, { FRIEND_SEARCH_MODAL_ZINDEX } from '../components/FriendsBar/FriendSearchForm';
 import { DRAWER_Z_INDEX } from '../components/Drawer/Drawer.style';
 import { MODAL_CENTER_TOP, MODAL_CENTER_LEFT, MODAL_CENTER_TRANSFORM } from '../constants';
+import styled from 'styled-components';
 
 const MainPage = () => {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
@@ -85,23 +86,29 @@ const MainPage = () => {
 
   return (
     <RecoilRoot>
-      <TopBar handleMenuClick={() => setIsDrawerOpen(true)} />
-      <FriendsBar myProfile={myProfile} friendsList={friendsList} handlePlusButtonClick={() => setIsFriendSearchFormOpen(true)} />
-      <MainContents />
-      {isDrawerOpen && <Dimmed zIndex={DRAWER_Z_INDEX - 1} onClick={() => setIsDrawerOpen(false)} />}
-      <Drawer isOpen={isDrawerOpen} friendRequests={friendRequests} handleFriendRequests={handleFriendRequests} />
-      {isFriendSearchFormOpen && (
-        <Modal
-          component={<FriendSearchForm selectedFriend={selectedFriend} setSelectedFriend={setSelectedFriend} handleRequestButtonClick={() => sendFriendRequest()} />}
-          top={MODAL_CENTER_TOP}
-          left={MODAL_CENTER_LEFT}
-          transform={MODAL_CENTER_TRANSFORM}
-          zIndex={FRIEND_SEARCH_MODAL_ZINDEX}
-          handleDimmedClick={() => resetFriendSearchForm()}
-        />
-      )}
+      <Container>
+        <TopBar handleMenuClick={() => setIsDrawerOpen(true)} />
+        <FriendsBar myProfile={myProfile} friendsList={friendsList} handlePlusButtonClick={() => setIsFriendSearchFormOpen(true)} />
+        <MainContents />
+        {isDrawerOpen && <Dimmed zIndex={DRAWER_Z_INDEX - 1} onClick={() => setIsDrawerOpen(false)} />}
+        <Drawer isOpen={isDrawerOpen} friendRequests={friendRequests} handleFriendRequests={handleFriendRequests} />
+        {isFriendSearchFormOpen && (
+          <Modal
+            component={<FriendSearchForm selectedFriend={selectedFriend} setSelectedFriend={setSelectedFriend} handleRequestButtonClick={() => sendFriendRequest()} />}
+            top={MODAL_CENTER_TOP}
+            left={MODAL_CENTER_LEFT}
+            transform={MODAL_CENTER_TRANSFORM}
+            zIndex={FRIEND_SEARCH_MODAL_ZINDEX}
+            handleDimmedClick={() => resetFriendSearchForm()}
+          />
+        )}
+      </Container>
     </RecoilRoot>
   );
 };
 
 export default MainPage;
+
+const Container = styled.div`
+  display: grid;
+`;
