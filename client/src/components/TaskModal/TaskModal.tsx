@@ -35,6 +35,7 @@ const TaskModal = ({ handleCloseButtonClick, fetchTaskList, tagList, syncTagList
   const { currentDate, getMonth, getDate } = useCurrentDate();
 
   const [importance, setImportance] = useState(DEFAULT_IMPORTANCE);
+  const [isTagInputFocused, setIsTagInputFocused] = useState(false);
 
   const contents = {
     close: '닫기 ▲',
@@ -119,7 +120,7 @@ const TaskModal = ({ handleCloseButtonClick, fetchTaskList, tagList, syncTagList
           <tbody>
             <Row title="제목" content={<S.InputBar {...register('title')} />} />
             <input type="number" {...register('tagIdx')} hidden={true} />
-            <Row title="태그" content={<TagInput tagObject={tagObject} setTagObject={setTagObject} tagList={tagList} syncTagList={syncTagList} />} />
+            <Row title="태그" content={<TagInput tagObject={tagObject} setTagObject={setTagObject} tagList={tagList} syncTagList={syncTagList} isTagInputFocused={isTagInputFocused} setIsTagInputFocused={setIsTagInputFocused} />} />
             <Row
               title="시간"
               content={

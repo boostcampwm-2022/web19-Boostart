@@ -13,6 +13,8 @@ interface TagInputProps {
   setTagObject: React.Dispatch<React.SetStateAction<Tag | null>>;
   tagList: Tag[];
   syncTagList: (tagList: Tag[]) => void;
+  isTagInputFocused: boolean;
+  setIsTagInputFocused: React.Dispatch<boolean>;
 }
 
 const httpGetTagList = async () => {
@@ -21,8 +23,7 @@ const httpGetTagList = async () => {
   return tagList;
 };
 
-const TagInput = ({ tagObject, setTagObject, syncTagList }: TagInputProps) => {
-  const [isTagInputFocused, setIsTagInputFocused] = useState(false);
+const TagInput = ({ tagObject, setTagObject, syncTagList, isTagInputFocused, setIsTagInputFocused }: TagInputProps) => {
   const [tagInput, onChangeTagInput, setTagInput] = useInput('');
   const [tagList, setTagList] = useState<Tag[]>([]);
   const [searchedTagList, setSearchedTagList] = useState<Tag[]>([]);
@@ -88,7 +89,6 @@ const TagInput = ({ tagObject, setTagObject, syncTagList }: TagInputProps) => {
         alert('태그 삭제에 실패했습니다.');
       }
     }
-    setIsTagInputFocused(true);
     onServerStatusChange();
   };
 
