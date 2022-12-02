@@ -62,7 +62,7 @@ export const Wrap = styled.div<{ color: string }>`
 export const Wave = styled.div<{ percentage: number }>`
   position: absolute;
   top: -13rem;
-  left: calc(-27rem + ${(props) => props.percentage * 3}rem);
+  left: calc(-33rem + ${(props) => props.percentage * 11.5}rem);
 
   width: 31rem;
   height: 31rem;
