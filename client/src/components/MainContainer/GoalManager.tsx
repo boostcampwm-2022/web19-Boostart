@@ -14,6 +14,23 @@ const GoalManager = () => {
   );
 };
 
+interface WaveProps {
+  textContent: string;
+  percentage: number;
+}
+
+const WaveContainer = ({ textContent, percentage }: WaveProps) => {
+  return (
+    <S.WaveContainer>
+      <S.Wrap>
+        <S.Wave percentage={percentage}></S.Wave>
+        <S.Layer percentage={percentage}></S.Layer>
+        <span>{textContent}</span>
+      </S.Wrap>
+    </S.WaveContainer>
+  );
+};
+
 const dummyGoals = [
   {
     idx: 1,
@@ -106,7 +123,9 @@ const Goal = ({ goal }: GoalProps) => {
         {currentAmount}
         {labelUnit}
       </span>
-      <span>{rate}</span>
+      <span>
+        <WaveContainer textContent={rate} percentage={currentAmount / goalAmount} />
+      </span>
     </S.Goal>
   );
 };
