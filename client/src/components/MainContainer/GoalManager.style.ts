@@ -39,7 +39,7 @@ export const WaveContainer = styled.div`
   background-color: white;
 `;
 
-export const Wrap = styled.div`
+export const Wrap = styled.div<{ color: string }>`
   display: flex;
   align-items: center;
   overflow: hidden;
@@ -53,7 +53,7 @@ export const Wrap = styled.div`
   span {
     font-size: 0.9rem;
     font-family: 'Press Start 2P', cursive;
-    color: white;
+    color: ${(props) => props.color};
     text-align: left;
     z-index: 100;
   }

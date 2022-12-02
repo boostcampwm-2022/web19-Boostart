@@ -20,9 +20,10 @@ interface WaveProps {
 }
 
 const WaveContainer = ({ textContent, percentage }: WaveProps) => {
+  const BOUNDARY = 0.3;
   return (
     <S.WaveContainer>
-      <S.Wrap>
+      <S.Wrap color={percentage <= BOUNDARY ? 'black' : 'white'}>
         <S.Wave percentage={percentage}></S.Wave>
         <S.Layer percentage={percentage}></S.Layer>
         <span>{textContent}</span>
@@ -104,11 +105,9 @@ const Goal = ({ goal }: GoalProps) => {
   const { idx, title, labelIdx, currentAmount, goalAmount, over } = goal;
   const { title: labelTitle, color: labelColor, unit: labelUnit } = dummyLabels[labelIdx];
 
-  const formatRate = (rate: number) => {
-    return (100 * rate).toFixed(0).toString() + '%';
-  };
-
-  const rate = over ? formatRate(Math.min(currentAmount / goalAmount, 1)) : currentAmount <= goalAmount ? 'success' : 'failed';
+  const isPast = true;
+  const rate = over ? currentAmount / goalAmount : currentAmount <= goalAmount ? 1 : isPast ? 0 : 0.5;
+  const rateString = rate >= 1 ? 'COMPLETE' : over ? (100 * rate).toFixed(0).toString() + '%' : isPast ? 'FAILED' : 'PROGRESS';
 
   return (
     <S.Goal>
@@ -124,7 +123,7 @@ const Goal = ({ goal }: GoalProps) => {
         {labelUnit}
       </span>
       <span>
-        <WaveContainer textContent={rate} percentage={currentAmount / goalAmount} />
+        <WaveContainer textContent={rateString} percentage={rate} />
       </span>
     </S.Goal>
   );
