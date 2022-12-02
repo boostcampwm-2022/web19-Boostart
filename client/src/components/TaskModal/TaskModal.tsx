@@ -7,7 +7,7 @@ import LocationSearchInput from './LocationSearchInput';
 import { Location, Tag, Label } from 'GlobalType';
 import useCurrentDate from '../../hooks/useCurrentDate';
 import LabelInput from './LabelInput';
-import { FieldValues, useForm } from 'react-hook-form';
+import { FieldValues, useFieldArray, useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
 import axios from 'axios';
@@ -62,12 +62,18 @@ const TaskModal = ({ handleCloseButtonClick, fetchTaskList }: Props) => {
     content: yup.string(),
   });
   const {
+    control,
     register,
     handleSubmit,
     setValue,
     formState: { errors },
   } = useForm({
     resolver: yupResolver(schema),
+  });
+
+  const { replace } = useFieldArray({
+    control,
+    name: 'labels',
   });
 
   type ColumnTitle = '제목' | '태그' | '시간' | '라벨' | '중요도' | '공개' | '위치' | '메모';
@@ -109,6 +115,12 @@ const TaskModal = ({ handleCloseButtonClick, fetchTaskList }: Props) => {
     if (tagIdx) {
       setValue('tagIdx', tagIdx);
     }
+
+    replace(
+      labelArray.map(({ idx: labelIdx, amount }) => {
+        return { labelIdx, amount };
+      })
+    );
   };
 
   return (
@@ -141,6 +153,7 @@ const TaskModal = ({ handleCloseButtonClick, fetchTaskList }: Props) => {
             <h4>{isDetailOpen ? `${contents.close}` : `${contents.readMore}`}</h4>
           </S.Border>
         </S.DetailButton>
+        <input {...register('labels')} hidden={true} />
         {isDetailOpen && (
           <S.FormTable>
             <tbody>
