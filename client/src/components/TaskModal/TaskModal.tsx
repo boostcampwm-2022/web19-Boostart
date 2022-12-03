@@ -15,7 +15,6 @@ import { HOST } from '../../constants';
 
 interface Props {
   handleCloseButtonClick: () => void;
-  fetchTaskList: () => Promise<void>;
   tagList: Tag[];
   fetchTagList: () => Promise<void>;
 }
@@ -29,7 +28,7 @@ const formatDate = (date: Date) => {
 };
 
 const DEFAULT_IMPORTANCE = 3;
-const TaskModal = ({ handleCloseButtonClick, fetchTaskList, tagList, fetchTagList }: Props) => {
+const TaskModal = ({ handleCloseButtonClick, tagList, fetchTagList }: Props) => {
   const [tagIdx, setTagIdx] = useState<number | null>(null);
   const [locationObject, setLocationObject] = useState<Location | null>(null); // { location, lng, lat }
   const [labelArray, setLabelArray] = useState<Label[]>([]);
@@ -91,7 +90,6 @@ const TaskModal = ({ handleCloseButtonClick, fetchTaskList, tagList, fetchTagLis
 
   const createTask = async (body: FieldValues) => {
     await httpPostTask({ ...body, date: formatDate(currentDate) });
-    await fetchTaskList();
     handleCloseButtonClick();
   };
 
