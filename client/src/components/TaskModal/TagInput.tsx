@@ -9,30 +9,22 @@ import { Tag } from 'GlobalType';
 axios.defaults.withCredentials = true; // withCredentials 전역 설정
 
 interface TagInputProps {
-  tagIdx: number | null;
+  tag?: Tag;
   setTagIdx: React.Dispatch<number | null>;
+  tagList: Tag[];
+  fetchTagList: () => Promise<void>;
+  isTagInputFocused: boolean;
+  setIsTagInputFocused: React.Dispatch<boolean>;
 }
 
-const TagInput = ({ tagIdx, setTagIdx }: TagInputProps) => {
-  const [isTagInputFocused, setIsTagInputFocused] = useState(false);
+const TagInput = ({ tag, setTagIdx, tagList, fetchTagList, isTagInputFocused, setIsTagInputFocused }: TagInputProps) => {
+  // const [isTagInputFocused, setIsTagInputFocused] = useState(false);
   const [tagInput, onChangeTagInput, setTagInput] = useInput('');
-  const [tagList, setTagList] = useState<Tag[]>([]);
   const [searchedTagList, setSearchedTagList] = useState<Tag[]>([]);
   const [newTagColor, setNewTagColor] = useState('');
 
-  const [title, setTitle] = useState<string>();
-  const [color, setColor] = useState<string>();
-
-  useEffect(() => {
-    if (!tagIdx) return;
-
-    const tag = tagList.find((tag) => tag.idx === tagIdx);
-    if (!tag) return;
-
-    const { title, color } = tag;
-    setTitle(title);
-    setColor(color);
-  }, [tagList]);
+  const { idx: tagIdx, title } = tag ?? {};
+  const [color, setColor] = useState<string | undefined>(tag?.color);
 
   //태그 선택 해제
   const unSetTagItem = () => {
@@ -52,18 +44,6 @@ const TagInput = ({ tagIdx, setTagIdx }: TagInputProps) => {
   }, []);
 
   //TAG GET
-  useEffect(() => {
-    const getTagList = async () => {
-      try {
-        const result = await axios.get(`${HOST}/api/v1/tag`);
-        const list = result.data.sort((a: Tag, b: Tag) => b.count - a.count);
-        setTagList(list);
-      } catch (error) {
-        console.log(error);
-      }
-    };
-    getTagList();
-  }, []);
 
   //검색된 Tag
   useEffect(() => {
@@ -83,6 +63,7 @@ const TagInput = ({ tagIdx, setTagIdx }: TagInputProps) => {
     try {
       const response = await axios.post(`${HOST}/api/v1/tag`, newTagData);
       setTagIdx(response.data.idx);
+      fetchTagList();
     } catch (error) {
       alert('이미 존재하는 태그입니다.');
     }
@@ -93,7 +74,7 @@ const TagInput = ({ tagIdx, setTagIdx }: TagInputProps) => {
     if (window.confirm('태그를 삭제하시겠습니까?')) {
       try {
         await axios.delete(`${HOST}/api/v1/tag/${idx}`);
-        setTagList((tagList) => tagList.filter((tag) => tag.idx !== idx));
+        fetchTagList();
       } catch (error) {
         alert('태그 삭제에 실패했습니다.');
       }
@@ -150,7 +131,7 @@ const TagInput = ({ tagIdx, setTagIdx }: TagInputProps) => {
     setIsTagInputFocused(true);
   };
 
-  return tagIdx === null ? (
+  return !tagIdx ? (
     <TagContainer>
       <InputBar value={tagInput} onChange={onChangeTagInput} onClick={handleTagInputClick} />
       {isTagInputFocused && <SearchedTagList />}

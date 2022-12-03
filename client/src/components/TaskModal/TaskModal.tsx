@@ -16,6 +16,8 @@ import { HOST } from '../../constants';
 interface Props {
   handleCloseButtonClick: () => void;
   fetchTaskList: () => Promise<void>;
+  tagList: Tag[];
+  fetchTagList: () => Promise<void>;
 }
 
 const formatDate = (date: Date) => {
@@ -27,7 +29,7 @@ const formatDate = (date: Date) => {
 };
 
 const DEFAULT_IMPORTANCE = 3;
-const TaskModal = ({ handleCloseButtonClick, fetchTaskList }: Props) => {
+const TaskModal = ({ handleCloseButtonClick, fetchTaskList, tagList, fetchTagList }: Props) => {
   const [tagIdx, setTagIdx] = useState<number | null>(null);
   const [locationObject, setLocationObject] = useState<Location | null>(null); // { location, lng, lat }
   const [labelArray, setLabelArray] = useState<Label[]>([]);
@@ -123,6 +125,9 @@ const TaskModal = ({ handleCloseButtonClick, fetchTaskList }: Props) => {
     );
   };
 
+  const tag = tagList.find((tag) => tag.idx === tagIdx);
+
+  const [isTagInputFocused, setIsTagInputFocused] = useState(false);
   return (
     <S.ModalContainer isDetailOpen={isDetailOpen}>
       <S.CloseButton onClick={handleCloseButtonClick} />
@@ -132,7 +137,7 @@ const TaskModal = ({ handleCloseButtonClick, fetchTaskList }: Props) => {
           <tbody>
             <Row title="제목" content={<S.InputBar {...register('title')} />} />
             <input type="number" {...register('tagIdx')} hidden={true} />
-            <Row title="태그" content={<TagInput tagIdx={tagIdx} setTagIdx={setTagIdx} />} />
+            <Row title="태그" content={<TagInput tag={tag} setTagIdx={setTagIdx} tagList={tagList} fetchTagList={fetchTagList} isTagInputFocused={isTagInputFocused} setIsTagInputFocused={setIsTagInputFocused} />} />
             <Row
               title="시간"
               content={
