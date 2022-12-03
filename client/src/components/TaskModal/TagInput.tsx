@@ -18,7 +18,6 @@ interface TagInputProps {
 }
 
 const TagInput = ({ tag, setTagIdx, tagList, fetchTagList, isTagInputFocused, setIsTagInputFocused }: TagInputProps) => {
-  // const [isTagInputFocused, setIsTagInputFocused] = useState(false);
   const [tagInput, onChangeTagInput, setTagInput] = useInput('');
   const [searchedTagList, setSearchedTagList] = useState<Tag[]>([]);
   const [newTagColor, setNewTagColor] = useState('');
