@@ -107,7 +107,7 @@ const Goal = ({ goal }: GoalProps) => {
 
   const isPast = true;
   const rate = over ? currentAmount / goalAmount : currentAmount <= goalAmount ? 1 : isPast ? 0 : 0.5;
-  const rateString = rate >= 1 ? 'COMPLETE' : over ? (100 * rate).toFixed(0).toString() + '%' : isPast ? 'FAILED' : 'PROGRESS';
+  const rateString = rate >= 1 ? 'success' : over ? (100 * rate).toFixed(0).toString() + '%' : isPast ? 'failed' : 'progress';
 
   return (
     <S.Goal>
