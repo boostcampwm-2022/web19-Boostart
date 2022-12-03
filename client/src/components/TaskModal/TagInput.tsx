@@ -133,7 +133,7 @@ const TagInput = ({ tag, setTagIdx, tagList, fetchTagList, isTagInputFocused, se
 
   return !tagIdx ? (
     <TagContainer>
-      <InputBar value={tagInput} onChange={onChangeTagInput} onClick={handleTagInputClick} />
+      <InputBar value={tagInput} onChange={onChangeTagInput} onClick={handleTagInputClick} autoFocus={isTagInputFocused} onFocus={() => setIsTagInputFocused(true)} />
       {isTagInputFocused && <SearchedTagList />}
     </TagContainer>
   ) : (
