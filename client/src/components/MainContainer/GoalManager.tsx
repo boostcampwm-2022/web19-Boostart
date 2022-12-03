@@ -18,11 +18,12 @@ interface WaveProps {
   percentage: number;
 }
 
+const PRIMARY_COLOR = '#9BB1D7';
 const WaveContainer = ({ textContent, percentage }: WaveProps) => {
   const BOUNDARY = 0.3;
   return (
     <S.WaveContainer>
-      <S.Wrap color={percentage <= BOUNDARY ? 'black' : 'white'}>
+      <S.Wrap color={percentage <= BOUNDARY ? PRIMARY_COLOR : 'white'}>
         <S.Wave percentage={percentage}></S.Wave>
         <S.Layer percentage={percentage}></S.Layer>
         <span>{textContent}</span>
