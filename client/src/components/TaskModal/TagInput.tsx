@@ -53,6 +53,7 @@ const TagInput = ({ tagIdx, setTagIdx, tagList, fetchTagList, showSearchedTagLis
   //하나의 태그 선택
   const setTagItem = (idx: number) => () => {
     setTagIdx(idx);
+    setShowSearchedTagList(false);
   };
 
   const postNewTag = async () => {
