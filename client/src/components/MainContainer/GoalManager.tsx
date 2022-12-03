@@ -45,7 +45,7 @@ const dummyGoals = [
     idx: 2,
     title: '잠좀자기',
     labelIdx: 3,
-    goalAmount: 480,
+    goalAmount: 40080,
     currentAmount: 300,
     over: true,
   },
@@ -53,8 +53,8 @@ const dummyGoals = [
     idx: 3,
     title: '절약',
     labelIdx: 2,
-    goalAmount: 20000,
-    currentAmount: 12000,
+    goalAmount: 2,
+    currentAmount: 1.2,
     over: false,
   },
 ];
@@ -67,23 +67,23 @@ interface Label {
 
 const dummyLabels: Label[] = [
   {
-    title: '커피',
-    color: '#222222',
-    unit: '잔',
+    title: '',
+    color: '',
+    unit: '',
   },
   {
     title: '커피',
-    color: '#222222',
+    color: '#4A6CC3',
     unit: '잔',
   },
   {
     title: '지출',
-    color: '#442222',
-    unit: '원',
+    color: '#D092E2',
+    unit: '만',
   },
   {
     title: '잠',
-    color: '#225522',
+    color: '#B9D58C',
     unit: '분',
   },
 ];
@@ -111,12 +111,9 @@ const Goal = ({ goal }: GoalProps) => {
 
   return (
     <S.Goal>
-      <span>
-        {labelTitle}
-        {goalAmount}
-        {labelUnit}
-        {over ? '▲' : '▼'}
-      </span>
+      <div>
+        <Label title={labelTitle} color={labelColor} unit={labelUnit} amount={goalAmount} over={over} />
+      </div>
       <span>{title}</span>{' '}
       <span>
         {currentAmount}
@@ -126,6 +123,27 @@ const Goal = ({ goal }: GoalProps) => {
         <WaveContainer textContent={rateString} percentage={rate} />
       </span>
     </S.Goal>
+  );
+};
+
+interface LabelProps {
+  title: string;
+  color: string;
+  unit: string;
+  amount: number;
+  over: boolean;
+}
+
+const Label = ({ title, color, unit, amount, over }: LabelProps) => {
+  return (
+    <S.Label color={color}>
+      <S.LabelTitle>{title}</S.LabelTitle>
+      <S.LabelAmountContainer>
+        <S.LabelAmount length={amount.toString().length}>{amount}</S.LabelAmount>
+        <span>{unit}</span>
+      </S.LabelAmountContainer>
+      <S.LabelOver>{over ? '▲' : '▼'}</S.LabelOver>
+    </S.Label>
   );
 };
 

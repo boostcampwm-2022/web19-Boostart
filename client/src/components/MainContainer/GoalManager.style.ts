@@ -11,6 +11,7 @@ const drift = keyframes`
 
 const goalVerticalPadding = '0.8rem';
 export const Goal = styled.div`
+  font-family: 'Noto Sans KR';
   display: flex;
   align-items: center;
   width: 40rem;
@@ -77,4 +78,45 @@ export const Layer = styled(Wave)`
   border-radius: 41%;
 
   animation: ${drift} 12s infinite linear;
+`;
+
+const LABEL_FONT_SIZE = '0.9rem';
+export const Label = styled.div<{ color: string }>`
+  margin: auto;
+
+  display: flex;
+  align-items: center;
+
+  width: 8rem;
+  padding: 0.2rem;
+
+  border-radius: 2rem;
+
+  background-color: ${(props) => props.color};
+
+  font-size: ${LABEL_FONT_SIZE};
+  color: white;
+`;
+
+export const LabelTitle = styled.div`
+  flex: 3;
+`;
+
+export const LabelAmountContainer = styled.div`
+  flex: 3;
+
+  display: flex;
+  align-items: center;
+  * {
+    flex: 1;
+  }
+`;
+
+export const LabelAmount = styled.div<{ length: number }>`
+  font-size: calc(${LABEL_FONT_SIZE} / ${(props) => props.length});
+`;
+
+export const LabelOver = styled.div`
+  flex: 1;
+  font-size: calc(${LABEL_FONT_SIZE} * 0.7);
 `;
