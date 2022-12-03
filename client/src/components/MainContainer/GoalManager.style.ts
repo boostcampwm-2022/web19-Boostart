@@ -120,3 +120,30 @@ export const LabelOver = styled.div`
   flex: 1;
   font-size: calc(${LABEL_FONT_SIZE} * 0.7);
 `;
+
+export const Current = styled.div`
+  margin: auto;
+  width: 5rem;
+
+  display: flex;
+  align-items: center;
+`;
+
+export const CurrentAmount = styled.div`
+  margin: auto;
+  flex: 2;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  width: 0;
+  height: 0;
+  padding: 1.2rem;
+
+  border-radius: 50%;
+  border: 1px solid #eeeeee;
+  box-shadow: 0px 0px 10px 5px rgb(175 175 175 / 10%);
+
+  color: var(--color-main);
+`;

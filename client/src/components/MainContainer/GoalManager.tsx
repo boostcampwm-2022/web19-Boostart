@@ -1,4 +1,3 @@
-import SubContainer from './SubContainer';
 import * as S from './GoalManager.style';
 
 const GoalManager = () => {
@@ -45,7 +44,7 @@ const dummyGoals = [
     idx: 2,
     title: '잠좀자기',
     labelIdx: 3,
-    goalAmount: 40080,
+    goalAmount: 680,
     currentAmount: 300,
     over: true,
   },
@@ -115,10 +114,14 @@ const Goal = ({ goal }: GoalProps) => {
         <Label title={labelTitle} color={labelColor} unit={labelUnit} amount={goalAmount} over={over} />
       </div>
       <span>{title}</span>{' '}
-      <span>
-        {currentAmount}
-        {labelUnit}
-      </span>
+      <div>
+        <S.Current>
+          <div>
+            <S.CurrentAmount>{currentAmount}</S.CurrentAmount>
+          </div>
+          <div>{labelUnit}</div>
+        </S.Current>
+      </div>
       <span>
         <WaveContainer textContent={rateString} percentage={rate} />
       </span>
