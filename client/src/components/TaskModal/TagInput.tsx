@@ -13,11 +13,11 @@ interface TagInputProps {
   setTagIdx: React.Dispatch<number | null>;
   tagList: Tag[];
   fetchTagList: () => Promise<void>;
-  isTagInputFocused: boolean;
-  setIsTagInputFocused: React.Dispatch<boolean>;
+  showSearchedTagList: boolean;
+  setShowSearchedTagList: React.Dispatch<boolean>;
 }
 
-const TagInput = ({ tag, setTagIdx, tagList, fetchTagList, isTagInputFocused, setIsTagInputFocused }: TagInputProps) => {
+const TagInput = ({ tag, setTagIdx, tagList, fetchTagList, showSearchedTagList, setShowSearchedTagList }: TagInputProps) => {
   const [tagInput, onChangeTagInput, setTagInput] = useInput('');
   const [searchedTagList, setSearchedTagList] = useState<Tag[]>([]);
   const [newTagColor, setNewTagColor] = useState('');
@@ -32,7 +32,7 @@ const TagInput = ({ tag, setTagIdx, tagList, fetchTagList, isTagInputFocused, se
   };
 
   const handleWindowClick = () => {
-    setIsTagInputFocused(false);
+    setShowSearchedTagList(false);
   };
 
   useEffect(() => {
@@ -127,13 +127,13 @@ const TagInput = ({ tag, setTagIdx, tagList, fetchTagList, isTagInputFocused, se
 
   const handleTagInputClick = (e: React.MouseEvent) => {
     e.stopPropagation();
-    setIsTagInputFocused(true);
+    setShowSearchedTagList(true);
   };
 
   return !tagIdx ? (
     <TagContainer>
-      <InputBar value={tagInput} onChange={onChangeTagInput} onClick={handleTagInputClick} autoFocus={isTagInputFocused} onFocus={() => setIsTagInputFocused(true)} />
-      {isTagInputFocused && <SearchedTagList />}
+      <InputBar value={tagInput} onChange={onChangeTagInput} onClick={handleTagInputClick} autoFocus={showSearchedTagList} onFocus={() => setShowSearchedTagList(true)} />
+      {showSearchedTagList && <SearchedTagList />}
     </TagContainer>
   ) : (
     <TagContainer>
