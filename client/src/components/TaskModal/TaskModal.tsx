@@ -123,8 +123,6 @@ const TaskModal = ({ handleCloseButtonClick, tagList, fetchTagList }: Props) => 
     );
   };
 
-  const tag = tagList.find((tag) => tag.idx === tagIdx);
-
   const [showSearchedTagList, setShowSearchedTagList] = useState(false);
   return (
     <S.ModalContainer isDetailOpen={isDetailOpen}>
@@ -135,7 +133,7 @@ const TaskModal = ({ handleCloseButtonClick, tagList, fetchTagList }: Props) => 
           <tbody>
             <Row title="제목" content={<S.InputBar {...register('title')} />} />
             <input type="number" {...register('tagIdx')} hidden={true} />
-            <Row title="태그" content={<TagInput tag={tag} setTagIdx={setTagIdx} tagList={tagList} fetchTagList={fetchTagList} showSearchedTagList={showSearchedTagList} setShowSearchedTagList={setShowSearchedTagList} />} />
+            <Row title="태그" content={<TagInput tagIdx={tagIdx} setTagIdx={setTagIdx} tagList={tagList} fetchTagList={fetchTagList} showSearchedTagList={showSearchedTagList} setShowSearchedTagList={setShowSearchedTagList} />} />
             <Row
               title="시간"
               content={

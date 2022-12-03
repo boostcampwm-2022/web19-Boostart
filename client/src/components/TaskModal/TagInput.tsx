@@ -9,7 +9,7 @@ import { Tag } from 'GlobalType';
 axios.defaults.withCredentials = true; // withCredentials 전역 설정
 
 interface TagInputProps {
-  tag?: Tag;
+  tagIdx: number | null;
   setTagIdx: React.Dispatch<number | null>;
   tagList: Tag[];
   fetchTagList: () => Promise<void>;
@@ -17,12 +17,13 @@ interface TagInputProps {
   setShowSearchedTagList: React.Dispatch<boolean>;
 }
 
-const TagInput = ({ tag, setTagIdx, tagList, fetchTagList, showSearchedTagList, setShowSearchedTagList }: TagInputProps) => {
+const TagInput = ({ tagIdx, setTagIdx, tagList, fetchTagList, showSearchedTagList, setShowSearchedTagList }: TagInputProps) => {
   const [tagInput, onChangeTagInput, setTagInput] = useInput('');
   const [searchedTagList, setSearchedTagList] = useState<Tag[]>([]);
   const [newTagColor, setNewTagColor] = useState('');
 
-  const { idx: tagIdx, title } = tag ?? {};
+  const tag = tagList.find((tag) => tag.idx === tagIdx);
+  const title = tag?.title;
   const [color, setColor] = useState<string | undefined>(tag?.color);
 
   //태그 선택 해제
