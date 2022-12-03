@@ -123,7 +123,7 @@ const TaskModal = ({ handleCloseButtonClick, tagList, fetchTagList }: Props) => 
     );
   };
 
-  const [showSearchedTagList, setShowSearchedTagList] = useState(false);
+  const [isTagInputFocused, setIsTagInputFocused] = useState(false);
   return (
     <S.ModalContainer isDetailOpen={isDetailOpen}>
       <S.CloseButton onClick={handleCloseButtonClick} />
@@ -133,7 +133,7 @@ const TaskModal = ({ handleCloseButtonClick, tagList, fetchTagList }: Props) => 
           <tbody>
             <Row title="제목" content={<S.InputBar {...register('title')} />} />
             <input type="number" {...register('tagIdx')} hidden={true} />
-            <Row title="태그" content={<TagInput tagIdx={tagIdx} setTagIdx={setTagIdx} tagList={tagList} fetchTagList={fetchTagList} showSearchedTagList={showSearchedTagList} setShowSearchedTagList={setShowSearchedTagList} />} />
+            <Row title="태그" content={<TagInput tagIdx={tagIdx} setTagIdx={setTagIdx} tagList={tagList} fetchTagList={fetchTagList} isTagInputFocused={isTagInputFocused} setIsTagInputFocused={setIsTagInputFocused} />} />
             <Row
               title="시간"
               content={

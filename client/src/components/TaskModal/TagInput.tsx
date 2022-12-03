@@ -13,11 +13,11 @@ interface TagInputProps {
   setTagIdx: React.Dispatch<number | null>;
   tagList: Tag[];
   fetchTagList: () => Promise<void>;
-  showSearchedTagList: boolean;
-  setShowSearchedTagList: React.Dispatch<boolean>;
+  isTagInputFocused: boolean;
+  setIsTagInputFocused: React.Dispatch<boolean>;
 }
 
-const TagInput = ({ tagIdx, setTagIdx, tagList, fetchTagList, showSearchedTagList, setShowSearchedTagList }: TagInputProps) => {
+const TagInput = ({ tagIdx, setTagIdx, tagList, fetchTagList, isTagInputFocused, setIsTagInputFocused }: TagInputProps) => {
   const [tagInput, onChangeTagInput, setTagInput] = useInput('');
   const [searchedTagList, setSearchedTagList] = useState<Tag[]>([]);
   const [newTagColor, setNewTagColor] = useState('');
@@ -33,7 +33,7 @@ const TagInput = ({ tagIdx, setTagIdx, tagList, fetchTagList, showSearchedTagLis
   };
 
   const handleWindowClick = () => {
-    setShowSearchedTagList(false);
+    setIsTagInputFocused(false);
   };
 
   useEffect(() => {
@@ -53,7 +53,7 @@ const TagInput = ({ tagIdx, setTagIdx, tagList, fetchTagList, showSearchedTagLis
   //하나의 태그 선택
   const setTagItem = (idx: number) => () => {
     setTagIdx(idx);
-    setShowSearchedTagList(false);
+    setIsTagInputFocused(false);
   };
 
   const postNewTag = async () => {
@@ -129,13 +129,13 @@ const TagInput = ({ tagIdx, setTagIdx, tagList, fetchTagList, showSearchedTagLis
 
   const handleTagInputClick = (e: React.MouseEvent) => {
     e.stopPropagation();
-    setShowSearchedTagList(true);
+    setIsTagInputFocused(true);
   };
 
   return !tagIdx ? (
     <TagContainer>
-      <InputBar value={tagInput} onChange={onChangeTagInput} onClick={handleTagInputClick} autoFocus={showSearchedTagList} onFocus={() => setShowSearchedTagList(true)} />
-      {showSearchedTagList && <SearchedTagList />}
+      <InputBar value={tagInput} onChange={onChangeTagInput} onClick={handleTagInputClick} autoFocus={isTagInputFocused} onFocus={() => setIsTagInputFocused(true)} />
+      {isTagInputFocused && <SearchedTagList />}
     </TagContainer>
   ) : (
     <TagContainer>
