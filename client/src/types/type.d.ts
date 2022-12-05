@@ -100,8 +100,8 @@ declare module 'GlobalType' {
     title: string;
     color: string;
     unit: string;
-    count: number?;
-    amount: number?;
+    count?: number;
+    amount?: number;
   }
 
   type ShapeType = 'rect' | 'triangle' | 'circle';
@@ -124,5 +124,6 @@ interface ModalProps {
   left?: string;
   right?: string;
   transform?: string;
+  dimmedBorderRadius?: string;
   handleDimmedClick: React.MouseEventHandler;
 }
