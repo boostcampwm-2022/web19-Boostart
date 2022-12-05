@@ -6,6 +6,7 @@ import tagRouter from './tag';
 import userRouter from './user';
 import friendRouter from './friend';
 import emoticonRouter from './emoticon';
+import goalRouter from './goal';
 
 const router = express.Router();
 
@@ -16,5 +17,6 @@ router.use('/tag', tagRouter);
 router.use('/user', userRouter);
 router.use('/friend', friendRouter);
 router.use('/emoticon', emoticonRouter);
+router.use('/goal', goalRouter);
 
 export default router;
