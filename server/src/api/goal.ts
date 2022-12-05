@@ -24,8 +24,8 @@ router.get('/:user_id', authenticateToken, async (req: AuthorizedRequest, res) =
     if (isNotFriend) return res.status(403).send({ msg: '친구가 아닌 사용자의 목표를 조회할 수 없어요.' });
 
     const goals = (await executeSql(
-      'select goal.idx, goal.title, goal.label_idx as labelIdx, goal.amount as goalAmount, sum(task_label.amount) as currentAmount, goal.over from goal inner join task_label on goal.label_idx = task_label.label_idx inner join task on task_label.task_idx = task.idx where goal.user_idx = ? and task.date = ? group by goal.idx',
-      [friendIdx, date]
+      'select idx, title, goal.label_idx as labelIdx, goal.amount as goalAmount, ifnull(sum(task_label.amount), 0) as currentAmount, over from goal left join (select label_idx, amount from task_label inner join task on task_label.task_idx = task.idx where user_idx = ? and date = ?) task_label on goal.label_idx = task_label.label_idx where user_idx = ? and date = ? group by idx',
+      [friendIdx, date, friendIdx, date]
     )) as RowDataPacket;
     res.json(goals);
   } catch {
