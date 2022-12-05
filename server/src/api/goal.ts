@@ -21,4 +21,19 @@ router.get('/', authenticateToken, async (req: AuthorizedRequest, res) => {
   }
 });
 
+router.delete('/:goal_idx', authenticateToken, async (req: AuthorizedRequest, res) => {
+  const { userIdx } = req.user;
+  const goalIdx = req.params.goal_idx;
+
+  try {
+    const existGoal = ((await executeSql('select idx from goal where user_idx = ? and idx = ?', [userIdx, goalIdx])) as RowDataPacket).length > 0;
+    if (!existGoal) return res.status(404).json({ msg: '존재하지 않는 목표예요.' });
+
+    await executeSql('delete from goal where idx = ?', [goalIdx]);
+    res.sendStatus(200);
+  } catch {
+    res.sendStatus(500);
+  }
+});
+
 export default router;
