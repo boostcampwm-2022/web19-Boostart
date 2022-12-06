@@ -25,17 +25,34 @@ const GoalManager = () => {
   const { dateToString } = useCurrentDate();
   const [goalList, setGoalList] = useState<Goal[]>([]);
 
-  const load = async () => {
-    const labelList = await httpGetLabelList();
-    labelList.forEach((label: Label) => {
-      labelMap.set(label.idx, label);
-    });
-    httpGetGoalList(dateToString()).then(setGoalList);
+  const fetchLabelMap = async () => {
+    try {
+      const labelList = await httpGetLabelList();
+      labelList.forEach((label: Label) => {
+        labelMap.set(label.idx, label);
+      });
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const fetchGoalList = async () => {
+    try {
+      httpGetGoalList(dateToString()).then(setGoalList);
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   useEffect(() => {
-    load();
-  });
+    try {
+      fetchLabelMap().then(() => {
+        fetchGoalList();
+      });
+    } catch (error) {
+      console.log(error);
+    }
+  }, []);
 
   const handleNewGoalButtonClick = () => {
     setIsGoalModalOpen(true);
@@ -114,7 +131,11 @@ const GoalModal = ({ isLabelModalOpen, setIsLabelModalOpen }: GoalModalProps) =>
   };
 
   useEffect(() => {
-    httpGetLabelList().then(setLabelList);
+    try {
+      httpGetLabelList().then(setLabelList);
+    } catch (error) {
+      console.log(error);
+    }
   }, []);
 
   const handleLabelClick = (label: Label) => {
@@ -171,8 +192,12 @@ const GoalModal = ({ isLabelModalOpen, setIsLabelModalOpen }: GoalModalProps) =>
           component={
             <LabelModal
               handleCloseButtonClick={() => {
-                httpGetLabelList().then(setLabelList);
-                setIsLabelModalOpen(false);
+                try {
+                  httpGetLabelList().then(setLabelList);
+                  setIsLabelModalOpen(false);
+                } catch (error) {
+                  console.log(error);
+                }
               }}
             />
           }
