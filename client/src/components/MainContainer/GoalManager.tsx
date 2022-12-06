@@ -134,7 +134,6 @@ const GoalModal = ({ isLabelModalOpen, setIsLabelModalOpen, handleCloseButtonCli
   };
 
   const goalSubmit = async (d: FieldValues) => {
-    console.log(d);
     try {
       const response = await httpPostGoal(d);
       console.log(response);
