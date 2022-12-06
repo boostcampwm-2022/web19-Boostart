@@ -250,6 +250,10 @@ export const LabelModalLabelUnitInput = styled.input`
 
 export const LabelModalLabelColorInput = styled.input`
   width: 2rem;
+  margin: 0 1rem;
+  background-color: transparent;
+  border: none;
+  outline: none;
 `;
 
 export const LabelModalLabelCreateButton = styled.button`
