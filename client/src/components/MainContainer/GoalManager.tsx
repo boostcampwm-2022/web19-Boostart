@@ -11,9 +11,32 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
 import useCurrentDate from '../../hooks/useCurrentDate';
 
+const httpGetGoalList = async (dateString: string) => {
+  const response = await axios.get(`${HOST}/api/v1/goal?date=${dateString}`);
+  const goalList = response.data;
+  return goalList;
+};
+
+const labelMap = new Map<number, Label>();
+
 const GoalManager = () => {
   const [isGoalModalOpen, setIsGoalModalOpen] = useState(false);
   const [isLabelModalOpen, setIsLabelModalOpen] = useState(false);
+  const { dateToString } = useCurrentDate();
+  const [goalList, setGoalList] = useState<Goal[]>([]);
+
+  const load = async () => {
+    const labelList = await httpGetLabelList();
+    labelList.forEach((label: Label) => {
+      labelMap.set(label.idx, label);
+    });
+    httpGetGoalList(dateToString()).then(setGoalList);
+  };
+
+  useEffect(() => {
+    load();
+  });
+
   const handleNewGoalButtonClick = () => {
     setIsGoalModalOpen(true);
   };
@@ -22,7 +45,7 @@ const GoalManager = () => {
       <S.GoalHead>
         <span>목표</span> <span>제목</span> <span>현황</span> <span>달성률</span>
       </S.GoalHead>
-      {dummyGoals.map((goal) => (
+      {goalList.map((goal) => (
         <Goal key={goal.idx} goal={goal} />
       ))}
       <NewTaskButton onClick={handleNewGoalButtonClick} />
@@ -318,7 +341,9 @@ interface GoalProps {
 
 const Goal = ({ goal }: GoalProps) => {
   const { idx, title, labelIdx, currentAmount, goalAmount, over } = goal;
-  const { title: labelTitle, color: labelColor, unit: labelUnit } = dummyLabels[labelIdx];
+  const label = labelMap.get(labelIdx);
+  if (!label) return <></>;
+  const { title: labelTitle, color: labelColor, unit: labelUnit } = label;
 
   const isPast = true;
   const rate = over ? currentAmount / goalAmount : currentAmount <= goalAmount ? 1 : isPast ? 0 : 0.5;
