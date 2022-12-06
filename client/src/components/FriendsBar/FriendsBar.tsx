@@ -22,6 +22,7 @@ const FriendsBar = ({ myProfile, friendsList, handlePlusButtonClick }: FriendsBa
 
     return (
       <S.ProfileBox
+        userId={userId}
         imgURL={profileImg}
         onClick={() => {
           setCurrentVisit({ userId: userId, isMe: myProfile!.userId === userId });
@@ -39,7 +40,7 @@ const FriendsBar = ({ myProfile, friendsList, handlePlusButtonClick }: FriendsBa
           friendsList.map(({ userId, profileImg }) => {
             return <ProfileBox key={userId} userId={userId} profileImg={profileImg} />;
           })}
-        <S.ProfileBox imgURL={plusIcon} onClick={handlePlusButtonClick}></S.ProfileBox>
+        <S.ProfileBox userId="" imgURL={plusIcon} onClick={handlePlusButtonClick}></S.ProfileBox>
       </S.FriendsBarContainer>
     </>
   );
