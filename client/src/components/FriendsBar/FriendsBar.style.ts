@@ -31,13 +31,13 @@ export const ProfileBox = styled.div<{
   }
   &:hover::after {
     content: '${(props) => props.userId}';
-    height: 1rem;
-    background: white;
-    padding: 0.5rem;
+    background: rgba(255, 255, 255, 0.6);
+    padding: 0.375rem;
     border: 1px solid var(--color-gray3);
     border-radius: 0.5rem;
     display: block;
-    line-height: 1rem;
+    font-size: 0.875rem;
+    line-height: 0.7rem;
     position: absolute;
     transform: translate(1.5rem, -1.75rem);
     z-index: 801;

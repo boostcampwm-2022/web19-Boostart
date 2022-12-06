@@ -40,7 +40,7 @@ const FriendsBar = ({ myProfile, friendsList, handlePlusButtonClick }: FriendsBa
           friendsList.map(({ userId, profileImg }) => {
             return <ProfileBox key={userId} userId={userId} profileImg={profileImg} />;
           })}
-        <S.ProfileBox userId="" imgURL={plusIcon} onClick={handlePlusButtonClick}></S.ProfileBox>
+        <S.ProfileBox userId={'친구 추가'} imgURL={plusIcon} onClick={handlePlusButtonClick}></S.ProfileBox>
       </S.FriendsBarContainer>
     </>
   );
