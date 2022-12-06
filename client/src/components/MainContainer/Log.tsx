@@ -8,6 +8,8 @@ import { HOST } from '../../constants';
 import useCurrentDate from '../../hooks/useCurrentDate';
 import Modal from '../common/Modal';
 import TaskModal from '../TaskModal/TaskModal';
+import { useRecoilState } from 'recoil';
+import { visitState } from '../common/atoms';
 
 interface Tag {
   idx: number;
@@ -29,6 +31,8 @@ const Log = () => {
   const { currentDate } = useCurrentDate();
   const [tagList, setTagList] = useState<Tag[]>([]);
 
+  const [currentVisit, setCurrentVisit] = useRecoilState(visitState);
+
   const fetch = async () => {
     await fetchTagList();
     await fetchTaskList();
@@ -48,25 +52,25 @@ const Log = () => {
   };
 
   const fetchTagList = async () => {
-    const response = await axios.get(`${HOST}/api/v1/tag`);
+    const response = currentVisit.isMe ? await axios.get(`${HOST}/api/v1/tag`) : await axios.get(`${HOST}/api/v1/tag/${currentVisit.userId}`);
     const tagList = response.data;
     setTagList(tagList);
   };
 
   const fetchTaskList = async () => {
     const date = currentDate.toLocaleDateString().split('. ').join('-').substring(0, 10);
-    const response = await axios.get(`${HOST}/api/v1/task?date=${date}`);
+    const response = currentVisit.isMe ? await axios.get(`${HOST}/api/v1/task?date=${date}`) : await axios.get(`${HOST}/api/v1/task/${currentVisit.userId}?date=${date}`);
     const taskList = response.data;
     setTaskList(taskList);
   };
 
   useEffect(() => {
     fetchTagList();
-  }, []);
+  }, [currentVisit]);
 
   useEffect(() => {
     fetchTaskList();
-  }, [currentDate]);
+  }, [currentDate, currentVisit]);
 
   const handleMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
     if (!(e.target instanceof HTMLDivElement)) return;
@@ -181,9 +185,11 @@ const Log = () => {
           <span>{TaskMap.get(selectedTask.idx).startedAt}</span> {TaskMap.get(selectedTask.idx).title}
         </S.SelectedItem>
       )}
-      <S.LogTitle>LOG</S.LogTitle>
-      <S.Container>
-        <S.LogContainer>
+      <S.LogTitle>
+        LOG<span> {currentVisit.isMe || `~${currentVisit.userId}`}</span>
+      </S.LogTitle>
+      <S.LogContainer>
+        <S.Grid>
           <S.TimeBarSection>
             <img src="/timebar-clock.svg" alt="TimeBar" />
             <S.TimeBar>
@@ -219,12 +225,10 @@ const Log = () => {
             })}
             <S.SlideObserver data-direction="right" direction="right"></S.SlideObserver>
           </S.LogMainSection>
-          <S.NewTaskButton onClick={() => setIsModalOpen(true)} />
-          {isModalOpen && (
-            <Modal component={<TaskModal handleCloseButtonClick={handleCloseButtonClick} tagList={tagList} fetchTagList={fetchTagList} />} zIndex={1001} top="50%" left="50%" transform="translate(-50%, -50%)" handleDimmedClick={() => {}} />
-          )}
-        </S.LogContainer>
-      </S.Container>
+          {currentVisit.isMe && <S.NewTaskButton onClick={() => setIsModalOpen(true)} />}
+          {isModalOpen && <Modal component={<TaskModal handleCloseButtonClick={handleCloseButtonClick} fetchTaskList={fetchTaskList} />} zIndex={1001} top="50%" left="50%" transform="translate(-50%, -50%)" handleDimmedClick={() => {}} />}
+        </S.Grid>
+      </S.LogContainer>
     </>
   );
 };

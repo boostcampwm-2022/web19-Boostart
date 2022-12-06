@@ -48,6 +48,19 @@ export const DeleteIcon = styled(RiDeleteBin2Fill)`
   margin: 0px 2px 0px 2px;
 `;
 
+export const LogContainer = styled.div`
+  width: 100%;
+  height: 37rem;
+  background: white;
+  border-radius: 1rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  box-shadow: 0px 0px 10px 5px rgba(175, 175, 175, 0.25);
+  user-select: none;
+`;
+
 export const LogTitle = styled.span`
   display: inline-block;
   color: white;
@@ -55,23 +68,21 @@ export const LogTitle = styled.span`
   font-family: 'Press Start 2P', cursive;
   transform: translate(1.75rem, 0.43rem);
   z-index: 1;
+  span {
+    font-size: 1.2rem;
+  }
 `;
 
-export const Container = styled.div``;
-
-export const LogContainer = styled.div`
+export const Grid = styled.div`
   display: grid;
-  padding: 0.5rem;
+  width: 43.5rem;
   height: 36rem;
-  background: white;
-  border-radius: 1rem;
   position: relative;
   grid-template-areas:
     'time nav'
     'time main';
   grid-template-columns: 1fr 16fr;
   grid-template-rows: 1fr 10fr;
-  box-shadow: 0px 0px 10px 5px rgba(175, 175, 175, 0.25);
   user-select: none;
 `;
 
@@ -183,7 +194,7 @@ export const TaskItem = styled.div<{
   width: 12.5rem;
   min-height: 2.1rem;
   max-height: 3rem;
-  transition: all 0.4s ease-out;
+  transition: min-height 0.4s ease-out;
 
   margin: 0.25rem 0.25rem;
   display: flex;
@@ -319,7 +330,7 @@ export const NewTaskButton = styled(FiPlus)`
   position: absolute;
   color: white;
   font-size: 1.6rem;
-  left: 40.5rem;
+  left: 40rem;
   bottom: 1rem;
   padding: 0.5rem;
   width: 2rem;
