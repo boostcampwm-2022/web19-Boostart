@@ -1,8 +1,7 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import * as S from './TaskModal.style';
 import ImportanceInput from './ImportanceInput';
 import TagInput from './TagInput';
-import useInput from '../../hooks/useInput';
 import LocationSearchInput from './LocationSearchInput';
 import { Location, Tag, Label } from 'GlobalType';
 import useCurrentDate from '../../hooks/useCurrentDate';
@@ -98,8 +97,6 @@ const TaskModal = ({ handleCloseButtonClick, tagList, fetchTagList }: Props) => 
   };
 
   const createTask = async (body: FieldValues) => {
-    console.log(body);
-    return;
     await httpPostTask({ ...body, date: formatDate(currentDate) });
     handleCloseButtonClick();
   };
