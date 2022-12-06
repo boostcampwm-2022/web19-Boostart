@@ -73,6 +73,7 @@ const Log = () => {
   }, [currentDate, currentVisit]);
 
   const handleMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (!currentVisit.isMe) return;
     if (!(e.target instanceof HTMLDivElement)) return;
     const target = e.target;
     if (!target.dataset.idx) return;
