@@ -376,7 +376,7 @@ export const Count = styled.div`
   margin-top: 3.5px;
   z-index: 1;
   width: 14.5px;
-  height: 14.5px;
+  min-height: 14.5px;
   font-size: 0.5px;
   zoom: 0.8;
   line-height: 14.5px;
@@ -387,7 +387,7 @@ export const Count = styled.div`
 `;
 export const EmoticonInput = styled.div`
   width: 12.8rem;
-  height: 45px;
+  min-height: 45px;
   margin-left: 2px;
   display: flex;
   background: url('/commentInput.svg');
@@ -399,5 +399,6 @@ export const EmoticonInput = styled.div`
   span {
     padding-top: 3px;
     margin: 5.5px;
+    cursor: pointer;
   }
 `;

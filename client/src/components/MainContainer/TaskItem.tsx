@@ -26,7 +26,7 @@ const TaskList = ({ taskList, activeTask, completionFilter, fetchTaskList }: tas
     e.stopPropagation();
     const taskIdx = e.target.dataset.idx;
     try {
-      const a = await axios.patch(`${HOST}/api/v1/task/status/${taskIdx}`, { done: e.target.checked });
+      const response = await axios.patch(`${HOST}/api/v1/task/status/${taskIdx}`, { done: e.target.checked });
       fetchTaskList();
     } catch (error) {
       console.log(error);
@@ -127,8 +127,7 @@ const TaskList = ({ taskList, activeTask, completionFilter, fetchTaskList }: tas
                 </S.TaskMainInfos>
                 {task.idx === activeTask && <DetailInfo task={task} />}
               </S.TaskItem>
-              {task.idx === activeTask && <EmoticonList key={task.idx} task={task} />}
-              {task.idx === activeTask && !currentVisit.isMe && <EmoticonInput key={task.idx} task={task} />}
+              {task.idx === activeTask && <EmoticonList key={task.idx} task={task} isMe={currentVisit.isMe} />}
             </>
           )
         );
@@ -137,48 +136,57 @@ const TaskList = ({ taskList, activeTask, completionFilter, fetchTaskList }: tas
   );
 };
 
-const EmoticonInput = ({ task }: { task: Task }) => {
-  const emoticonSample = ['🙂', '😭', '👍', '👎', '🔥', '❤️', '🎉'];
-  return (
-    <S.EmoticonInput>
-      {emoticonSample.map((el) => (
-        <span>{el}</span>
-      ))}
-    </S.EmoticonInput>
-  );
-};
-const EmoticonList = ({ task }: { task: Task }) => {
+const EmoticonList = ({ task, isMe }: { task: Task; isMe: boolean }) => {
   const [emoticonList, setEmoticonList] = useState<Emoticon[]>([]);
   const [emoticonSet, setEmoticonSet] = useState<Emoticon[]>([]);
 
-  //Emoticon GET
   useEffect(() => {
-    const getEmoticon = async () => {
-      try {
-        const result = await axios.get(`${HOST}/api/v1/emoticon/task/${task.idx}`);
-        setEmoticonList(result.data);
-        setEmoticonSet(
-          result.data.filter((element: Emoticon, index: any) => {
-            console.log(element.emoticon);
-            return result.data.findIndex((el: Emoticon) => el.emoticon == element.emoticon) === index;
-          })
-        );
-      } catch (error) {
-        console.log(error);
-      }
-    };
     getEmoticon();
   }, []);
 
+  const getEmoticon = async () => {
+    try {
+      const result = await axios.get(`${HOST}/api/v1/emoticon/task/${task.idx}`);
+      setEmoticonList(result.data);
+      setEmoticonSet(
+        result.data.filter((element: Emoticon, index: any) => {
+          return result.data.findIndex((el: Emoticon) => el.emoticon == element.emoticon) === index;
+        })
+      );
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const emoticonSample = ['🙂', '❤️', '😭', '👍', '👎', '🔥', '🎉'];
+
+  const postEmoticon = async (index: number) => {
+    try {
+      const response = await axios.put(`${HOST}/api/v1/emoticon/task/${task.idx}`, { emoticon: index + 1 });
+      getEmoticon();
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   return (
-    <S.EmoticonContainer>
-      {emoticonSet.map((i) => (
-        <div key={i.idx}>
-          {emoticonList.filter((el) => el.emoticon === i.emoticon).length > 1 && <S.Count> {emoticonList.filter((el) => el.emoticon === i.emoticon).length} </S.Count>}
-          <S.Emoticon> {i.emoticon}</S.Emoticon>
-        </div>
-      ))}
-    </S.EmoticonContainer>
+    <>
+      {!isMe && (
+        <S.EmoticonInput>
+          {emoticonSample.map((el, index) => (
+            <span onClick={(e) => postEmoticon(index)}>{el}</span>
+          ))}
+        </S.EmoticonInput>
+      )}
+      <S.EmoticonContainer>
+        {emoticonSet.map((i) => (
+          <div key={i.idx}>
+            {emoticonList.filter((el) => el.emoticon === i.emoticon).length > 1 && <S.Count> {emoticonList.filter((el) => el.emoticon === i.emoticon).length} </S.Count>}
+            <S.Emoticon> {i.emoticon}</S.Emoticon>
+          </div>
+        ))}
+      </S.EmoticonContainer>
+    </>
   );
 };
 
