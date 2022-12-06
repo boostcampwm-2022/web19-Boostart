@@ -29,3 +29,52 @@ export const ProfileBox = styled.div<{
     border: 5px solid #bccdec;
   }
 `;
+
+export const FriendMenuModal = styled.div`
+  height: 4rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-evenly;
+  background-color: #eef3fd;
+  border: #7689fd solid 1px;
+  border-radius: 5px;
+  margin-top: 6.8px;
+  padding: 5px 11px;
+  position: absolute;
+  width: fit-content;
+  z-index: 800;
+  &::after {
+    content: '';
+    width: 0;
+    display: block;
+    position: absolute;
+    border-color: #eef3fd transparent;
+    border-style: solid;
+    border-width: 0 6px 8px 6.5px;
+    top: -7px;
+    left: 1.375rem;
+    z-index: 1;
+  }
+  &::before {
+    border-color: #7689fd transparent;
+    border-style: solid;
+    border-width: 0 6px 8px 6.5px;
+    content: '';
+    display: block;
+    left: 1.375rem;
+    position: absolute;
+    top: -8px;
+    width: 0;
+    z-index: 0;
+  }
+`;
+
+export const FriendMenuModalItem = styled.div`
+  color: var(--color-main);
+  font-size: 1rem;
+  cursor: pointer;
+  &:hover {
+    font-weight: 700;
+    color: #505bf0;
+  }
+`;
