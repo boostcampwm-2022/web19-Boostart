@@ -204,7 +204,7 @@ const LabelModal = ({ handleCloseButtonClick }: LabelModalProps) => {
 
   const LabelSubmit = async (d: FieldValues) => {
     try {
-      await axios.post(`${HOST}/api/v1/label`, {});
+      await axios.post(`${HOST}/api/v1/label`, d);
       handleCloseButtonClick();
     } catch (error) {
       if (axios.isAxiosError(error)) {
