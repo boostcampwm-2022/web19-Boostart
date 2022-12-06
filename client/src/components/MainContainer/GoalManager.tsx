@@ -109,9 +109,16 @@ const GoalModal = ({ isLabelModalOpen, setIsLabelModalOpen }: GoalModalProps) =>
   const handleDeleteButtonClick = async (e: React.MouseEvent, label: Label) => {
     e.stopPropagation();
     if (!window.confirm('라벨을 삭제하시겠습니까?')) return;
-    const response = await httpDeleteLabel(label.idx);
-    if (response.status === 200) {
+    try {
+      await httpDeleteLabel(label.idx);
       httpGetLabelList().then(setLabelList);
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        const { msg } = error.response?.data;
+        alert(msg);
+      } else {
+        console.log(error);
+      }
     }
   };
 
@@ -196,12 +203,16 @@ const LabelModal = ({ handleCloseButtonClick }: LabelModalProps) => {
   };
 
   const LabelSubmit = async (d: FieldValues) => {
-    console.log(d);
-    const response = await axios.post(`${HOST}/api/v1/label`, d);
-    if (response.status === 201) {
+    try {
+      await axios.post(`${HOST}/api/v1/label`, {});
       handleCloseButtonClick();
-    } else {
-      console.log(response);
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        const { msg } = error.response?.data;
+        alert(msg);
+      } else {
+        console.log(error);
+      }
     }
   };
 
