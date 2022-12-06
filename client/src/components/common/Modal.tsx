@@ -1,12 +1,12 @@
 import styled from 'styled-components';
 
-const Modal = ({ component, zIndex, top, bottom, left, right, transform, handleDimmedClick }: ModalProps) => {
+const Modal = ({ component, zIndex, top, bottom, left, right, transform, handleDimmedClick, dimmedBorderRadius }: ModalProps) => {
   return (
     <>
       <ModalContent zIndex={zIndex} top={top} bottom={bottom} left={left} right={right} transform={transform}>
         {component}
       </ModalContent>
-      <Dimmed zIndex={zIndex - 1} onClick={handleDimmedClick} />
+      <Dimmed zIndex={zIndex - 1} onClick={handleDimmedClick} borderRadius={dimmedBorderRadius} />
     </>
   );
 };
@@ -21,7 +21,7 @@ const ModalContent = styled.div<{ zIndex: number; top?: string; bottom?: string;
   ${(props) => props.transform && `transform: ${props.transform};`}
 `;
 
-export const Dimmed = styled.div<{ zIndex: number }>`
+export const Dimmed = styled.div<{ zIndex: number; borderRadius?: string }>`
   position: fixed;
   z-index: ${(props) => props.zIndex};
   top: 0;
@@ -30,6 +30,7 @@ export const Dimmed = styled.div<{ zIndex: number }>`
   height: 100%;
   opacity: 0.3;
   background-color: black;
+  ${(props) => (props.borderRadius ? `border-radius:${props.borderRadius}` : '')}
 `;
 
 export default Modal;
