@@ -7,20 +7,31 @@ export const DiaryTitle = styled.span`
   font-family: 'Press Start 2P', cursive;
   transform: translate(1.75rem, 0.43rem);
   z-index: 1;
+  span {
+    font-size: 1.2rem;
+  }
 `;
 
-export const Container = styled.div``;
-
-export const DiaryContainer = styled.div`
+export const Container = styled.div`
   height: 36rem;
   background: white;
   border-radius: 1rem;
   margin-top: 0rem;
   margin-bottom: 1rem;
   padding: 0.5rem;
-  position: relative;
   box-shadow: 0px 0px 10px 5px rgba(175, 175, 175, 0.25);
+`;
+
+export const DiaryContainer = styled.div`
+  position: relative;
   user-select: none;
+  width: 100;
+  height: 100;
+  padding: 0.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  //justify-content: center;
 `;
 
 export const DiaryNavBarSection = styled.div`
