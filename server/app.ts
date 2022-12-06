@@ -77,7 +77,7 @@ io.on('connection', (socket) => {
     const targetObjects = diaryObjects[roomName];
     io.to(socket.id).emit('offerCurrentObjects', targetObjects);
   });
-  socket.on('sendModifiedObject', async (objectData) => {
+  socket.on('sendModifiedObject', (objectData) => {
     const roomName = visitingRoom.get(socket.id);
     const targetObjects = diaryObjects[roomName];
     const objectId = objectData.id;
