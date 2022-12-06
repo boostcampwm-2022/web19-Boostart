@@ -31,7 +31,7 @@ export const ProfileBox = styled.div<{
 `;
 
 export const FriendMenuModal = styled.div`
-  height: 4rem;
+  height: 3.5rem;
   display: flex;
   flex-direction: column;
   justify-content: space-evenly;
@@ -71,7 +71,7 @@ export const FriendMenuModal = styled.div`
 
 export const FriendMenuModalItem = styled.div`
   color: var(--color-main);
-  font-size: 1rem;
+  font-size: 0.75rem;
   cursor: pointer;
   &:hover {
     font-weight: 700;
