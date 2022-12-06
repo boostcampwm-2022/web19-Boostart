@@ -142,7 +142,11 @@ const GoalModal = ({ isLabelModalOpen, setIsLabelModalOpen }: GoalModalProps) =>
   };
 
   const handleColorInputBlur = async () => {
-    httpPatchLabel({ color });
+    try {
+      httpPatchLabel({ color });
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   return (
