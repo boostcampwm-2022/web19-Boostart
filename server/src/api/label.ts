@@ -54,6 +54,44 @@ router.post('/', authenticateToken, async (req: AuthorizedRequest, res) => {
   }
 });
 
+router.patch('/:label_idx', authenticateToken, async (req: AuthorizedRequest, res) => {
+  const { userIdx } = req.user;
+  const labelIdx = req.params.label_idx;
+  const { title, color } = req.body;
+
+  try {
+    const [label] = (await executeSql('select idx from label where user_idx = ? and idx = ?', [userIdx, labelIdx])) as RowDataPacket[];
+    if (!label) return res.status(404).json({ msg: '존재하지 않는 라벨이에요.' });
+
+    let sql = 'update label set ';
+    const values = [];
+    let status = 200;
+    console.log(title);
+    if (title) {
+      console.log(111);
+      const [label] = (await executeSql('select idx from label where title = ?', [title])) as RowDataPacket[];
+      if (label) status = 409;
+      else {
+        sql += 'title = ?';
+        values.push(title);
+      }
+    }
+    if (color) {
+      if (status === 409) status = 206;
+      sql += `${title ? ', ' : ''}color = ? `;
+      sql += 'where idx = ? ';
+      values.push(color);
+    }
+    values.push(labelIdx);
+    console.log(sql, values);
+
+    await executeSql(sql, values);
+    res.sendStatus(status);
+  } catch (error) {
+    res.sendStatus(500);
+  }
+});
+
 router.delete('/:label_idx', authenticateToken, async (req: AuthorizedRequest, res) => {
   const { userIdx } = req.user;
   const labelIdx = req.params.label_idx;
