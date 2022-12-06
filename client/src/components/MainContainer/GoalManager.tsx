@@ -136,7 +136,6 @@ const GoalModal = ({ isLabelModalOpen, setIsLabelModalOpen, handleCloseButtonCli
   const goalSubmit = async (d: FieldValues) => {
     try {
       const response = await httpPostGoal(d);
-      console.log(response);
       handleCloseButtonClick();
     } catch (error) {
       if (axios.isAxiosError(error)) {
