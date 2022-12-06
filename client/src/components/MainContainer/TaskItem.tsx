@@ -43,8 +43,6 @@ const TaskList = ({ taskList, activeTask, completionFilter, fetchTaskList }: tas
   };
 
   const DetailInfo = ({ task }: { task: Task }) => {
-    //코멘트 조회
-
     return (
       <>
         <hr />
@@ -55,7 +53,7 @@ const TaskList = ({ taskList, activeTask, completionFilter, fetchTaskList }: tas
           </S.TaskDetailInfosCol>
           <S.TaskDetailInfosCol>
             <S.ImportanceIcon />
-            {[1, 2, 3, 4, 5].map((d, index) => d >= task.importance && <div key={index}>{'⭐️ '}</div>)}
+            {[1, 2, 3, 4, 5].map((d, index) => d <= task.importance && <div key={index}>{'⭐️ '}</div>)}
           </S.TaskDetailInfosCol>
           {task.location && (
             <S.TaskDetailInfosCol>
@@ -129,7 +127,8 @@ const TaskList = ({ taskList, activeTask, completionFilter, fetchTaskList }: tas
                 </S.TaskMainInfos>
                 {task.idx === activeTask && <DetailInfo task={task} />}
               </S.TaskItem>
-              {task.idx === activeTask && <EmoticonList key={task.idx} task={task} activeTask={activeTask} />}
+              {task.idx === activeTask && <EmoticonList key={task.idx} task={task} />}
+              {task.idx === activeTask && !currentVisit.isMe && <EmoticonInput key={task.idx} task={task} />}
             </>
           )
         );
@@ -138,15 +137,32 @@ const TaskList = ({ taskList, activeTask, completionFilter, fetchTaskList }: tas
   );
 };
 
-const EmoticonList = ({ task, activeTask }: { task: Task; activeTask: number }) => {
+const EmoticonInput = ({ task }: { task: Task }) => {
+  const emoticonSample = ['🙂', '😭', '👍', '👎', '🔥', '❤️', '🎉'];
+  return (
+    <S.EmoticonInput>
+      {emoticonSample.map((el) => (
+        <span>{el}</span>
+      ))}
+    </S.EmoticonInput>
+  );
+};
+const EmoticonList = ({ task }: { task: Task }) => {
   const [emoticonList, setEmoticonList] = useState<Emoticon[]>([]);
-  console.log(task.idx);
+  const [emoticonSet, setEmoticonSet] = useState<Emoticon[]>([]);
+
   //Emoticon GET
   useEffect(() => {
     const getEmoticon = async () => {
       try {
         const result = await axios.get(`${HOST}/api/v1/emoticon/task/${task.idx}`);
         setEmoticonList(result.data);
+        setEmoticonSet(
+          result.data.filter((element: Emoticon, index: any) => {
+            console.log(element.emoticon);
+            return result.data.findIndex((el: Emoticon) => el.emoticon == element.emoticon) === index;
+          })
+        );
       } catch (error) {
         console.log(error);
       }
@@ -156,8 +172,9 @@ const EmoticonList = ({ task, activeTask }: { task: Task; activeTask: number }) 
 
   return (
     <S.EmoticonContainer>
-      {emoticonList.map((i) => (
+      {emoticonSet.map((i) => (
         <div key={i.idx}>
+          {emoticonList.filter((el) => el.emoticon === i.emoticon).length > 1 && <S.Count> {emoticonList.filter((el) => el.emoticon === i.emoticon).length} </S.Count>}
           <S.Emoticon> {i.emoticon}</S.Emoticon>
         </div>
       ))}

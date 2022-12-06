@@ -226,7 +226,7 @@ const Log = () => {
           {currentVisit.isMe && <S.NewTaskButton onClick={() => setIsModalOpen(true)} />}
           {isModalOpen && (
             <Modal component={<TaskModal handleCloseButtonClick={handleCloseButtonClick} tagList={tagList} fetchTagList={fetchTagList} />} zIndex={1001} top="50%" left="50%" transform="translate(-50%, -50%)" handleDimmedClick={() => {}} />
-          )}        
+          )}
         </S.Grid>
       </S.LogContainer>
     </>

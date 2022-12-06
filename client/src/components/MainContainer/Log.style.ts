@@ -194,7 +194,7 @@ export const TaskItem = styled.div<{
   width: 12.5rem;
   min-height: 2.1rem;
   max-height: 3rem;
-  transition: min-height 0.4s ease-out;
+  transition: min-height ${(props) => (props.cols < 3.6 ? '0.3s' : '0.4s')} ease-out;
 
   margin: 0.25rem 0.25rem;
   display: flex;
@@ -357,13 +357,47 @@ export const EmoticonContainer = styled.div`
   display: flex;
 `;
 export const Emoticon = styled.div`
-  width: 35px;
-  height: 43px;
+  width: 29.5px;
+  height: 36.5px;
+  margin-right: 0.2px;
   display: flex;
   background: url('/comment.svg');
-
+  font-size: 1rem;
   background-size: contain;
 
   justify-content: center;
   align-items: center;
+  position: relative;
+`;
+
+export const Count = styled.div`
+  position: absolute;
+  margin-left: 25.5px;
+  margin-top: 3.5px;
+  z-index: 1;
+  width: 14.5px;
+  height: 14.5px;
+  font-size: 0.5px;
+  zoom: 0.8;
+  line-height: 14.5px;
+  text-align: center;
+  color: white;
+  border-radius: 10rem;
+  background-color: #ccd5e7;
+`;
+export const EmoticonInput = styled.div`
+  width: 12.8rem;
+  height: 45px;
+  margin-left: 2px;
+  display: flex;
+  background: url('/commentInput.svg');
+  font-size: 16px;
+  background-size: contain;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  span {
+    padding-top: 3px;
+    margin: 5.5px;
+  }
 `;
