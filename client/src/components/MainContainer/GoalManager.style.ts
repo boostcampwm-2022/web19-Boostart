@@ -147,3 +147,135 @@ export const CurrentAmount = styled.div`
 
   color: var(--color-main);
 `;
+
+export const GOAL_MODAL_BORDER_RADIUS = '2rem';
+export const GoalModal = styled.form`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 2rem;
+  background-color: white;
+  border-radius: ${GOAL_MODAL_BORDER_RADIUS};
+`;
+
+export const GoalModalLabel = styled.div<{ color?: string }>`
+  display: flex;
+  background-color: ${(props) => props.color ?? 'transparent'};
+  justify-content: space-evenly;
+  align-items: center;
+  border: ${(props) => (props.color ? 'none' : 'solid 1px black')};
+
+  width: 15rem;
+  height: 1.5rem;
+  padding: 0.4rem;
+  border-radius: 20rem;
+`;
+
+export const GoalModalLabelTitleInput = styled.input`
+  width: 7rem;
+
+  margin: auto;
+  text-align: center;
+  outline: none;
+  border: none;
+  border-bottom: 1px solid #cccccc;
+  margin-bottom: 2rem;
+`;
+
+export const GoalModalLabelSetButton = styled.button`
+  display: flex;
+  width: 1.5rem;
+  height: 0;
+  justify-content: center;
+  align-items: center;
+  padding: 0.5rem;
+  border-radius: 3rem;
+  border: 0.8px solid black;
+  background-color: transparent;
+`;
+
+export const GoalModalAmountInput = styled.input`
+  width: 3.2rem;
+
+  text-align: center;
+
+  background-color: transparent;
+  border: none;
+  outline: none;
+`;
+
+export const GoalModalSubmitButton = styled.button`
+  border-radius: 2rem;
+  margin-top: 2rem;
+  outline: none;
+  border: none;
+  height: 2.3rem;
+  font-family: var(--font-title);
+`;
+
+export const LabelListContainer = styled.div`
+  width: 23rem;
+  height: 2.3rem;
+`;
+
+export const LabelModal = styled.form`
+  background-color: white;
+  padding: 2rem;
+  border-radius: 1rem;
+  display: flex;
+  flex-direction: column;
+`;
+
+export const LabelModalLabel = styled.div<{ color: string }>`
+  display: flex;
+  background-color: ${(props) => props.color};
+  border-radius: 3rem;
+  ${(props) => (props.color ? 'border: none' : '')}
+  padding: 0.2rem;
+  input {
+    margin: 0 1rem;
+    background-color: transparent;
+    border: none;
+    outline: none;
+  }
+`;
+
+export const LabelModalLabelTitleInput = styled.input`
+  width: 3.2rem;
+`;
+
+export const LabelModalLabelUnitInput = styled.input`
+  width: 2.2rem;
+`;
+
+export const LabelModalLabelColorInput = styled.input`
+  width: 2rem;
+`;
+
+export const LabelModalLabelCreateButton = styled.button`
+  outline: none;
+  border: none;
+  margin-top: 2rem;
+  border-radius: 0.3rem;
+`;
+
+export const GoalModalLabelName = styled.input<{ filled: boolean }>`
+  width: 6rem;
+
+  background-color: transparent;
+  border: none;
+  outline: none;
+
+  ${(props) => (props.filled ? 'text-align: center' : '')}
+`;
+
+export const VertialRule = styled.div`
+  border: none;
+  border-right: solid 1px grey;
+  margin: 5px 0;
+`;
+
+export const GoalModalOverInput = styled.div`
+  width: 2rem;
+  text-align: center;
+`;

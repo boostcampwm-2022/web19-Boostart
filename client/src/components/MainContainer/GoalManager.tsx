@@ -1,6 +1,22 @@
+import React, { useEffect, useState } from 'react';
+import Modal from '../common/Modal';
+import { LabelList } from '../TaskModal/LabelInput';
 import * as S from './GoalManager.style';
+import { NewTaskButton } from './Log.style';
+import { Label } from 'GlobalType';
+import axios from 'axios';
+import { HOST } from '../../constants';
+import { FieldValues, useForm } from 'react-hook-form';
+import { yupResolver } from '@hookform/resolvers/yup';
+import * as yup from 'yup';
+import useCurrentDate from '../../hooks/useCurrentDate';
 
 const GoalManager = () => {
+  const [isGoalModalOpen, setIsGoalModalOpen] = useState(false);
+  const [isLabelModalOpen, setIsLabelModalOpen] = useState(false);
+  const handleNewGoalButtonClick = () => {
+    setIsGoalModalOpen(true);
+  };
   return (
     <>
       <S.GoalHead>
@@ -9,7 +25,208 @@ const GoalManager = () => {
       {dummyGoals.map((goal) => (
         <Goal key={goal.idx} goal={goal} />
       ))}
+      <NewTaskButton onClick={handleNewGoalButtonClick} />
+      {isGoalModalOpen && (
+        <Modal
+          component={<GoalModal isLabelModalOpen={isLabelModalOpen} setIsLabelModalOpen={setIsLabelModalOpen} />}
+          zIndex={GOAL_MODAL_Z_INDEX}
+          top="50%"
+          left="50%"
+          transform="translate(-50%, -50%)"
+          handleDimmedClick={() => {
+            isLabelModalOpen ? setIsLabelModalOpen(false) : setIsGoalModalOpen(false);
+          }}
+        />
+      )}
     </>
+  );
+};
+
+const httpGetLabelList = async () => {
+  // TODO: 전역 상태로 분리 고려
+  const response = await axios.get(`${HOST}/api/v1/label`);
+  const labelList = response.data;
+  return labelList;
+};
+
+const httpDeleteLabel = async (idx: number) => {
+  const response = await axios.delete(`${HOST}/api/v1/label/${idx}`);
+  return response;
+};
+
+const GOAL_MODAL_Z_INDEX = 1000;
+
+interface GoalModalProps {
+  isLabelModalOpen: boolean;
+  setIsLabelModalOpen: React.Dispatch<boolean>;
+}
+
+const GoalModal = ({ isLabelModalOpen, setIsLabelModalOpen }: GoalModalProps) => {
+  const [selectedLabelIndex, setSelectedLabelIndex] = useState<number>();
+  const [labelList, setLabelList] = useState<Label[]>([]);
+  const [over, setOver] = useState(true);
+  const { dateToString } = useCurrentDate();
+
+  const schema = yup.object().shape({
+    title: yup.string().required(),
+    date: yup.string().required(),
+    labelIdx: yup.number().required(),
+    amount: yup.number().required(),
+    over: yup.boolean().required(),
+  });
+
+  const {
+    register,
+    handleSubmit,
+    setValue,
+    formState: { errors },
+  } = useForm({
+    resolver: yupResolver(schema),
+  });
+
+  const setValues = () => {
+    setValue('date', dateToString());
+    if (typeof selectedLabelIndex === 'number') setValue('labelIdx', selectedLabelIndex);
+    if (over) setValue('over', over);
+  };
+
+  useEffect(() => {
+    httpGetLabelList().then(setLabelList);
+  }, []);
+
+  const handleLabelClick = (label: Label) => {
+    setSelectedLabelIndex(label.idx);
+  };
+
+  const handleLabelAddButtonClick = () => {
+    setIsLabelModalOpen(true);
+  };
+
+  const handleOverInputClick = () => {
+    setOver(!over);
+  };
+
+  const handleDeleteButtonClick = async (e: React.MouseEvent, label: Label) => {
+    e.stopPropagation();
+    if (!window.confirm('라벨을 삭제하시겠습니까?')) return;
+    try {
+      await httpDeleteLabel(label.idx);
+      httpGetLabelList().then(setLabelList);
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        const { msg } = error.response?.data;
+        alert(msg);
+      } else {
+        console.log(error);
+      }
+    }
+  };
+
+  const goalSubmit = async (d: FieldValues) => {
+    console.log(d);
+  };
+
+  const label = labelList.find((label) => label.idx === selectedLabelIndex);
+
+  return (
+    <>
+      <S.GoalModal onSubmit={handleSubmit(goalSubmit)}>
+        <S.GoalModalLabelTitleInput placeholder="제목을 설정하세요" {...register('title')} />
+        <S.GoalModalLabel color={label?.color}>
+          <S.GoalModalLabelName value={label ? label.title : ''} placeholder="라벨을 설정하세요" filled={!!label} disabled={true} />
+          <S.GoalModalAmountInput type="number" min="0" disabled={selectedLabelIndex === undefined} placeholder="목표량" {...register('amount')} />
+          <div>{label ? label.unit : ''}</div>
+          <S.GoalModalOverInput onClick={handleOverInputClick}>{over ? '▲' : '▼'}</S.GoalModalOverInput>
+        </S.GoalModalLabel>
+        <S.LabelListContainer>
+          <LabelList labelList={labelList} handlePlusButtonClick={handleLabelAddButtonClick} handleItemClick={handleLabelClick} handleDeleteButtonClick={handleDeleteButtonClick} />
+        </S.LabelListContainer>
+        <S.GoalModalSubmitButton onClick={setValues}>NEW GOAL!</S.GoalModalSubmitButton>
+      </S.GoalModal>
+      {isLabelModalOpen && (
+        <Modal
+          component={
+            <LabelModal
+              handleCloseButtonClick={() => {
+                httpGetLabelList().then(setLabelList);
+                setIsLabelModalOpen(false);
+              }}
+            />
+          }
+          zIndex={LABEL_MODAL_Z_INDEX}
+          top="50%"
+          left="50%"
+          transform="translate(-50%, -50%)"
+          handleDimmedClick={() => {
+            setIsLabelModalOpen(false);
+          }}
+          dimmedBorderRadius={S.GOAL_MODAL_BORDER_RADIUS}
+        />
+      )}
+    </>
+  );
+};
+
+const LABEL_MODAL_Z_INDEX = 1002;
+
+const generateRandomHexColor = () => {
+  const R = Math.floor(Math.random() * 127 + 128).toString(16);
+  const G = Math.floor(Math.random() * 127 + 128).toString(16);
+  const B = Math.floor(Math.random() * 127 + 128).toString(16);
+  return `#${[R, G, B].join('')}`;
+};
+
+interface LabelModalProps {
+  handleCloseButtonClick: () => void;
+}
+const LabelModal = ({ handleCloseButtonClick }: LabelModalProps) => {
+  const schema = yup.object().shape({
+    title: yup.string().required(),
+    unit: yup.string().required(),
+    color: yup.string().required(),
+  });
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm({
+    resolver: yupResolver(schema),
+  });
+
+  const [color, setColor] = useState(generateRandomHexColor());
+
+  const handleLabelColorChange = (e: React.ChangeEvent) => {
+    // TODO: Throttle 고려
+    const color = (e.target as HTMLInputElement).value;
+    setColor(color);
+  };
+
+  const LabelSubmit = async (d: FieldValues) => {
+    try {
+      await axios.post(`${HOST}/api/v1/label`, {});
+      handleCloseButtonClick();
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        const { msg } = error.response?.data;
+        alert(msg);
+      } else {
+        console.log(error);
+      }
+    }
+  };
+
+  return (
+    <S.LabelModal onSubmit={handleSubmit(LabelSubmit)}>
+      <S.LabelModalLabel color={color}>
+        <S.LabelModalLabelTitleInput placeholder="라벨 이름" {...register('title')} />
+        <S.VertialRule />
+        <S.LabelModalLabelUnitInput placeholder="단위" {...register('unit')} />
+        <S.VertialRule />
+        <S.LabelModalLabelColorInput value={color} type="color" {...register('color')} onChange={handleLabelColorChange} />
+      </S.LabelModalLabel>
+      <S.LabelModalLabelCreateButton>ADD LABEL</S.LabelModalLabelCreateButton>
+    </S.LabelModal>
   );
 };
 
@@ -59,29 +276,27 @@ const dummyGoals = [
   },
 ];
 
-interface Label {
-  color: string;
-  title: string;
-  unit: string;
-}
-
 const dummyLabels: Label[] = [
   {
+    idx: 1,
     title: '',
     color: '',
     unit: '',
   },
   {
+    idx: 2,
     title: '커피',
     color: '#4A6CC3',
     unit: '잔',
   },
   {
+    idx: 3,
     title: '지출',
     color: '#D092E2',
     unit: '만',
   },
   {
+    idx: 4,
     title: '잠',
     color: '#B9D58C',
     unit: '분',
@@ -112,9 +327,9 @@ const Goal = ({ goal }: GoalProps) => {
   return (
     <S.Goal>
       <div>
-        <Label title={labelTitle} color={labelColor} unit={labelUnit} amount={goalAmount} over={over} />
+        <GoalLabel title={labelTitle} color={labelColor} unit={labelUnit} amount={goalAmount} over={over} />
       </div>
-      <span>{title}</span>{' '}
+      <span>{title}</span>
       <div>
         <S.Current>
           <div>
@@ -138,7 +353,7 @@ interface LabelProps {
   over: boolean;
 }
 
-const Label = ({ title, color, unit, amount, over }: LabelProps) => {
+const GoalLabel = ({ title, color, unit, amount, over }: LabelProps) => {
   return (
     <S.Label color={color}>
       <S.LabelTitle>{title}</S.LabelTitle>

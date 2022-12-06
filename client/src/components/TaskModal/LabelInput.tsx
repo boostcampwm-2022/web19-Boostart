@@ -144,22 +144,6 @@ const LabelInput = ({ labelArray, setLabelArray }: LabelInputProps) => {
   };
 
   // 전체 라벨
-  const LabelList = () => {
-    return (
-      <LabelListContainer>
-        <PlusButton onClick={openNewLabelModal} />
-        {labelList &&
-          labelList.map((item: Label) => {
-            return (
-              <LabelListItem delete={item.count === 0} key={item.idx} color={item.color} onClick={(e) => openAddLabelModal(item)}>
-                <span>{item.title}</span>
-                {item.count === 0 && <DeleteButton data-idx={item.idx} type="button" onClick={deleteLabel} />}
-              </LabelListItem>
-            );
-          })}
-      </LabelListContainer>
-    );
-  };
 
   //라벨 선택 해제
   const popLabelItem = (idx: number) => {
@@ -192,8 +176,24 @@ const LabelInput = ({ labelArray, setLabelArray }: LabelInputProps) => {
     <LabelInputContainer>
       {isLabelModalOpen && <Modal component={<NewLabelModal />} zIndex={1001} top={'50%'} left={'50%'} transform={'translate(-50%, -50%)'} handleDimmedClick={(e) => setIsLabelModalOpen(false)} />}
       <SelectedLabelList />
-      <LabelList />
+      <LabelList labelList={labelList} handlePlusButtonClick={openNewLabelModal} handleItemClick={openAddLabelModal} handleDeleteButtonClick={deleteLabel} />
     </LabelInputContainer>
+  );
+};
+export const LabelList = ({ labelList, handlePlusButtonClick, handleItemClick, handleDeleteButtonClick }: any) => {
+  return (
+    <LabelListContainer>
+      <PlusButton onClick={handlePlusButtonClick} />
+      {labelList &&
+        labelList.map((item: Label) => {
+          return (
+            <LabelListItem delete={item.count === 0} key={item.idx} color={item.color} onClick={(e) => handleItemClick(item)}>
+              <span>{item.title}</span>
+              {item.count === 0 && <DeleteButton data-idx={item.idx} type="button" onClick={(e) => handleDeleteButtonClick(e, item)} />}
+            </LabelListItem>
+          );
+        })}
+    </LabelListContainer>
   );
 };
 
