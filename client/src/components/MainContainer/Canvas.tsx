@@ -263,7 +263,6 @@ const Canvas = () => {
     Object.values(objectDataMap).forEach((objectData) => {
       updateModifiedObject(objectData);
     });
-    console.log('objects');
   };
   const setCanvasBackground = () => {
     fabric.Image.fromURL(canvasBackground, function (img) {
@@ -275,7 +274,6 @@ const Canvas = () => {
       img.scaleToWidth(674);
       img.setCoords();
       if (!canvasRef.current) return;
-      console.log('img');
       canvasRef.current.add(img);
       globalSocket.emit('requestCurrentObjects');
     });

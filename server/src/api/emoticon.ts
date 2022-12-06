@@ -10,8 +10,15 @@ router.get('/task/:task_idx', authenticateToken, async (req: AuthorizedRequest, 
   const { userIdx } = req.user;
   const taskIdx = req.params.task_idx;
   try {
-    const notExistTask = ((await executeSql('select idx from task where idx = ? and user_idx = ?', [taskIdx, userIdx])) as RowDataPacket).length === 0;
-    if (notExistTask) return res.status(404).json({ msg: '존재하지 않는 일정이에요.' });
+    const [task] = (await executeSql('select user_idx from task where idx = ?', [taskIdx])) as RowDataPacket[];
+    if (!task) return res.status(404).json({ msg: '존재하지 않는 일정이에요.' });
+
+    const { user_idx: taskAuthorIdx } = task;
+    if (userIdx !== taskAuthorIdx) {
+      const isFriend =
+        ((await executeSql('select * from friendship where accepted = true and ((sender_idx = ? and receiver_idx = ?) or (sender_idx = ? and receiver_idx = ?))', [userIdx, taskAuthorIdx, taskAuthorIdx, userIdx])) as RowDataPacket).length > 0;
+      if (!isFriend) return res.status(403).json({ msg: '친구가 아닌 사용자의 정보를 조회할 수 없어요.' });
+    }
 
     const emoticons = await executeSql(
       'select task_social_action.idx, emoticon.value as emoticon, user.user_id as authorName from task_social_action inner join emoticon on task_social_action.emoticon_idx = emoticon.idx inner join user on task_social_action.author_idx = user.idx where task_idx = ?',
