@@ -1,6 +1,6 @@
 import axios from 'axios';
-import { Task, CompletionCheckBoxStatus } from 'GlobalType';
-import { useEffect } from 'react';
+import { Task, CompletionCheckBoxStatus, Emoticon } from 'GlobalType';
+import { useEffect, useState } from 'react';
 import { HOST } from '../../constants';
 import * as S from './Log.style';
 import { visitState } from '../common/atoms';
@@ -120,19 +120,48 @@ const TaskList = ({ taskList, activeTask, completionFilter, fetchTaskList }: tas
       {taskList.map((task: Task) => {
         return (
           !isTaskFiltered(task.done) && (
-            <S.TaskItem key={'task' + task.idx} data-idx={task.idx} data-tag={task.tagIdx} data-active={task.idx === activeTask} done={Number(task.done)} cols={CalcHeight(task)}>
-              <S.TaskMainInfos>
-                <S.TaskTime>{task.startedAt}</S.TaskTime>
-                <S.TaskTitle>{task.title}</S.TaskTitle>
-                {!task.isPublic && <S.LockerImage src="/lock.svg" />}
-              </S.TaskMainInfos>
-              {/*해당 메뉴는 상세 정보가 열려 있을 때만 표시 */}
-              {task.idx === activeTask && <DetailInfo task={task} />}
-            </S.TaskItem>
+            <>
+              <S.TaskItem key={'task' + task.idx} data-idx={task.idx} data-tag={task.tagIdx} data-active={task.idx === activeTask} done={Number(task.done)} cols={CalcHeight(task)}>
+                <S.TaskMainInfos>
+                  <S.TaskTime>{task.startedAt}</S.TaskTime>
+                  <S.TaskTitle>{task.title}</S.TaskTitle>
+                  {!task.isPublic && <S.LockerImage src="/lock.svg" />}
+                </S.TaskMainInfos>
+                {task.idx === activeTask && <DetailInfo task={task} />}
+              </S.TaskItem>
+              {task.idx === activeTask && <EmoticonList key={task.idx} task={task} activeTask={activeTask} />}
+            </>
           )
         );
       })}
     </>
+  );
+};
+
+const EmoticonList = ({ task, activeTask }: { task: Task; activeTask: number }) => {
+  const [emoticonList, setEmoticonList] = useState<Emoticon[]>([]);
+  console.log(task.idx);
+  //Emoticon GET
+  useEffect(() => {
+    const getEmoticon = async () => {
+      try {
+        const result = await axios.get(`${HOST}/api/v1/emoticon/task/${task.idx}`);
+        setEmoticonList(result.data);
+      } catch (error) {
+        console.log(error);
+      }
+    };
+    getEmoticon();
+  }, []);
+
+  return (
+    <S.EmoticonContainer>
+      {emoticonList.map((i) => (
+        <div key={i.idx}>
+          <S.Emoticon> {i.emoticon}</S.Emoticon>
+        </div>
+      ))}
+    </S.EmoticonContainer>
   );
 };
 

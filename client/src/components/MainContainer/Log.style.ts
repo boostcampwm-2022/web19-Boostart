@@ -352,3 +352,18 @@ export const LabelListItem = styled.div`
   font-size: 0.7rem;
   margin: 2px 3px;
 `;
+
+export const EmoticonContainer = styled.div`
+  display: flex;
+`;
+export const Emoticon = styled.div`
+  width: 35px;
+  height: 43px;
+  display: flex;
+  background: url('/comment.svg');
+
+  background-size: contain;
+
+  justify-content: center;
+  align-items: center;
+`;
