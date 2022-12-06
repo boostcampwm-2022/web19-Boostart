@@ -20,6 +20,7 @@ const MainPage = () => {
   const [myProfile, setMyProfile] = useState<Friend | null>(null);
   const [friendsList, setFriendsList] = useState<Friend[] | null>(null);
   const [currentVisit, setCurrentVisit] = useRecoilState(visitState);
+
   const [friendRequests, setFriendRequests] = useState<Friend[] | null>(null);
 
   //API Requests
@@ -94,7 +95,7 @@ const MainPage = () => {
     getFriendsList();
     getFriendRequests();
     getMyProfile().then((userData: Friend) => {
-      setCurrentVisit(userData.userId);
+      setCurrentVisit((prev) => ({ isMe: true, userId: userData.userId }));
     });
   }, []);
 
