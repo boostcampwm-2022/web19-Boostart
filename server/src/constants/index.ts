@@ -20,3 +20,7 @@ export const OAUTH_TYPES = {
 } as const;
 export const HOST = process.env.MODE === 'dev' ? process.env.DEV_HOST : process.env.PROD_HOST;
 export const DEFAULT_PROFILE = 'default_profile.png';
+export const REDIS_USERNAME = process.env.REDIS_USERNAME;
+export const REDIS_PASSWORD = process.env.REDIS_PASSWORD;
+export const REDIS_HOST = process.env.REDIS_HOST;
+export const REDIS_PORT = process.env.REDIS_PORT;
