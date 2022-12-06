@@ -13,14 +13,16 @@ const Diary = () => {
 
   useEffect(() => {
     const currentDateString = dateToString();
-    globalSocket.emit('joinToNewRoom', currentVisit, currentDateString);
+    globalSocket.emit('joinToNewRoom', currentVisit.userId, currentDateString);
     return () => {
-      globalSocket.emit('leaveCurrentRoom', currentVisit, currentDateString);
+      globalSocket.emit('leaveCurrentRoom', currentVisit.userId, currentDateString);
     };
   }, [currentVisit, currentDate]);
   return (
     <>
-      <S.DiaryTitle>DIARY</S.DiaryTitle>
+      <S.DiaryTitle>
+        DIARY <span> {currentVisit.isMe || `~${currentVisit.userId}`}</span>
+      </S.DiaryTitle>
       <S.Container>
         <S.DiaryContainer>
           <S.DiaryNavBarSection>

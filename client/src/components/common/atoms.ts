@@ -6,5 +6,5 @@ export const dateState = atom({
 });
 export const visitState = atom({
   key: 'currentVisiting',
-  default: '',
+  default: { userId: '', isMe: true },
 });

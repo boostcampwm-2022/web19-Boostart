@@ -17,6 +17,20 @@ interface ProfileBoxProps {
 const FriendsBar = ({ myProfile, friendsList, handlePlusButtonClick }: FriendsBarProps) => {
   const plusIcon = '/plus.svg';
 
+  const ProfileBox = ({ userId, profileImg }: ProfileBoxProps) => {
+    const [currentVisit, setCurrentVisit] = useRecoilState(visitState);
+
+    return (
+      <S.ProfileBox
+        imgURL={profileImg}
+        onClick={() => {
+          setCurrentVisit({ userId: userId, isMe: myProfile!.userId === userId });
+        }}
+        nowVisiting={currentVisit.userId === userId}
+      ></S.ProfileBox>
+    );
+  };
+
   return (
     <>
       <S.FriendsBarContainer>
@@ -32,8 +46,3 @@ const FriendsBar = ({ myProfile, friendsList, handlePlusButtonClick }: FriendsBa
 };
 
 export default FriendsBar;
-
-const ProfileBox = ({ userId, profileImg }: ProfileBoxProps) => {
-  const [currentVisit, setCurrentVisit] = useRecoilState(visitState);
-  return <S.ProfileBox imgURL={profileImg} onClick={() => setCurrentVisit(userId)}></S.ProfileBox>;
-};

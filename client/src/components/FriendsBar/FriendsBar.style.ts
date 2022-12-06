@@ -16,11 +16,12 @@ export const FriendsBarContainer = styled.div`
 
 export const ProfileBox = styled.div<{
   imgURL: string;
+  nowVisiting?: boolean;
 }>`
   width: 2.8rem;
   height: 2.8rem;
   border-radius: 3.4rem;
-  border: 1px solid #d4d4d4;
+  border: ${(props) => (props.nowVisiting ? '5px solid #bccdec' : '1px solid #d4d4d4')};
   margin: 0 0.4rem;
   box-sizing: border-box;
   background: url(${(props) => (props.imgURL === '/plus.svg' ? props.imgURL : HOST + '/' + props.imgURL)}) no-repeat center center / ${(props) => (props.imgURL === '/plus.svg' ? '1.25rem 2.8rem' : '3.5rem 3.5rem')};
