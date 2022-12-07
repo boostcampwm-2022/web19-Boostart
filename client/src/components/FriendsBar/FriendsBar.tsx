@@ -4,8 +4,8 @@ import { Friend } from 'GlobalType';
 import * as S from './FriendsBar.style';
 import { visitState } from '../common/atoms';
 import Modal from '../common/Modal';
-import {MODAL_CENTER_TOP, MODAL_CENTER_LEFT, MODAL_CENTER_TRANSFORM, HOST} from '../../constants/index'
-import {ProfileImage} from '../Drawer/Drawer.style'
+import { MODAL_CENTER_TOP, MODAL_CENTER_LEFT, MODAL_CENTER_TRANSFORM, HOST } from '../../constants/index';
+import { ProfileImage } from '../Drawer/Drawer.style';
 
 interface FriendsBarProps {
   myProfile: Friend | null;
@@ -16,19 +16,19 @@ interface ProfileBoxProps {
   userId: string;
   profileImg: string;
 }
-interface FriendMenuModalProps{
+interface FriendMenuModalProps {
   setIsFriendProfileOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }
-interface FriendProfileModalProps{
+interface FriendProfileModalProps {
   userId: string;
-  username:string;
-  profileImg:string;
+  username: string;
+  profileImg: string;
 }
 
 const FriendsBar = ({ myProfile, friendsList, handlePlusButtonClick }: FriendsBarProps) => {
   const plusIcon = '/plus.svg';
   const [friendMenuId, setFriendMenuId] = useState<string | null>(null);
-  const [isFriendProfileOpen, setIsFriendProfileOpen] = useState(false)
+  const [isFriendProfileOpen, setIsFriendProfileOpen] = useState(false);
 
   const ProfileBox = ({ userId, profileImg }: ProfileBoxProps) => {
     const [currentVisit, setCurrentVisit] = useRecoilState(visitState);
@@ -45,7 +45,7 @@ const FriendsBar = ({ myProfile, friendsList, handlePlusButtonClick }: FriendsBa
     return (
       <>
         <div>
-          <S.ProfileBox          
+          <S.ProfileBox
             userId={userId}
             imgURL={profileImg}
             onClick={() => {
@@ -60,10 +60,10 @@ const FriendsBar = ({ myProfile, friendsList, handlePlusButtonClick }: FriendsBa
     );
   };
 
-  const closeFriendProfileModal = (e:React.MouseEvent)=>{
+  const closeFriendProfileModal = (e: React.MouseEvent) => {
     e.stopPropagation();
-    setIsFriendProfileOpen(false)
-  }
+    setIsFriendProfileOpen(false);
+  };
 
   return (
     <>
@@ -75,40 +75,57 @@ const FriendsBar = ({ myProfile, friendsList, handlePlusButtonClick }: FriendsBa
           })}
         <S.ProfileBox userId={'친구 추가'} imgURL={plusIcon} onClick={handlePlusButtonClick}></S.ProfileBox>
       </S.FriendsBarContainer>
-      {isFriendProfileOpen&&
-      friendsList?.filter(({userId})=>userId===friendMenuId)
-      .map(({userId, username, profileImg})=>{
-        return <Modal key={'profile'+userId} component={<FriendProfileModal userId={userId} username={username} profileImg={profileImg}/>} top={MODAL_CENTER_TOP} left={MODAL_CENTER_LEFT} transform={MODAL_CENTER_TRANSFORM} zIndex={1000} handleDimmedClick={(e) => closeFriendProfileModal(e)} />
-      })}
-      </>
+      {isFriendProfileOpen &&
+        friendsList
+          ?.filter(({ userId }) => userId === friendMenuId)
+          .map(({ userId, username, profileImg }) => {
+            return (
+              <Modal
+                key={'profile' + userId}
+                component={<FriendProfileModal userId={userId} username={username} profileImg={profileImg} />}
+                top={MODAL_CENTER_TOP}
+                left={MODAL_CENTER_LEFT}
+                transform={MODAL_CENTER_TRANSFORM}
+                zIndex={1000}
+                handleDimmedClick={(e) => closeFriendProfileModal(e)}
+              />
+            );
+          })}
+    </>
   );
 };
 
 export default FriendsBar;
 
-const FriendMenuModal = ({setIsFriendProfileOpen}:FriendMenuModalProps) => {
-  const openFriendProfile = (e:React.MouseEvent)=>{
-    e.stopPropagation()
-    setIsFriendProfileOpen(true)
-  }
+const FriendMenuModal = ({ setIsFriendProfileOpen }: FriendMenuModalProps) => {
+  const openFriendProfile = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setIsFriendProfileOpen(true);
+  };
   return (
     <>
       <S.FriendMenuModal>
-        <S.FriendMenuModalItem onClick={(e)=>openFriendProfile(e)}>프로필보기</S.FriendMenuModalItem>
+        <S.FriendMenuModalItem onClick={(e) => openFriendProfile(e)}>프로필보기</S.FriendMenuModalItem>
         <S.FriendMenuModalItem>삭제하기</S.FriendMenuModalItem>
       </S.FriendMenuModal>
     </>
   );
 };
 
-const FriendProfileModal=({userId, username, profileImg}:FriendProfileModalProps)=>{
+const FriendProfileModal = ({ userId, username, profileImg }: FriendProfileModalProps) => {
+  const preventCapturing = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    return;
+  };
   return (
-    <S.FriendProfileContainer>
+    <S.FriendProfileContainer onClick={(e) => preventCapturing(e)}>
       <ProfileImage padding="2rem" size="10rem" src={HOST + '/' + profileImg}></ProfileImage>
-    <S.FriendProfileInfo>
-      <S.FriendProfileName><strong>{username}</strong>님</S.FriendProfileName>
-      <S.FriendProfileId>@{userId}</S.FriendProfileId>
-    </S.FriendProfileInfo>
+      <S.FriendProfileInfo>
+        <S.FriendProfileName>
+          <strong>{username}</strong>님
+        </S.FriendProfileName>
+        <S.FriendProfileId>@{userId}</S.FriendProfileId>
+      </S.FriendProfileInfo>
     </S.FriendProfileContainer>
-  )
-}
+  );
+};
