@@ -153,7 +153,7 @@ export const GoalModal = styled.form`
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 2rem;
+  padding: 4rem;
   background-color: white;
   border-radius: ${GOAL_MODAL_BORDER_RADIUS};
 `;
@@ -163,7 +163,7 @@ export const GoalModalLabel = styled.div<{ color?: string }>`
   background-color: ${(props) => props.color ?? 'transparent'};
   justify-content: space-evenly;
   align-items: center;
-  border: ${(props) => (props.color ? 'none' : 'solid 1px black')};
+  border: solid 1px ${(props) => (props.color ? 'transparent' : 'black')};
 
   width: 15rem;
   height: 1.5rem;
@@ -172,7 +172,8 @@ export const GoalModalLabel = styled.div<{ color?: string }>`
 `;
 
 export const GoalModalLabelTitleInput = styled.input`
-  width: 7rem;
+  width: 15rem;
+  font-size: 1.7rem;
 
   margin: auto;
   text-align: center;
@@ -207,21 +208,26 @@ export const GoalModalAmountInput = styled.input`
 export const GoalModalSubmitButton = styled.button`
   border-radius: 2rem;
   margin-top: 2rem;
+
+  padding: 1.5rem;
+  background-color: var(--color-main);
+  color: white;
   outline: none;
   border: none;
-  height: 2.3rem;
   font-family: var(--font-title);
 `;
 
 export const LabelListContainer = styled.div`
   width: 23rem;
   height: 2.3rem;
+  margin-top: 2rem;
 `;
 
 export const LabelModal = styled.form`
   background-color: white;
   padding: 2rem;
   border-radius: 1rem;
+  height: 12rem;
   display: flex;
   flex-direction: column;
 `;
@@ -230,8 +236,9 @@ export const LabelModalLabel = styled.div<{ color: string }>`
   display: flex;
   background-color: ${(props) => props.color};
   border-radius: 3rem;
-  ${(props) => (props.color ? 'border: none' : '')}
-  padding: 0.2rem;
+  ${(props) => (props.color ? 'border: none;' : '')}
+  padding: 0.5rem;
+  margin-top: 2rem;
   input {
     margin: 0 1rem;
     background-color: transparent;
@@ -259,8 +266,15 @@ export const LabelModalLabelColorInput = styled.input`
 export const LabelModalLabelCreateButton = styled.button`
   outline: none;
   border: none;
-  margin-top: 2rem;
+  margin: auto;
+  margin-bottom: 1rem;
   border-radius: 0.3rem;
+  font-family: 'Press Start 2P', cursive;
+  background-color: var(--color-main);
+  color: white;
+  padding: 0.5rem;
+  border-radius: 3rem;
+  width: max-content;
 `;
 
 export const GoalModalLabelName = styled.input<{ filled: boolean }>`

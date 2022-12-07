@@ -95,6 +95,47 @@ router.post('/', authenticateToken, async (req: AuthorizedRequest, res) => {
   }
 });
 
+router.patch('/:label_idx', authenticateToken, async (req: AuthorizedRequest, res) => {
+  const { userIdx } = req.user;
+  const labelIdx = req.params.label_idx;
+  const { title, color } = req.body;
+
+  try {
+    const [label] = (await executeSql('select title, user_idx from label where idx = ?', [labelIdx])) as RowDataPacket[];
+    if (!label || label.user_idx !== userIdx) return res.status(404).json({ msg: '존재하지 않는 라벨이에요.' });
+
+    let status = 200;
+    let sql = 'update label set';
+    const values = [];
+
+    if (title) {
+      const [labelTitleAlreadyExists] = (await executeSql('select idx from label where title = ? and user_idx = ?', [title, userIdx])) as RowDataPacket[];
+      if (labelTitleAlreadyExists && label.title !== title) status = 409;
+      else {
+        sql += ' title = ?';
+        values.push(title);
+      }
+    }
+    if (color) {
+      if (status === 409) {
+        status = 206;
+      } else {
+        sql += title ? ',' : '';
+        status = 200;
+      }
+      sql += ' color = ?';
+      values.push(color);
+    }
+    sql += ' where idx = ?';
+    values.push(labelIdx);
+
+    if (status !== 409 && (title || color)) await executeSql(sql, values);
+    res.sendStatus(status);
+  } catch (error) {
+    res.sendStatus(500);
+  }
+});
+
 router.delete('/:label_idx', authenticateToken, async (req: AuthorizedRequest, res) => {
   const { userIdx } = req.user;
   const labelIdx = req.params.label_idx;
