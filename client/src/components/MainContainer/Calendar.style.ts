@@ -4,6 +4,7 @@ export const CalendarTitle = styled.span`
   display: inline-block;
   position: relative;
   color: white;
+  position: relative;
   font-size: 1.7rem;
   font-family: 'Press Start 2P', cursive;
   transform: translate(1.75rem, 0.43rem);
