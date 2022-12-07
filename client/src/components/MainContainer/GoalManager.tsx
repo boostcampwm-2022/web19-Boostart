@@ -64,6 +64,11 @@ const httpDeleteLabel = async (idx: number) => {
   return response;
 };
 
+const httpPatchLabel = async ({ title, color }: { title?: string; color?: string }) => {
+  const response = await axios.post(`${HOST}/api/v1/label/color`, { title, color });
+  return response;
+};
+
 const GOAL_MODAL_Z_INDEX = 1000;
 
 interface GoalModalProps {
@@ -107,6 +112,7 @@ const GoalModal = ({ isLabelModalOpen, setIsLabelModalOpen, handleCloseButtonCli
 
   const handleLabelClick = (label: Label) => {
     setSelectedLabelIndex(label.idx);
+    setColor(label.color);
   };
 
   const handleLabelAddButtonClick = () => {
@@ -149,11 +155,27 @@ const GoalModal = ({ isLabelModalOpen, setIsLabelModalOpen, handleCloseButtonCli
 
   const label = labelList.find((label) => label.idx === selectedLabelIndex);
 
+  const [color, setColor] = useState(label?.color);
+
+  const handleColorInputChange = (e: React.ChangeEvent) => {
+    const color = (e.target as HTMLInputElement).value;
+    setColor(color);
+  };
+
+  const handleColorInputBlur = async () => {
+    try {
+      httpPatchLabel({ color });
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   return (
     <>
       <S.GoalModal onSubmit={handleSubmit(goalSubmit)}>
         <S.GoalModalLabelTitleInput placeholder="제목을 설정하세요" {...register('title')} />
-        <S.GoalModalLabel color={label?.color}>
+        <S.GoalModalLabel color={label ? color : 'white'}>
+          <S.LabelModalLabelColorInput value={color ?? '#ffffff'} type="color" {...register('color')} onChange={handleColorInputChange} onBlur={handleColorInputBlur} />
           <S.GoalModalLabelName value={label ? label.title : ''} placeholder="라벨을 설정하세요" filled={!!label} disabled={true} />
           <S.GoalModalAmountInput type="number" min="0" disabled={selectedLabelIndex === undefined} placeholder="목표량" {...register('amount')} />
           <div>{label ? label.unit : ''}</div>
