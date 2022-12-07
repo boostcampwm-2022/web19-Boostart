@@ -139,9 +139,9 @@ const GoalModal = ({ isLabelModalOpen, setIsLabelModalOpen, handleCloseButtonCli
     }
   };
 
-  const goalSubmit = async (d: FieldValues) => {
+  const goalSubmit = async (goalData: FieldValues) => {
     try {
-      const response = await httpPostGoal(d);
+      const response = await httpPostGoal(goalData);
       handleCloseButtonClick();
     } catch (error) {
       if (axios.isAxiosError(error)) {
@@ -245,9 +245,9 @@ const LabelModal = ({ handleCloseButtonClick }: LabelModalProps) => {
     setColor(color);
   };
 
-  const labelSubmit = async (d: FieldValues) => {
+  const LabelSubmit = async (labelData: FieldValues) => {
     try {
-      await axios.post(`${HOST}/api/v1/label`, {});
+      await axios.post(`${HOST}/api/v1/label`, labelData);
       handleCloseButtonClick();
     } catch (error) {
       if (axios.isAxiosError(error)) {
