@@ -50,6 +50,7 @@ const TaskList = ({ taskList, activeTask, completionFilter, fetchTaskList, setIs
   };
   const DetailInfo = ({ task }: { task: Task }) => {
     //코멘트 조회
+    console.log(task);
 
     return (
       <>
@@ -84,7 +85,7 @@ const TaskList = ({ taskList, activeTask, completionFilter, fetchTaskList, setIs
             <S.TaskDetailInfos flex="row">
               {task.labels.map((label) => {
                 return (
-                  <S.LabelListItem key={label.title} color={label.color}>
+                  <S.LabelListItem key={label.labelIdx} color={label.color}>
                     {label.title} {label.amount} {label.unit}
                   </S.LabelListItem>
                 );

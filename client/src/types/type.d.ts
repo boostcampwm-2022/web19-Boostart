@@ -7,7 +7,7 @@ declare module 'GlobalType' {
   }
 
   interface LabelData {
-    idx: number;
+    labelIdx: number;
     title: string;
     color: string;
     amount: number;
