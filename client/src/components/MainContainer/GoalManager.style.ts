@@ -214,7 +214,6 @@ export const GoalModalSubmitButton = styled.button`
   color: white;
   outline: none;
   border: none;
-  /* height: 2.3rem; */
   font-family: var(--font-title);
 `;
 
