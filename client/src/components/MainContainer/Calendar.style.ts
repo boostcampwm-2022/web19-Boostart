@@ -2,6 +2,7 @@ import styled from 'styled-components';
 
 export const CalendarTitle = styled.span`
   display: inline-block;
+  position: relative;
   color: white;
   position: relative;
   font-size: 1.7rem;
