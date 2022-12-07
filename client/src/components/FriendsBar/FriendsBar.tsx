@@ -68,6 +68,7 @@ const FriendsBar = ({ myProfile, friendsList,setFriendsList, handlePlusButtonCli
     const response = await sendUnfriendRequest(unfollowingIdx);
     if(!friendsList||!response) return;
     setFriendsList([...friendsList.filter(({idx})=>idx!==unfollowingIdx)])
+    setIsDoubleCheckMdoalOpen(false)
   }
   return (
     <>
