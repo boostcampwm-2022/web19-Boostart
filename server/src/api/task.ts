@@ -257,14 +257,17 @@ router.patch('/update/:task_idx', authenticateToken, async (req: AuthorizedReque
 
   try {
     Object.values(TaskBodyKeys).forEach((key) => {
-      if (!req.body[key]) return;
+      if (req.body[key] === undefined) return;
       if (key === TaskBodyKeys.date || key === TaskBodyKeys.done) return;
       if (!validate(key, req.body[key])) req.body[key] = TaskBodyDefaultValues[key];
 
       if (key === TaskBodyKeys.labels) return;
+
       if (updateValue.length > 0) updateSql += ',';
       updateSql += ` ${TaskColumnKeys[key]} = ? `;
-      updateValue.push(req.body[key]);
+
+      if (req.body[key] === null || req.body[key] === '') updateValue.push(null);
+      else updateValue.push(req.body[key]);
     });
     updateSql += 'where idx = ?';
     updateValue.push(taskIdx);
