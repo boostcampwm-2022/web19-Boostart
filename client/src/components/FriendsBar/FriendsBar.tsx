@@ -16,18 +16,18 @@ interface ProfileBoxProps {
 
 const FriendsBar = ({ myProfile, friendsList, handlePlusButtonClick }: FriendsBarProps) => {
   const plusIcon = '/plus.svg';
-  const [friendMenuIndex, setFriendMenuIndex] = useState<string | null>(null);
+  const [friendMenuId, setFriendMenuId] = useState<string | null>(null);
 
   const ProfileBox = ({ userId, profileImg }: ProfileBoxProps) => {
     const [currentVisit, setCurrentVisit] = useRecoilState(visitState);
 
     const closeFriendMenuModal = () => {
-      setFriendMenuIndex(null);
+      setFriendMenuId(null);
       document.removeEventListener('click', closeFriendMenuModal);
     };
     const handleRightClick = (e: React.MouseEvent, userId: string) => {
       e.preventDefault();
-      setFriendMenuIndex(userId);
+      setFriendMenuId(userId);
       document.addEventListener('click', closeFriendMenuModal);
     };
     return (
@@ -41,7 +41,7 @@ const FriendsBar = ({ myProfile, friendsList, handlePlusButtonClick }: FriendsBa
             onContextMenu={(e) => handleRightClick(e, userId)}
             nowVisiting={currentVisit.userId === userId}
           ></S.ProfileBox>
-          {friendMenuIndex === userId && userId !== myProfile?.userId && <FriendMenuModal></FriendMenuModal>}
+          {friendMenuId === userId && userId !== myProfile?.userId && <FriendMenuModal></FriendMenuModal>}
         </div>
       </>
     );
