@@ -35,7 +35,7 @@ const DEFAULT_IMPORTANCE = 3;
 const TaskModal = ({ handleCloseButtonClick, tagList, fetchTagList, currentTask }: Props) => {
   const [tagIdx, setTagIdx] = useState<number | null>(currentTask ? currentTask.tagIdx : null);
   const [locationObject, setLocationObject] = useState<Location | null>(currentTask && currentTask?.location !== null && currentTask?.location !== '' ? { location: currentTask!.location, lng: currentTask!.lng, lat: currentTask!.lat } : null); // { location, lng, lat }
-  const [labelArray, setLabelArray] = useState<Label[]>(currentTask ? currentTask.labels : []);
+  const [labelArray, setLabelArray] = useState<Label[]>(currentTask ? currentTask.labels.map((d) => ({ idx: d.labelIdx, title: d.title, amount: d.amount, color: d.color, count: 999, unit: d.unit })) : []);
 
   const [isDetailOpen, setIsDetailOpen] = useState(false);
 
@@ -112,7 +112,6 @@ const TaskModal = ({ handleCloseButtonClick, tagList, fetchTagList, currentTask 
   };
 
   const httpPatchTask = async (body: FieldValues) => {
-    console.log(body);
     await axios.patch(`${HOST}/api/v1/task/update/${currentTask!.idx}`, body);
   };
 
