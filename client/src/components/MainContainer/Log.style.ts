@@ -240,6 +240,7 @@ export const TaskDetailIcon = styled.label`
   color: var(--color-gray7);
   justify-content: center;
   text-align: center;
+  cursor: pointer;
 `;
 export const TaskTime = styled.span`
   margin: 0 0.25rem 0 0;
