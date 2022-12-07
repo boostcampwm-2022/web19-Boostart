@@ -11,24 +11,74 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
 import useCurrentDate from '../../hooks/useCurrentDate';
 
+const httpGetGoalList = async (dateString: string) => {
+  const response = await axios.get(`${HOST}/api/v1/goal?date=${dateString}`);
+  const goalList = response.data;
+  return goalList;
+};
+
+const labelMap = new Map<number, Label>();
+
+const httpPostGoal = async (body: FieldValues) => {
+  const response = await axios.post(`${HOST}/api/v1/goal`, body);
+  return response;
+};
+
 const GoalManager = () => {
   const [isGoalModalOpen, setIsGoalModalOpen] = useState(false);
   const [isLabelModalOpen, setIsLabelModalOpen] = useState(false);
+  const { dateToString } = useCurrentDate();
+  const [goalList, setGoalList] = useState<Goal[]>([]);
+
+  const fetchLabelMap = async () => {
+    try {
+      const labelList = await httpGetLabelList();
+      labelList.forEach((label: Label) => {
+        labelMap.set(label.idx, label);
+      });
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const fetchGoalList = async () => {
+    try {
+      httpGetGoalList(dateToString()).then(setGoalList);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  useEffect(() => {
+    try {
+      fetchLabelMap().then(() => {
+        fetchGoalList();
+      });
+    } catch (error) {
+      console.log(error);
+    }
+  }, []);
+
   const handleNewGoalButtonClick = () => {
     setIsGoalModalOpen(true);
   };
+
+  const handleCloseButtonClick = () => {
+    setIsGoalModalOpen(false);
+  };
+
   return (
     <>
       <S.GoalHead>
         <span>목표</span> <span>제목</span> <span>현황</span> <span>달성률</span>
       </S.GoalHead>
-      {dummyGoals.map((goal) => (
+      {goalList.map((goal) => (
         <Goal key={goal.idx} goal={goal} />
       ))}
       <NewTaskButton onClick={handleNewGoalButtonClick} />
       {isGoalModalOpen && (
         <Modal
-          component={<GoalModal isLabelModalOpen={isLabelModalOpen} setIsLabelModalOpen={setIsLabelModalOpen} />}
+          component={<GoalModal isLabelModalOpen={isLabelModalOpen} setIsLabelModalOpen={setIsLabelModalOpen} handleCloseButtonClick={handleCloseButtonClick} />}
           zIndex={GOAL_MODAL_Z_INDEX}
           top="50%"
           left="50%"
@@ -54,14 +104,20 @@ const httpDeleteLabel = async (idx: number) => {
   return response;
 };
 
+const httpPatchLabel = async ({ title, color }: { title?: string; color?: string }) => {
+  const response = await axios.post(`${HOST}/api/v1/label/color`, { title, color });
+  return response;
+};
+
 const GOAL_MODAL_Z_INDEX = 1000;
 
 interface GoalModalProps {
   isLabelModalOpen: boolean;
   setIsLabelModalOpen: React.Dispatch<boolean>;
+  handleCloseButtonClick: () => void;
 }
 
-const GoalModal = ({ isLabelModalOpen, setIsLabelModalOpen }: GoalModalProps) => {
+const GoalModal = ({ isLabelModalOpen, setIsLabelModalOpen, handleCloseButtonClick }: GoalModalProps) => {
   const [selectedLabelIndex, setSelectedLabelIndex] = useState<number>();
   const [labelList, setLabelList] = useState<Label[]>([]);
   const [over, setOver] = useState(true);
@@ -91,11 +147,16 @@ const GoalModal = ({ isLabelModalOpen, setIsLabelModalOpen }: GoalModalProps) =>
   };
 
   useEffect(() => {
-    httpGetLabelList().then(setLabelList);
+    try {
+      httpGetLabelList().then(setLabelList);
+    } catch (error) {
+      console.log(error);
+    }
   }, []);
 
   const handleLabelClick = (label: Label) => {
     setSelectedLabelIndex(label.idx);
+    setColor(label.color);
   };
 
   const handleLabelAddButtonClick = () => {
@@ -122,17 +183,43 @@ const GoalModal = ({ isLabelModalOpen, setIsLabelModalOpen }: GoalModalProps) =>
     }
   };
 
-  const goalSubmit = async (d: FieldValues) => {
-    console.log(d);
+  const goalSubmit = async (goalData: FieldValues) => {
+    try {
+      const response = await httpPostGoal(goalData);
+      handleCloseButtonClick();
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        const { msg } = error.response?.data;
+        alert(msg);
+      } else {
+        console.log(error);
+      }
+    }
   };
 
   const label = labelList.find((label) => label.idx === selectedLabelIndex);
+
+  const [color, setColor] = useState(label?.color);
+
+  const handleColorInputChange = (e: React.ChangeEvent) => {
+    const color = (e.target as HTMLInputElement).value;
+    setColor(color);
+  };
+
+  const handleColorInputBlur = async () => {
+    try {
+      httpPatchLabel({ color });
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   return (
     <>
       <S.GoalModal onSubmit={handleSubmit(goalSubmit)}>
         <S.GoalModalLabelTitleInput placeholder="제목을 설정하세요" {...register('title')} />
-        <S.GoalModalLabel color={label?.color}>
+        <S.GoalModalLabel color={label ? color : 'white'}>
+          <S.LabelModalLabelColorInput value={color ?? '#ffffff'} type="color" {...register('color')} onChange={handleColorInputChange} onBlur={handleColorInputBlur} />
           <S.GoalModalLabelName value={label ? label.title : ''} placeholder="라벨을 설정하세요" filled={!!label} disabled={true} />
           <S.GoalModalAmountInput type="number" min="0" disabled={selectedLabelIndex === undefined} placeholder="목표량" {...register('amount')} />
           <div>{label ? label.unit : ''}</div>
@@ -148,8 +235,12 @@ const GoalModal = ({ isLabelModalOpen, setIsLabelModalOpen }: GoalModalProps) =>
           component={
             <LabelModal
               handleCloseButtonClick={() => {
-                httpGetLabelList().then(setLabelList);
-                setIsLabelModalOpen(false);
+                try {
+                  httpGetLabelList().then(setLabelList);
+                  setIsLabelModalOpen(false);
+                } catch (error) {
+                  console.log(error);
+                }
               }}
             />
           }
@@ -202,9 +293,9 @@ const LabelModal = ({ handleCloseButtonClick }: LabelModalProps) => {
     setColor(color);
   };
 
-  const LabelSubmit = async (d: FieldValues) => {
+  const labelSubmit = async (labelData: FieldValues) => {
     try {
-      await axios.post(`${HOST}/api/v1/label`, {});
+      await axios.post(`${HOST}/api/v1/label`, labelData);
       handleCloseButtonClick();
     } catch (error) {
       if (axios.isAxiosError(error)) {
@@ -217,7 +308,7 @@ const LabelModal = ({ handleCloseButtonClick }: LabelModalProps) => {
   };
 
   return (
-    <S.LabelModal onSubmit={handleSubmit(LabelSubmit)}>
+    <S.LabelModal onSubmit={handleSubmit(labelSubmit)}>
       <S.LabelModalLabel color={color}>
         <S.LabelModalLabelTitleInput placeholder="라벨 이름" {...register('title')} />
         <S.VertialRule />
@@ -318,7 +409,9 @@ interface GoalProps {
 
 const Goal = ({ goal }: GoalProps) => {
   const { idx, title, labelIdx, currentAmount, goalAmount, over } = goal;
-  const { title: labelTitle, color: labelColor, unit: labelUnit } = dummyLabels[labelIdx];
+  const label = labelMap.get(labelIdx);
+  if (!label) return <></>;
+  const { title: labelTitle, color: labelColor, unit: labelUnit } = label;
 
   const isPast = true;
   const rate = over ? currentAmount / goalAmount : currentAmount <= goalAmount ? 1 : isPast ? 0 : 0.5;

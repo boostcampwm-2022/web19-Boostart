@@ -6,7 +6,6 @@ export const TopBarContainer = styled.div`
   margin: 0 auto;
   display: flex;
   justify-content: space-between;
-  z-index: 999;
 `;
 
 export const TopBarElement = styled.div<{ align: string }>`

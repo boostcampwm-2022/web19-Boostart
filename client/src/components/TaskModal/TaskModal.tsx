@@ -1,8 +1,7 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import * as S from './TaskModal.style';
 import ImportanceInput from './ImportanceInput';
 import TagInput from './TagInput';
-import useInput from '../../hooks/useInput';
 import LocationSearchInput from './LocationSearchInput';
 import { Location, Tag, Label } from 'GlobalType';
 import useCurrentDate from '../../hooks/useCurrentDate';
@@ -27,6 +26,10 @@ const formatDate = (date: Date) => {
   return [y.padStart(4, '0'), m.padStart(2, '0'), d.padStart(2, '0')].join('-');
 };
 
+const isSameOrAfter = (time1: string, time2: string) => {
+  return time1 >= time2;
+};
+
 const DEFAULT_IMPORTANCE = 3;
 const TaskModal = ({ handleCloseButtonClick, tagList, fetchTagList }: Props) => {
   const [tagIdx, setTagIdx] = useState<number | null>(null);
@@ -48,10 +51,15 @@ const TaskModal = ({ handleCloseButtonClick, tagList, fetchTagList }: Props) => 
     title: yup.string().required(),
     tagIdx: yup.number().required(),
     startedAt: yup.string().required(),
-    endedAt: yup.string().required(),
+    endedAt: yup.string().when('startedAt', (startedAt) => {
+      return yup.string().test('e > s', '종료 시각은 시작 시각과 같거나 그 이후여야 해요.', (endedAt) => {
+        if (!endedAt) return false;
+        return isSameOrAfter(endedAt, startedAt);
+      });
+    }),
     importance: yup.number().required(),
     isPublic: yup.bool(),
-    location: yup.string(),
+    location: yup.string().nullable(),
     lat: yup
       .number()
       .transform((value) => (isNaN(value) ? undefined : value))
@@ -108,6 +116,10 @@ const TaskModal = ({ handleCloseButtonClick, tagList, fetchTagList }: Props) => 
       setValue('lat', lat);
       setValue('lng', lng);
       setValue('location', location);
+    } else {
+      setValue('lat', null);
+      setValue('lng', null);
+      setValue('location', null);
     }
 
     setValue('importance', importance);

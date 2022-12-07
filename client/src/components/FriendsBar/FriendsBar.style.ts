@@ -15,6 +15,7 @@ export const FriendsBarContainer = styled.div`
 `;
 
 export const ProfileBox = styled.div<{
+  userId: string;
   imgURL: string;
   nowVisiting?: boolean;
 }>`
@@ -27,5 +28,67 @@ export const ProfileBox = styled.div<{
   background: url(${(props) => (props.imgURL === '/plus.svg' ? props.imgURL : HOST + '/' + props.imgURL)}) no-repeat center center / ${(props) => (props.imgURL === '/plus.svg' ? '1.25rem 2.8rem' : '3.5rem 3.5rem')};
   &:hover {
     border: 5px solid #bccdec;
+  }
+  &:hover::after {
+    content: '${(props) => props.userId}';
+    background: rgba(255, 255, 255, 0.6);
+    padding: 0.375rem;
+    border: 1px solid var(--color-gray3);
+    border-radius: 0.5rem;
+    display: block;
+    font-size: 0.875rem;
+    line-height: 0.7rem;
+    position: absolute;
+    transform: translate(1.5rem, -1.75rem);
+    z-index: 801;
+  }
+`;
+
+export const FriendMenuModal = styled.div`
+  height: 3.5rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-evenly;
+  background-color: #eef3fd;
+  border: #7689fd solid 1px;
+  border-radius: 5px;
+  margin-top: 6.8px;
+  padding: 5px 11px;
+  position: absolute;
+  width: fit-content;
+  z-index: 800;
+  &::after {
+    content: '';
+    width: 0;
+    display: block;
+    position: absolute;
+    border-color: #eef3fd transparent;
+    border-style: solid;
+    border-width: 0 6px 8px 6.5px;
+    top: -7px;
+    left: 1.375rem;
+    z-index: 1;
+  }
+  &::before {
+    border-color: #7689fd transparent;
+    border-style: solid;
+    border-width: 0 6px 8px 6.5px;
+    content: '';
+    display: block;
+    left: 1.375rem;
+    position: absolute;
+    top: -8px;
+    width: 0;
+    z-index: 0;
+  }
+`;
+
+export const FriendMenuModalItem = styled.div`
+  color: var(--color-main);
+  font-size: 0.75rem;
+  cursor: pointer;
+  &:hover {
+    font-weight: 700;
+    color: #505bf0;
   }
 `;
