@@ -22,11 +22,15 @@ class ValidationError extends Error {
 const validate = (key: string, value: string) => {
   switch (key) {
     case CalendarQueryKeys.year: {
+      const regex = /^\d{4}$/;
+      if (!regex.test(value)) throw new ValidationError('올바른 연도를 입력해주세요.');
       const year = parseInt(value);
       if (isNaN(year)) throw new ValidationError('올바른 연도를 입력해주세요.');
       return true;
     }
     case CalendarQueryKeys.month: {
+      const regex = /^([1-9]|1[012])$/;
+      if (!regex.test(value)) throw new ValidationError('올바른 연도를 입력해주세요.');
       const month = parseInt(value);
       if (isNaN(month) || month < 1 || month > 12) throw new ValidationError('올바른 달을 입력해주세요.');
       return true;
