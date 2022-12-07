@@ -60,7 +60,7 @@ router.get('/task', authenticateToken, async (req: AuthorizedRequest, res) => {
       result[parseInt(date) - 1] = true;
     });
 
-    res.send(result);
+    res.json(result);
   } catch {
     res.sendStatus(500);
   }
