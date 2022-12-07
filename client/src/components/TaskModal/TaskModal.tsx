@@ -3,7 +3,7 @@ import * as S from './TaskModal.style';
 import ImportanceInput from './ImportanceInput';
 import TagInput from './TagInput';
 import LocationSearchInput from './LocationSearchInput';
-import { Location, Tag, Label } from 'GlobalType';
+import { Location, Tag, Label, Task } from 'GlobalType';
 import useCurrentDate from '../../hooks/useCurrentDate';
 import LabelInput from './LabelInput';
 import { FieldValues, useFieldArray, useForm } from 'react-hook-form';
@@ -16,6 +16,7 @@ interface Props {
   handleCloseButtonClick: () => void;
   tagList: Tag[];
   fetchTagList: () => Promise<void>;
+  currentTask: Task | null;
 }
 
 const formatDate = (date: Date) => {
@@ -31,16 +32,16 @@ const isSameOrAfter = (time1: string, time2: string) => {
 };
 
 const DEFAULT_IMPORTANCE = 3;
-const TaskModal = ({ handleCloseButtonClick, tagList, fetchTagList }: Props) => {
-  const [tagIdx, setTagIdx] = useState<number | null>(null);
-  const [locationObject, setLocationObject] = useState<Location | null>(null); // { location, lng, lat }
-  const [labelArray, setLabelArray] = useState<Label[]>([]);
+const TaskModal = ({ handleCloseButtonClick, tagList, fetchTagList, currentTask }: Props) => {
+  const [tagIdx, setTagIdx] = useState<number | null>(currentTask ? currentTask.tagIdx : null);
+  const [locationObject, setLocationObject] = useState<Location | null>(currentTask && currentTask?.location !== null && currentTask?.location !== '' ? { location: currentTask!.location, lng: currentTask!.lng, lat: currentTask!.lat } : null); // { location, lng, lat }
+  const [labelArray, setLabelArray] = useState<Label[]>(currentTask ? currentTask.labels : []);
 
   const [isDetailOpen, setIsDetailOpen] = useState(false);
 
   const { currentDate, getMonth, getDate } = useCurrentDate();
 
-  const [importance, setImportance] = useState(DEFAULT_IMPORTANCE);
+  const [importance, setImportance] = useState(currentTask ? currentTask.importance : DEFAULT_IMPORTANCE);
 
   const contents = {
     close: '닫기 ▲',
@@ -101,8 +102,18 @@ const TaskModal = ({ handleCloseButtonClick, tagList, fetchTagList }: Props) => 
     handleCloseButtonClick();
   };
 
+  const editTask = async (body: FieldValues) => {
+    await httpPatchTask({ ...body, date: formatDate(currentDate) });
+    handleCloseButtonClick();
+  };
+
   const httpPostTask = async (body: FieldValues) => {
     await axios.post(`${HOST}/api/v1/task`, body);
+  };
+
+  const httpPatchTask = async (body: FieldValues) => {
+    console.log(body);
+    await axios.patch(`${HOST}/api/v1/task/update/${currentTask!.idx}`, body);
   };
 
   // k-th star clicked
@@ -136,25 +147,25 @@ const TaskModal = ({ handleCloseButtonClick, tagList, fetchTagList }: Props) => 
     <S.ModalContainer isDetailOpen={isDetailOpen}>
       <S.CloseButton onClick={handleCloseButtonClick} />
       <S.Date>{`• ${getMonth() + 1}.${getDate()} •`}</S.Date>
-      <S.TaskForm onSubmit={handleSubmit(createTask)}>
+      <S.TaskForm onSubmit={currentTask ? handleSubmit(editTask) : handleSubmit(createTask)}>
         <S.FormTable>
           <tbody>
-            <Row title="제목" content={<S.InputBar {...register('title')} />} />
+            <Row title="제목" content={<S.InputBar defaultValue={currentTask ? currentTask.title : ''} {...register('title')} />} />
             <input type="number" {...register('tagIdx')} hidden={true} />
             <Row title="태그" content={<TagInput tagIdx={tagIdx} setTagIdx={setTagIdx} tagList={tagList} fetchTagList={fetchTagList} isTagInputFocused={isTagInputFocused} setIsTagInputFocused={setIsTagInputFocused} />} />
             <Row
               title="시간"
               content={
                 <>
-                  <S.InputTimeBar type="time" {...register('startedAt')} />
+                  <S.InputTimeBar type="time" defaultValue={currentTask ? currentTask.startedAt : ''} {...register('startedAt')} />
                   {' ~ '}
-                  <S.InputTimeBar type="time" {...register('endedAt')} />
+                  <S.InputTimeBar type="time" defaultValue={currentTask ? currentTask.endedAt : ''} {...register('endedAt')} />
                 </>
               }
             />
             <input type="number" {...register('importance')} hidden={true} />
             <Row title="중요도" content={<ImportanceInput importance={importance} handleStarClick={handleStarClick} />} />
-            <Row title="공개" content={<input type="checkbox" {...register('isPublic')} />} />
+            <Row title="공개" content={<input type="checkbox" defaultChecked={currentTask ? currentTask.isPublic : true} {...register('isPublic')} />} />
           </tbody>
         </S.FormTable>
         <S.DetailButton onClick={() => setIsDetailOpen(!isDetailOpen)}>
@@ -174,11 +185,11 @@ const TaskModal = ({ handleCloseButtonClick, tagList, fetchTagList }: Props) => 
                 <td>라벨</td>
                 <td>{<LabelInput labelArray={labelArray} setLabelArray={setLabelArray} />}</td>
               </S.LagreTr>
-              <Row title="메모" content={<S.InputArea {...register('content')} />} />
+              <Row title="메모" content={<S.InputArea defaultValue={currentTask ? currentTask.content : ''} {...register('content')} />} />
             </tbody>
           </S.FormTable>
         )}
-        <S.SubmitButton onClick={setValues}>NEW TASK!</S.SubmitButton>
+        <S.SubmitButton onClick={setValues}>{currentTask ? 'EDIT TASK' : 'NEW TASK!'}</S.SubmitButton>
       </S.TaskForm>
     </S.ModalContainer>
   );
