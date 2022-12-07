@@ -63,3 +63,5 @@ export const FRIEND_REQUEST_ACTION = {
   ACCEPT: axios.patch,
   REJECT: axios.delete,
 };
+
+export const API_VERSION = 'api/v1'

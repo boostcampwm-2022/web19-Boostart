@@ -92,3 +92,33 @@ export const FriendMenuModalItem = styled.div`
     color: #505bf0;
   }
 `;
+
+export const DoubleCheckContainer = styled.div`
+width: 31rem;
+height:13rem;
+border-radius: 2rem;
+background: white;
+display: flex;
+flex-direction: column;
+align-items: center;
+justify-content: center;
+gap:2rem;
+user-select: none;
+& span{
+  color: var(--color-main);
+  font-size: 1.25rem;
+  font-weight: 700;
+}
+`
+
+export const StyledButton = styled.div`
+  width: 10rem;
+  height: 2rem;
+  line-height: 2rem;
+  border-radius: 1rem;
+  background: var(--color-main);
+  color: white;
+  font-family: 'Press Start 2P';
+  font-size: 0.875rem;
+  text-align: center;
+  cursor: pointer;`

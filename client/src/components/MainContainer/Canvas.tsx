@@ -341,7 +341,7 @@ const ForeignerScreen = styled.div<{
   top: 3.5rem;
   left: 0;
   background: rgba(0, 0, 0, 0);
-  z-index: 1000;
+  z-index: 500;
   display: ${(props) => (props.isActive ? 'none' : 'block')};
 `;
 
