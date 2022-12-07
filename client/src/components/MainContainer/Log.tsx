@@ -171,7 +171,7 @@ const Log = () => {
     setCompletionCheckBoxStatus({ ...completionCheckBoxStatus, [type]: isChecked });
   };
 
-  const handleEditModal = useEffect(() => {
+  useEffect(() => {
     window.addEventListener('mousemove', handleMouseMove);
     window.addEventListener('mouseup', handleMouseUp);
     return () => {
