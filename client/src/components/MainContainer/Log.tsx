@@ -73,6 +73,7 @@ const Log = () => {
   }, [currentDate, currentVisit]);
 
   const handleMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (!currentVisit.isMe) return;
     if (!(e.target instanceof HTMLDivElement)) return;
     const target = e.target;
     if (!target.dataset.idx) return;
@@ -102,8 +103,6 @@ const Log = () => {
   };
 
   const handleTagWrapClick = (e: React.MouseEvent<HTMLDivElement>) => {
-    e.stopPropagation();
-
     if (!(e.target instanceof HTMLDivElement)) return;
     const target = e.target;
     const activeTaskIdx = target.dataset.idx;
@@ -228,7 +227,7 @@ const Log = () => {
           {currentVisit.isMe && <S.NewTaskButton onClick={() => setIsModalOpen(true)} />}
           {isModalOpen && (
             <Modal component={<TaskModal handleCloseButtonClick={handleCloseButtonClick} tagList={tagList} fetchTagList={fetchTagList} />} zIndex={1001} top="50%" left="50%" transform="translate(-50%, -50%)" handleDimmedClick={() => {}} />
-          )}        
+          )}
         </S.Grid>
       </S.LogContainer>
     </>
