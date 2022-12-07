@@ -63,6 +63,7 @@ io.on('connection', (socket) => {
       const diaryData = (await getDiary(roomName)) || {};
       diaryObjects[roomName] = diaryData;
     }
+    io.to(socket.id).emit('initReady');
   });
   socket.on('leaveCurrentRoom', async (destId, date) => {
     const roomName = destId + date;

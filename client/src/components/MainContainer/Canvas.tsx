@@ -1,4 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
+import { useRecoilValue } from 'recoil';
+import { visitState } from '../common/atoms';
+import useCurrentDate from '../../hooks/useCurrentDate';
 import globalSocket from '../common/Socket';
 import { DEFAULT_OBJECT_VALUE } from '../../constants';
 import { Shape, FabricText, FabricLine, ShapeType, FabricObject, ObjectData } from 'GlobalType';
@@ -9,6 +12,8 @@ import styled from 'styled-components';
 const Canvas = () => {
   const canvasRef = useRef<fabric.Canvas | null>(null);
   const colorRef = useRef<HTMLInputElement | null>(null);
+  const currentVisit = useRecoilValue(visitState);
+  const { currentDate, dateToString } = useCurrentDate();
   const canvasBackground = '/canvasBackground.png';
   const diaryObjects = new Map();
 
@@ -259,6 +264,11 @@ const Canvas = () => {
     globalSocket.emit('sendModifiedObject', objectData);
   };
 
+  const joinSocketRoom = () => {
+    const currentDateString = dateToString();
+    globalSocket.emit('joinToNewRoom', currentVisit.userId, currentDateString);
+  };
+
   const presentPresetObjects = (objectDataMap: ObjectData) => {
     Object.values(objectDataMap).forEach((objectData) => {
       updateModifiedObject(objectData);
@@ -275,8 +285,12 @@ const Canvas = () => {
       img.setCoords();
       if (!canvasRef.current) return;
       canvasRef.current.add(img);
-      globalSocket.emit('requestCurrentObjects');
+      joinSocketRoom();
     });
+  };
+
+  const requestInitObjects = () => {
+    globalSocket.emit('requestCurrentObjects');
   };
 
   useEffect(() => {
@@ -287,6 +301,7 @@ const Canvas = () => {
     globalSocket.on('offerCurrentObjects', presentPresetObjects);
     globalSocket.on('updateModifiedObject', updateModifiedObject);
     globalSocket.on('applyObjectRemoving', removeObject);
+    globalSocket.on('initReady', requestInitObjects);
     window.addEventListener('keydown', handleKeydown);
 
     return () => {
@@ -296,7 +311,9 @@ const Canvas = () => {
       globalSocket.off('offerCurrentObjects', presentPresetObjects);
       globalSocket.off('updateModifiedObject', updateModifiedObject);
       globalSocket.off('applyObjectRemoving', removeObject);
+      globalSocket.off('initReady', requestInitObjects);
       window.removeEventListener('keydown', handleKeydown);
+      globalSocket.emit('leaveCurrentRoom', currentVisit.userId, dateToString());
       canvasRef.current.clear();
     };
   });
