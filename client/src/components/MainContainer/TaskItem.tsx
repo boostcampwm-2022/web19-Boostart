@@ -179,10 +179,18 @@ const EmoticonList = ({ task, isMe }: { task: Task; isMe: boolean }) => {
         </S.EmoticonInput>
       )}
       <S.EmoticonContainer>
-        {emoticonSet.map((i) => (
+        {emoticonSet.map((i, index) => (
           <div key={i.idx}>
             {emoticonList.filter((el) => el.emoticon === i.emoticon).length > 1 && <S.Count> {emoticonList.filter((el) => el.emoticon === i.emoticon).length} </S.Count>}
-            <S.Emoticon> {i.emoticon}</S.Emoticon>
+            <S.Emoticon
+              authorName={`${emoticonList
+                .filter((el) => el.emoticon === i.emoticon)
+                .map((el_) => el_.authorName)
+                .join(',')}`}
+              index={index}
+            >
+              {i.emoticon}
+            </S.Emoticon>
           </div>
         ))}
       </S.EmoticonContainer>

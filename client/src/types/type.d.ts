@@ -116,7 +116,7 @@ declare module 'GlobalType' {
   interface Emoticon {
     idx: number;
     emoticon: string;
-    author_name: string;
+    authorName: string;
   }
 }
 

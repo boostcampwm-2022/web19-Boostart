@@ -170,7 +170,8 @@ export const TagWrap = styled.div`
   z-index: 5;
   min-width: fit-content;
   height: 31rem;
-  overflow: overlay;
+  overflow-x: hidden;
+  overflow-y: overlay;
 `;
 export const TagTitle = styled.div<{ color: string }>`
   width: 11rem;
@@ -193,7 +194,7 @@ export const TaskItem = styled.div<{
 }>`
   width: 12.5rem;
   min-height: 2.1rem;
-  max-height: 3rem;
+  max-height: 3.1rem;
   transition: min-height ${(props) => (props.cols < 3.6 ? '0.3s' : '0.4s')} ease-out;
 
   margin: 0.25rem 0.25rem;
@@ -355,8 +356,10 @@ export const LabelListItem = styled.div`
 
 export const EmoticonContainer = styled.div`
   display: flex;
+  position: relative;
 `;
-export const Emoticon = styled.div`
+
+export const Emoticon = styled.div<{ authorName: string; index: number }>`
   width: 29.5px;
   height: 36.5px;
   margin-right: 0.2px;
@@ -364,10 +367,32 @@ export const Emoticon = styled.div`
   background: url('/comment.svg');
   font-size: 1rem;
   background-size: contain;
-
-  justify-content: center;
   align-items: center;
-  position: relative;
+  justify-content: center;
+  transition: all 0.35s ease-in-out;
+
+  &:hover::after {
+    content: '${(props) => props.authorName}';
+    width: fit-content;
+    min-height: 17px;
+    background: rgb(170, 170, 170, 0.5);
+    padding: 0px 5px;
+    line-height: 13px;
+    font-size: 12px;
+    display: inline;
+
+    //right: calc(${(props) => 6 - props.index} * 30px + 3px);
+
+    border: 1px solid var(--color-gray5);
+    border-radius: 3px;
+    position: absolute;
+    text-align: left;
+
+    margin-left: ${(props) => (props.index > 3 ? '-30px' : '30px')};
+    margin-top: 60px;
+
+    color: white;
+  }
 `;
 
 export const Count = styled.div`
