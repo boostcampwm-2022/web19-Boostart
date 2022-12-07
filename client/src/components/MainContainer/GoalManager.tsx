@@ -245,7 +245,7 @@ const LabelModal = ({ handleCloseButtonClick }: LabelModalProps) => {
     setColor(color);
   };
 
-  const LabelSubmit = async (labelData: FieldValues) => {
+  const labelSubmit = async (labelData: FieldValues) => {
     try {
       await axios.post(`${HOST}/api/v1/label`, labelData);
       handleCloseButtonClick();
