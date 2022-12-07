@@ -60,7 +60,7 @@ const TaskModal = ({ handleCloseButtonClick, tagList, fetchTagList, currentTask 
     }),
     importance: yup.number().required(),
     isPublic: yup.bool(),
-    location: yup.string(),
+    location: yup.string().nullable(),
     lat: yup
       .number()
       .transform((value) => (isNaN(value) ? undefined : value))
@@ -127,6 +127,10 @@ const TaskModal = ({ handleCloseButtonClick, tagList, fetchTagList, currentTask 
       setValue('lat', lat);
       setValue('lng', lng);
       setValue('location', location);
+    } else {
+      setValue('lat', null);
+      setValue('lng', null);
+      setValue('location', null);
     }
 
     setValue('importance', importance);

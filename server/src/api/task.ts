@@ -363,6 +363,7 @@ router.delete('/:task_idx', authenticateToken, async (req: AuthorizedRequest, re
     if (notExistTask) return res.status(404).json({ msg: '존재하지 않는 태스크예요.' });
 
     await executeSql('delete from task_label where task_idx = ?', [taskIdx]);
+    await executeSql('delete from task_social_action where task_idx = ?', [taskIdx]);
     await executeSql('delete from task where user_idx = ? and idx = ?', [userIdx, taskIdx]);
     res.sendStatus(200);
   } catch (error) {
