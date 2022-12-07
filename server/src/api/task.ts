@@ -195,6 +195,8 @@ router.post('/', authenticateToken, async (req: AuthorizedRequest, res) => {
 
   const { title, date, importance, startedAt, endedAt, lat, lng, location, isPublic, tagIdx, content, done, labels } = req.body;
 
+  if (startedAt > endedAt) return res.sendStatus(400);
+
   try {
     if (labels.length > 0) {
       let labelCheckSql = 'select idx from label where user_idx = ? and ';
