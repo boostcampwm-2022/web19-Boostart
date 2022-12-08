@@ -349,60 +349,6 @@ const WaveContainer = ({ textContent, percentage }: WaveProps) => {
   );
 };
 
-const dummyGoals = [
-  {
-    idx: 1,
-    title: '커피 줄이기',
-    labelIdx: 1,
-    goalAmount: 2,
-    currentAmount: 4,
-    over: false,
-  },
-  {
-    idx: 2,
-    title: '잠좀자기',
-    labelIdx: 3,
-    goalAmount: 680,
-    currentAmount: 300,
-    over: true,
-  },
-  {
-    idx: 3,
-    title: '절약',
-    labelIdx: 2,
-    goalAmount: 2,
-    currentAmount: 1.2,
-    over: false,
-  },
-];
-
-const dummyLabels: Label[] = [
-  {
-    idx: 1,
-    title: '',
-    color: '',
-    unit: '',
-  },
-  {
-    idx: 2,
-    title: '커피',
-    color: '#4A6CC3',
-    unit: '잔',
-  },
-  {
-    idx: 3,
-    title: '지출',
-    color: '#D092E2',
-    unit: '만',
-  },
-  {
-    idx: 4,
-    title: '잠',
-    color: '#B9D58C',
-    unit: '분',
-  },
-];
-
 interface Goal {
   idx: number;
   title: string;
