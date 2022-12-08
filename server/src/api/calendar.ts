@@ -88,9 +88,9 @@ router.get('/goal', authenticateToken, async (req: AuthorizedRequest, res) => {
 
   const result = Array.from({ length: lastDay }, () => 0);
   try {
-    const taskLabelSql = 'select label_idx, amount from task_label inner join task on task_label.task_idx = task.idx where done = true and user_idx = ? and date like ?';
+    const taskLabelSql = 'select date, label_idx, amount from task_label inner join task on task_label.task_idx = task.idx where done = true and user_idx = ? and date like ?';
     const currentAmountSql = 'cast(ifnull(sum(task_label.amount), 0) as unsigned)';
-    const dailyRateSql = `select date, case when over then if(${currentAmountSql} / goal.amount > 1, 1, ${currentAmountSql} / goal.amount) when ${currentAmountSql} > goal.amount then 0 else 1 end as rate from goal left join (${taskLabelSql}) task_label on goal.label_idx = task_label.label_idx where user_idx = ? and date like ? group by idx`;
+    const dailyRateSql = `select goal.date, case when over then if(${currentAmountSql} / goal.amount > 1, 1, ${currentAmountSql} / goal.amount) when ${currentAmountSql} > goal.amount then 0 else 1 end as rate from goal left join (${taskLabelSql}) task_label on goal.label_idx = task_label.label_idx and goal.date = task_label.date where user_idx = ? and goal.date like ? group by idx, date`;
 
     const dailyAverageRate = (await executeSql(`select date_format(date, "%d") as date, avg(rate) as averageRate from (${dailyRateSql}) daily_rate group by date`, [userIdx, dateSearchFormat, userIdx, dateSearchFormat])) as RowDataPacket;
     dailyAverageRate.forEach(({ date, averageRate }) => {
