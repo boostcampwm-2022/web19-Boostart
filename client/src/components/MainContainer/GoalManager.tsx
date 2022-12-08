@@ -159,7 +159,7 @@ const GoalModal = ({ isLabelModalOpen, setIsLabelModalOpen, handleCloseButtonCli
   const setValues = () => {
     setValue('date', dateToString());
     if (typeof selectedLabelIndex === 'number') setValue('labelIdx', selectedLabelIndex);
-    if (over) setValue('over', over);
+    if (over !== undefined) setValue('over', over);
   };
 
   useEffect(() => {
