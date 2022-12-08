@@ -5,6 +5,7 @@ import { FRIEND_REQUEST_ACTION, HOST } from '../../constants';
 import Modal from '../common/Modal';
 import { Friend } from 'GlobalType';
 import * as S from './Drawer.style';
+import useInput from '../../hooks/useInput';
 
 interface DrawerProps {
   isOpen: boolean;
@@ -49,29 +50,55 @@ const Drawer = ({ isOpen, myProfile, friendRequests, handleFriendRequests, handl
         </S.LogoutButton>
       </S.Drawer>
       {isProfileEditModalOpen && (
-        <Modal component={<ProfileEditForm />} top={PROFILE_EDIT_FORM_TOP} left={PROFILE_EDIT_FORM_LEFT} transform={PROFILE_EDIT_FORM_TRANFORM} zIndex={PROFILE_EDIT_FORM_Z_INDEX} handleDimmedClick={() => setIsProfileEditModalOpen(false)} />
+        <Modal
+          component={<ProfileEditForm myProfile={myProfile!} />}
+          top={PROFILE_EDIT_FORM_TOP}
+          left={PROFILE_EDIT_FORM_LEFT}
+          transform={PROFILE_EDIT_FORM_TRANFORM}
+          zIndex={PROFILE_EDIT_FORM_Z_INDEX}
+          handleDimmedClick={() => setIsProfileEditModalOpen(false)}
+        />
       )}
     </>
   );
 };
 
-const ProfileEditForm = () => {
+const ProfileEditForm = ({ myProfile }: { myProfile: Friend }) => {
+  //api 연결
+  const [profileImg, setProfileImg] = useState<File | null>(null);
+  const [username, onUsernameChange, setUsername] = useInput(myProfile.username);
+
+  const handleProfileImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files.length > 0) {
+      setProfileImg(e.target.files[0]);
+    }
+  };
+
+  const postProfileChange = () => {
+    const formData = new FormData();
+    formData.append('username', username);
+    if (profileImg) formData.append('profileImg', profileImg);
+    //axios
+  };
+
   return (
-    <S.ProfileEditForm>
-      <S.ProfileSection horizonPadding="2rem">
-        <S.Profile>
-          <S.ProfileImage padding="2rem" size="10rem" src="https://avatars.githubusercontent.com/u/55306894?s=80&u=aedb7854f1fd10d8eb6dc1272f1583dbb255f5b8&v=4" />
-          <S.ProfileInfo height="3.5rem" marginTop="-2rem">
-            <S.SizedText fontSize="1.5rem">
-              <S.Username>모작</S.Username>님
-              <S.PencilIcon />
-            </S.SizedText>
-            <S.UserId>@mojac</S.UserId>
-          </S.ProfileInfo>
-        </S.Profile>
-      </S.ProfileSection>
-      <S.ProfileMessageSection>안녕하세요</S.ProfileMessageSection>
-      <S.ProfileEditApplyButton>적용</S.ProfileEditApplyButton>
+    <S.ProfileEditForm onSubmit={postProfileChange}>
+      <S.Profile>
+        <S.ProfileImageForm>
+          <img src={profileImg ? URL.createObjectURL(profileImg) : `${HOST}/${myProfile.profileImg}`} alt="profile-img" />
+          <S.EditRound>
+            <input type="file" onChange={handleProfileImageChange} />
+            <S.EditIcon />
+          </S.EditRound>
+        </S.ProfileImageForm>
+        <S.ProfileInfo height="3.5rem" marginTop="-2rem">
+          <S.SizedText fontSize="14px">
+            <S.InputBar placeholder="NICKNAME" value={username} onChange={onUsernameChange} /> 님
+          </S.SizedText>
+          <S.UserId>@{myProfile.userId}</S.UserId>
+        </S.ProfileInfo>
+      </S.Profile>
+      <S.ProfileEditApplyButton isDone={true}>PROFILE CHANGE</S.ProfileEditApplyButton>
     </S.ProfileEditForm>
   );
 };

@@ -1,3 +1,4 @@
+import { BsFillCameraFill } from 'react-icons/bs';
 import styled from 'styled-components';
 
 // 최상위 레이아웃
@@ -55,12 +56,15 @@ export const Username = styled.span`
 `;
 
 export const UserId = styled.span`
-  color: #707070;
-  font-size: 0.9rem;
+  color: var(--color-gray6);
+  font-size: 1rem;
+  line-height: 3rem;
 `;
 
 export const SizedText = styled.span<{ fontSize: string }>`
   font-size: ${(props) => props.fontSize};
+  display: flex;
+  align-items: center;
 `;
 
 export const ProfileImage = styled.img<{ size?: string; padding?: string }>`
@@ -83,8 +87,8 @@ export const ProfileEditButton = styled.a`
   margin-left: auto;
 `;
 
-const PROFILE_EDIT_FORM_WIDTH = '40rem';
-const PROFILE_EDIT_FORM_HEIGHT = '30rem';
+const PROFILE_EDIT_FORM_WIDTH = '35rem';
+const PROFILE_EDIT_FORM_HEIGHT = '20rem';
 export const PROFILE_EDIT_FORM_Z_INDEX = 1001;
 export const PROFILE_EDIT_FORM_TOP = '50%';
 export const PROFILE_EDIT_FORM_LEFT = '50%';
@@ -95,7 +99,9 @@ export const ProfileEditForm = styled.div`
   background-color: white;
   width: ${PROFILE_EDIT_FORM_WIDTH};
   height: ${PROFILE_EDIT_FORM_HEIGHT};
-  border-radius: 20px;
+  border-radius: 30px;
+  justify-content: center;
+  align-items: center;
 `;
 
 export const ProfileMessageSection = styled.div`
@@ -106,12 +112,77 @@ export const ProfileMessageSection = styled.div`
   margin: 0 3rem;
 `;
 
-export const ProfileEditApplyButton = styled.div`
-  margin-top: auto;
-  margin-left: auto;
-  padding: 2rem;
-  padding-right: 3rem;
-  color: #bbbbbb;
+export const ProfileImageForm = styled.div`
+  width: 140px;
+  position: relative;
+  margin: auto;
+  img {
+    border: 6px solid var(--color-gray1);
+    height: 10rem;
+    width: 10rem;
+    object-fit: cover;
+    border-radius: 10rem;
+  }
+  margin: 30px 80px 30px 30px;
+`;
+
+export const EditRound = styled.div`
+  position: absolute;
+  bottom: 10px;
+  right: -30px;
+  background: var(--color-main);
+  width: 2.6rem;
+  height: 2.6rem;
+  border-radius: 3rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  input[type='file'] {
+    position: absolute;
+    transform: scale(2);
+    opacity: 0;
+    cursor: pointer;
+  }
+`;
+
+export const EditIcon = styled(BsFillCameraFill)`
+  width: 1.4rem;
+  height: 1.4rem;
+  display: block;
+  color: white;
+`;
+
+export const InputBar = styled.input`
+  background: var(--color-gray0);
+  border: 1px solid var(--color-gray3);
+  border-radius: 8px;
+  color: black;
+  width: 10rem;
+  margin: 5px 10px 5px 0px;
+  height: 2.3rem;
+  border-radius: 0.5rem;
+  font-size: 1rem;
+  padding-left: 1rem;
+
+  ::placeholder {
+    font-size: 0.8rem;
+    color: #a3a3a3;
+  }
+`;
+
+export const ProfileEditApplyButton = styled.div<{ isDone: boolean }>`
+  width: 18.5rem;
+  height: 2rem;
+  border: none;
+  border-radius: 1rem;
+  color: white;
+  font-family: 'Press Start 2P', cursive;
+  font-size: 0.875rem;
+  text-align: center;
+  line-height: 2rem;
+  margin-bottom: 30px;
+  cursor: pointer;
+  background: ${(props) => (props.isDone ? 'var(--color-gray3)' : 'var(--color-main)')};
 `;
 
 // 프로필 영역
