@@ -267,7 +267,7 @@ const Canvas = () => {
 
   const joinSocketRoom = () => {
     const currentDateString = dateToString();
-    globalSocket.emit('joinToNewRoom', currentVisit.userId, currentDateString);
+    socket.emit('joinToNewRoom', currentVisit.userId, currentDateString);
   };
 
   const presentPresetObjects = (objectDataMap: ObjectData) => {
@@ -292,7 +292,7 @@ const Canvas = () => {
   };
 
   const requestInitObjects = () => {
-    globalSocket.emit('requestCurrentObjects');
+    socket.emit('requestCurrentObjects');
   };
 
   useEffect(() => {
@@ -315,7 +315,7 @@ const Canvas = () => {
       socket.off('applyObjectRemoving', removeObject);
       socket.off('initReady', requestInitObjects);
       window.removeEventListener('keydown', handleKeydown);
-      globalSocket.emit('leaveCurrentRoom', currentVisit.userId, dateToString());
+      socket.emit('leaveCurrentRoom', currentVisit.userId, dateToString());
       canvasRef.current.clear();
     };
   });
