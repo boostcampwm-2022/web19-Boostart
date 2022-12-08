@@ -5,15 +5,17 @@ import { HOST } from '../../constants';
 import * as S from './Log.style';
 import { visitState } from '../common/atoms';
 import { useRecoilState } from 'recoil';
+import TaskModal from '../TaskModal/TaskModal';
 
 interface taskListProps {
   taskList: Task[];
   activeTask: number | null;
   completionFilter: CompletionCheckBoxStatus;
   fetchTaskList: () => Promise<void>;
+  setIsEditModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-const TaskList = ({ taskList, activeTask, completionFilter, fetchTaskList }: taskListProps) => {
+const TaskList = ({ taskList, activeTask, completionFilter, fetchTaskList, setIsEditModalOpen }: taskListProps) => {
   const [currentVisit, setCurrentVisit] = useRecoilState(visitState);
 
   const isTaskFiltered = (done: boolean) => {
@@ -53,6 +55,10 @@ const TaskList = ({ taskList, activeTask, completionFilter, fetchTaskList }: tas
     return count;
   };
 
+  const taskChange = (task: Task) => {
+    setIsEditModalOpen(true);
+    //modal...
+  };
   const DetailInfo = ({ task }: { task: Task }) => {
     return (
       <>
@@ -87,7 +93,7 @@ const TaskList = ({ taskList, activeTask, completionFilter, fetchTaskList }: tas
             <S.TaskDetailInfos flex="row">
               {task.labels.map((label) => {
                 return (
-                  <S.LabelListItem key={label.title} color={label.color}>
+                  <S.LabelListItem key={label.labelIdx} color={label.color}>
                     {label.title} {label.amount} {label.unit}
                   </S.LabelListItem>
                 );
@@ -107,7 +113,7 @@ const TaskList = ({ taskList, activeTask, completionFilter, fetchTaskList }: tas
                   완료
                 </S.TaskDetailIcon>
 
-                <S.TaskDetailIcon>
+                <S.TaskDetailIcon onClick={(e) => taskChange(task)}>
                   <S.EditIcon />
                   수정
                 </S.TaskDetailIcon>

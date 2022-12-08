@@ -118,9 +118,11 @@ const Log = () => {
     }
   };
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState<boolean>(false);
 
   const handleCloseButtonClick = () => {
     setIsModalOpen(false);
+    setIsEditModalOpen(false);
     fetch();
   };
 
@@ -218,7 +220,7 @@ const Log = () => {
                     <S.TagTitle color={tag.color} data-tag={tag.idx}>
                       #{tag.title}
                     </S.TagTitle>
-                    <TaskList taskList={getFilteredTaskListbyTag(tag.idx)} activeTask={activeTask} completionFilter={completionCheckBoxStatus} fetchTaskList={fetchTaskList} />
+                    <TaskList taskList={getFilteredTaskListbyTag(tag.idx)} activeTask={activeTask} completionFilter={completionCheckBoxStatus} fetchTaskList={fetchTaskList} setIsEditModalOpen={setIsEditModalOpen} />
                   </S.TagWrap>
                 );
             })}
@@ -226,7 +228,24 @@ const Log = () => {
           </S.LogMainSection>
           {currentVisit.isMe && <S.NewTaskButton onClick={() => setIsModalOpen(true)} />}
           {isModalOpen && (
-            <Modal component={<TaskModal handleCloseButtonClick={handleCloseButtonClick} tagList={tagList} fetchTagList={fetchTagList} />} zIndex={1001} top="50%" left="50%" transform="translate(-50%, -50%)" handleDimmedClick={() => {}} />
+            <Modal
+              component={<TaskModal handleCloseButtonClick={handleCloseButtonClick} tagList={tagList} fetchTagList={fetchTagList} currentTask={null} />}
+              zIndex={1001}
+              top="50%"
+              left="50%"
+              transform="translate(-50%, -50%)"
+              handleDimmedClick={() => {}}
+            />
+          )}
+          {isEditModalOpen && (
+            <Modal
+              component={<TaskModal handleCloseButtonClick={handleCloseButtonClick} tagList={tagList} fetchTagList={fetchTagList} currentTask={taskList.find((el) => el.idx === activeTask)!} />}
+              zIndex={1001}
+              top="50%"
+              left="50%"
+              transform="translate(-50%, -50%)"
+              handleDimmedClick={() => {}}
+            />
           )}
         </S.Grid>
       </S.LogContainer>
