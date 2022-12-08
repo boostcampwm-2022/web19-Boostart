@@ -18,6 +18,7 @@ export const Map = () => {
   const mapRef = useRef<HTMLDivElement | null>(null);
   const kakaoMapRef = useRef<any>(null);
   const boundRef = useRef<any>(null);
+  const imageSrc = '/mapMarkerPurple.png';
 
   const fetchTaskList = async () => {
     const date = dateToString();
@@ -25,6 +26,23 @@ export const Map = () => {
     const tasks: Task[] = response.data;
     const validTasks = tasks.filter(({ lat }) => lat);
     setTaskList(validTasks);
+  };
+
+  const focusAllTasks = () => {
+    taskList.forEach(({ title, lat, lng }) => {
+      const imageSize = new kakao.maps.Size(35, 35);
+      const markerImage = new kakao.maps.MarkerImage(imageSrc, imageSize);
+      const markerPosition = new kakao.maps.LatLng(lat, lng);
+      const marker = new kakao.maps.Marker({
+        map: kakaoMapRef.current,
+        position: markerPosition,
+        title: title,
+        image: markerImage,
+      });
+      setMarkers((markers) => [...markers, marker]);
+      boundRef.current.extend(markerPosition);
+    });
+    kakaoMapRef.current.setBounds(boundRef.current);
   };
 
   useEffect(() => {
@@ -53,25 +71,35 @@ export const Map = () => {
       setIsTaskNull(true);
       return;
     }
-    const imageSrc = '/mapMarkerPurple.png';
-    taskList.forEach(({ title, lat, lng }) => {
-      const imageSize = new kakao.maps.Size(35, 35);
-      const markerImage = new kakao.maps.MarkerImage(imageSrc, imageSize);
-      const markerPosition = new kakao.maps.LatLng(lat, lng);
-      const marker = new kakao.maps.Marker({
-        map: kakaoMapRef.current,
-        position: markerPosition,
-        title: title,
-        image: markerImage,
-      });
-      setMarkers((markers) => [...markers, marker]);
-      boundRef.current.extend(markerPosition);
-    });
-    kakaoMapRef.current.setBounds(boundRef.current);
+    setIsTaskNull(false);
+    focusAllTasks();
     return () => {
       boundRef.current = new kakao.maps.LatLngBounds();
     };
   }, [taskList]);
+
+  const ValidTaskList = () => {
+    const focusSelectedTask = (lat: number, lng: number) => {
+      const focusPosition = new kakao.maps.LatLng(lat, lng);
+      kakaoMapRef.current.setCenter(focusPosition);
+      kakaoMapRef.current.setLevel(3);
+    };
+    return (
+      <TaskListOnMap>
+        <TaskListTitleOnMap>Task 목록</TaskListTitleOnMap>
+        {taskList &&
+          taskList.map(({ title, lat, lng, tagName }) => {
+            return (
+              <TaskItemOnMap onClick={() => focusSelectedTask(lat, lng)}>
+                <span>{title}</span>
+                <span>#{tagName}</span>
+              </TaskItemOnMap>
+            );
+          })}
+        <TaskItemOnMap onClick={() => focusAllTasks()}>전체보기</TaskItemOnMap>
+      </TaskListOnMap>
+    );
+  };
 
   return (
     <>
@@ -80,9 +108,7 @@ export const Map = () => {
         <DateSelector />
         <KakaoContainer>
           <div ref={mapRef} style={{ width: '41rem', height: '31rem' }}></div>
-          {/* {taskList.length > 0 && <TaskListOnMap>
-            taskList.map(({}))
-            </TaskListOnMap>} */}
+          {taskList.length > 0 && <ValidTaskList />}
           {isTaskNull && <TaskAlertBox>위치정보가 있는 Task를 추가해주세요</TaskAlertBox>}
         </KakaoContainer>
       </MapContainer>
@@ -94,17 +120,40 @@ export default Map;
 
 const TaskListOnMap = styled.div`
   width: 10rem;
+  max-height: 80%;
   display: flex;
   position: absolute;
-  top: 0;
+  border-radius: 1rem;
+  top: 50%;
   left: 0;
+  transform: translate(0, -50%);
   flex-direction: column;
-  background: rgba(255, 255, 255, 0.7);
-  gap: 0.5rem;
+  background: rgba(255, 255, 255, 0.8);
+  gap: 0.25rem;
+  overflow: scroll;
   z-index: 600;
+  cursor: pointer;
 `;
 
-const TaskItemOnMap = styled.div``;
+const TaskListTitleOnMap = styled.div`
+  height: 2rem;
+  line-height: 2rem;
+  text-align: center;
+  font-weight: 700;
+`;
+
+const TaskItemOnMap = styled.div`
+  width: 100%;
+  height: 3.5rem;
+  padding: 0 1.5rem;
+  border-top: 1px solid var(--color-gray5);
+  font-family: 'Noto Sans KR';
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  box-sizing: border-box;
+`;
 
 const MapTitle = styled.span`
   display: inline-block;
