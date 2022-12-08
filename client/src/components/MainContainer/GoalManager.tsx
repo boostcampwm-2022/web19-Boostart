@@ -10,11 +10,13 @@ import { FieldValues, useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
 import useCurrentDate from '../../hooks/useCurrentDate';
+import { visitState } from '../common/atoms';
+import { useRecoilValue } from 'recoil';
 
 const labelMap = new Map<number, Label>();
 
-const httpGetGoalList = async (dateString: string) => {
-  const response = await axios.get(`${HOST}/api/v1/goal?date=${dateString}`);
+const httpGetGoalList = async (userId: string, dateString: string) => {
+  const response = await axios.get(`${HOST}/api/v1/goal/${userId}?date=${dateString}`);
   const goalList = response.data;
   return goalList;
 };
@@ -24,9 +26,9 @@ const httpPostGoal = async (body: FieldValues) => {
   return response;
 };
 
-const httpGetLabelList = async () => {
+const httpGetLabelList = async (userId: string = '') => {
   // TODO: 전역 상태로 분리 고려
-  const response = await axios.get(`${HOST}/api/v1/label`);
+  const response = await axios.get(`${HOST}/api/v1/label/${userId}`);
   const labelList = response.data;
   return labelList;
 };
@@ -53,10 +55,11 @@ const GoalManager = () => {
   const [isLabelModalOpen, setIsLabelModalOpen] = useState(false);
   const { currentDate, dateToString } = useCurrentDate();
   const [goalList, setGoalList] = useState<Goal[]>([]);
+  const currentVisit = useRecoilValue(visitState);
 
   const fetchLabelMap = async () => {
     try {
-      const labelList = await httpGetLabelList();
+      const labelList = await httpGetLabelList(currentVisit.userId);
       labelList.forEach((label: Label) => {
         labelMap.set(label.idx, label);
       });
@@ -67,19 +70,17 @@ const GoalManager = () => {
 
   const fetchGoalList = async () => {
     try {
-      httpGetGoalList(dateToString()).then(setGoalList);
+      httpGetGoalList(currentVisit.userId, dateToString()).then(setGoalList);
     } catch (error) {
       console.log(error);
     }
   };
 
   useEffect(() => {
-    try {
-      fetchLabelMap();
-    } catch (error) {
-      console.log(error);
-    }
-  }, []);
+    fetchLabelMap().then(() => {
+      fetchGoalList();
+    });
+  }, [currentVisit]);
 
   useEffect(() => {
     fetchGoalList();
