@@ -106,8 +106,8 @@ const httpDeleteLabel = async (idx: number) => {
   return response;
 };
 
-const httpPatchLabel = async ({ title, color }: { title?: string; color?: string }) => {
-  const response = await axios.post(`${HOST}/api/v1/label/color`, { title, color });
+const httpPatchLabel = async (idx: number, { title, color }: { title?: string; color?: string }) => {
+  const response = await axios.patch(`${HOST}/api/v1/label/${idx}`, { title, color });
   return response;
 };
 
@@ -209,8 +209,14 @@ const GoalModal = ({ isLabelModalOpen, setIsLabelModalOpen, handleCloseButtonCli
   };
 
   const handleColorInputBlur = async () => {
+    if (!selectedLabelIndex) return;
+    if (!color) return;
     try {
-      httpPatchLabel({ color });
+      httpPatchLabel(selectedLabelIndex, { color });
+      const label = labelList.find((label) => label.idx === selectedLabelIndex);
+      if (!label) return;
+      label.color = color;
+      setLabelList([...labelList]);
     } catch (error) {
       console.log(error);
     }
@@ -318,7 +324,7 @@ const LabelModal = ({ handleCloseButtonClick }: LabelModalProps) => {
         <S.VertialRule />
         <S.LabelModalLabelColorInput value={color} type="color" {...register('color')} onChange={handleLabelColorChange} />
       </S.LabelModalLabel>
-      <S.LabelModalLabelCreateButton>ADD LABEL</S.LabelModalLabelCreateButton>
+      <S.LabelModalLabelCreateButton>ADD LABEL!</S.LabelModalLabelCreateButton>
     </S.LabelModal>
   );
 };
