@@ -1,15 +1,16 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { useRecoilValue } from 'recoil';
+import { useRecoilValue, useRecoilState } from 'recoil';
 import styled from 'styled-components';
 import axios from 'axios';
 import DateSelector from './DateSelector';
-import { HOST } from '../../constants';
+import { HOST, Menus } from '../../constants';
 import useCurrentDate from '../../hooks/useCurrentDate';
-import { visitState } from '../common/atoms';
+import { visitState, menuState } from '../common/atoms';
 import { Task } from 'GlobalType';
 const { kakao } = window;
 
 export const Map = () => {
+  const [currentMenu, setCurrentMenu] = useRecoilState(menuState);
   const { currentDate, dateToString } = useCurrentDate();
   const [taskList, setTaskList] = useState<Task[]>([]);
   const [markers, setMarkers] = useState<any[]>([]);
@@ -46,6 +47,7 @@ export const Map = () => {
   };
 
   useEffect(() => {
+    setCurrentMenu('MAP');
     const options = {
       center: new kakao.maps.LatLng(37.566535, 126.97796919),
       level: 5,
