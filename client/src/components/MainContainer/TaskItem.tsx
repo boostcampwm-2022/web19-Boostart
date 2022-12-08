@@ -135,7 +135,7 @@ const TaskList = ({ taskList, activeTask, completionFilter, fetchTaskList, setIs
       {taskList.map((task: Task) => {
         return (
           !isTaskFiltered(task.done) && (
-            <>
+            <div key={task.idx}>
               <S.TaskItem key={'task' + task.idx} data-idx={task.idx} data-tag={task.tagIdx} data-active={task.idx === activeTask} done={Number(task.done)} cols={CalcHeight(task)}>
                 <S.TaskMainInfos>
                   <S.TaskTime>{task.startedAt}</S.TaskTime>
@@ -145,7 +145,7 @@ const TaskList = ({ taskList, activeTask, completionFilter, fetchTaskList, setIs
                 {task.idx === activeTask && <DetailInfo task={task} />}
               </S.TaskItem>
               {task.idx === activeTask && <EmoticonList key={task.idx} task={task} isMe={currentVisit.isMe} />}
-            </>
+            </div>
           )
         );
       })}
@@ -191,7 +191,9 @@ const EmoticonList = ({ task, isMe }: { task: Task; isMe: boolean }) => {
       {!isMe && (
         <S.EmoticonInput>
           {emoticonSample.map((el, index) => (
-            <span onClick={(e) => postEmoticon(index)}>{el}</span>
+            <span key={index} onClick={(e) => postEmoticon(index)}>
+              {el}
+            </span>
           ))}
         </S.EmoticonInput>
       )}

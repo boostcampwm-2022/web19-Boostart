@@ -10,6 +10,8 @@ import { FieldValues, useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
 import useCurrentDate from '../../hooks/useCurrentDate';
+import { menuState } from '../common/atoms';
+import { useRecoilState } from 'recoil';
 
 const httpGetGoalList = async (dateString: string) => {
   const response = await axios.get(`${HOST}/api/v1/goal?date=${dateString}`);
@@ -29,6 +31,8 @@ const GoalManager = () => {
   const [isLabelModalOpen, setIsLabelModalOpen] = useState(false);
   const { currentDate, dateToString } = useCurrentDate();
   const [goalList, setGoalList] = useState<Goal[]>([]);
+
+  const [currentMenu, setCurrentMenu] = useRecoilState(menuState);
 
   const fetchLabelMap = async () => {
     try {
@@ -68,6 +72,10 @@ const GoalManager = () => {
   const handleCloseButtonClick = () => {
     setIsGoalModalOpen(false);
   };
+
+  useEffect(() => {
+    setCurrentMenu('GOAL');
+  }, []);
 
   return (
     <>

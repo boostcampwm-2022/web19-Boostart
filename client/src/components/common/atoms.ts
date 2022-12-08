@@ -8,3 +8,7 @@ export const visitState = atom({
   key: 'currentVisiting',
   default: { userId: '', isMe: true },
 });
+export const menuState = atom({
+  key: 'currentMenu',
+  default: 'LOG',
+});

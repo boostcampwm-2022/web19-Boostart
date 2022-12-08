@@ -9,7 +9,7 @@ import useCurrentDate from '../../hooks/useCurrentDate';
 import Modal from '../common/Modal';
 import TaskModal from '../TaskModal/TaskModal';
 import { useRecoilState } from 'recoil';
-import { visitState } from '../common/atoms';
+import { menuState, visitState } from '../common/atoms';
 
 interface Tag {
   idx: number;
@@ -179,6 +179,11 @@ const Log = () => {
     };
   });
 
+  const [currentMenu, setCurrentMenu] = useRecoilState(menuState);
+
+  useEffect(() => {
+    setCurrentMenu('LOG');
+  }, []);
   return (
     <>
       {selectedTask !== null && (
