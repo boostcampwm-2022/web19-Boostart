@@ -11,17 +11,41 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
 import useCurrentDate from '../../hooks/useCurrentDate';
 
+const labelMap = new Map<number, Label>();
+
 const httpGetGoalList = async (dateString: string) => {
   const response = await axios.get(`${HOST}/api/v1/goal?date=${dateString}`);
   const goalList = response.data;
   return goalList;
 };
 
-const labelMap = new Map<number, Label>();
-
 const httpPostGoal = async (body: FieldValues) => {
   const response = await axios.post(`${HOST}/api/v1/goal`, body);
   return response;
+};
+
+const httpGetLabelList = async () => {
+  // TODO: 전역 상태로 분리 고려
+  const response = await axios.get(`${HOST}/api/v1/label`);
+  const labelList = response.data;
+  return labelList;
+};
+
+const httpDeleteLabel = async (idx: number) => {
+  const response = await axios.delete(`${HOST}/api/v1/label/${idx}`);
+  return response;
+};
+
+const httpPatchLabel = async (idx: number, { title, color }: { title?: string; color?: string }) => {
+  const response = await axios.patch(`${HOST}/api/v1/label/${idx}`, { title, color });
+  return response;
+};
+
+const generateRandomHexColor = () => {
+  const R = Math.floor(Math.random() * 127 + 128).toString(16);
+  const G = Math.floor(Math.random() * 127 + 128).toString(16);
+  const B = Math.floor(Math.random() * 127 + 128).toString(16);
+  return `#${[R, G, B].join('')}`;
 };
 
 const GoalManager = () => {
@@ -92,23 +116,6 @@ const GoalManager = () => {
       )}
     </>
   );
-};
-
-const httpGetLabelList = async () => {
-  // TODO: 전역 상태로 분리 고려
-  const response = await axios.get(`${HOST}/api/v1/label`);
-  const labelList = response.data;
-  return labelList;
-};
-
-const httpDeleteLabel = async (idx: number) => {
-  const response = await axios.delete(`${HOST}/api/v1/label/${idx}`);
-  return response;
-};
-
-const httpPatchLabel = async (idx: number, { title, color }: { title?: string; color?: string }) => {
-  const response = await axios.patch(`${HOST}/api/v1/label/${idx}`, { title, color });
-  return response;
 };
 
 const GOAL_MODAL_Z_INDEX = 1000;
@@ -268,16 +275,10 @@ const GoalModal = ({ isLabelModalOpen, setIsLabelModalOpen, handleCloseButtonCli
 
 const LABEL_MODAL_Z_INDEX = 1002;
 
-const generateRandomHexColor = () => {
-  const R = Math.floor(Math.random() * 127 + 128).toString(16);
-  const G = Math.floor(Math.random() * 127 + 128).toString(16);
-  const B = Math.floor(Math.random() * 127 + 128).toString(16);
-  return `#${[R, G, B].join('')}`;
-};
-
 interface LabelModalProps {
   handleCloseButtonClick: () => void;
 }
+
 const LabelModal = ({ handleCloseButtonClick }: LabelModalProps) => {
   const schema = yup.object().shape({
     title: yup.string().required(),
