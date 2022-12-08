@@ -133,3 +133,7 @@ interface ModalProps {
   dimmedBorderRadius?: string;
   handleDimmedClick: React.MouseEventHandler;
 }
+
+interface Window {
+  kakao: any;
+}

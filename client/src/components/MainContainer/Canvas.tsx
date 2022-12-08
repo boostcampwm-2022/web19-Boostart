@@ -270,6 +270,7 @@ const Canvas = () => {
   };
 
   const presentPresetObjects = (objectDataMap: ObjectData) => {
+    if (!objectDataMap) return;
     Object.values(objectDataMap).forEach((objectData) => {
       updateModifiedObject(objectData);
     });
