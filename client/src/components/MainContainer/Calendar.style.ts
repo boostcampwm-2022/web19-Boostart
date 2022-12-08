@@ -8,7 +8,7 @@ export const CalendarTitle = styled.span`
   font-size: 1.7rem;
   font-family: 'Press Start 2P', cursive;
   transform: translate(1.75rem, 0.43rem);
-  z-index: -1;
+  z-index: 1;
 `;
 export const CalendarContainer = styled.div`
   width: 100%;
