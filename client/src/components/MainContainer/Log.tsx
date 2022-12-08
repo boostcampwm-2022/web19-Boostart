@@ -9,7 +9,7 @@ import useCurrentDate from '../../hooks/useCurrentDate';
 import Modal from '../common/Modal';
 import TaskModal from '../TaskModal/TaskModal';
 import { useRecoilState } from 'recoil';
-import { visitState } from '../common/atoms';
+import { menuState, visitState } from '../common/atoms';
 
 interface Tag {
   idx: number;
@@ -73,6 +73,7 @@ const Log = () => {
   }, [currentDate, currentVisit]);
 
   const handleMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (!currentVisit.isMe) return;
     if (!(e.target instanceof HTMLDivElement)) return;
     const target = e.target;
     if (!target.dataset.idx) return;
@@ -102,8 +103,6 @@ const Log = () => {
   };
 
   const handleTagWrapClick = (e: React.MouseEvent<HTMLDivElement>) => {
-    e.stopPropagation();
-
     if (!(e.target instanceof HTMLDivElement)) return;
     const target = e.target;
     const activeTaskIdx = target.dataset.idx;
@@ -119,9 +118,11 @@ const Log = () => {
     }
   };
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState<boolean>(false);
 
   const handleCloseButtonClick = () => {
     setIsModalOpen(false);
+    setIsEditModalOpen(false);
     fetch();
   };
 
@@ -178,6 +179,11 @@ const Log = () => {
     };
   });
 
+  const [currentMenu, setCurrentMenu] = useRecoilState(menuState);
+
+  useEffect(() => {
+    setCurrentMenu('LOG');
+  }, []);
   return (
     <>
       {selectedTask !== null && (
@@ -219,7 +225,7 @@ const Log = () => {
                     <S.TagTitle color={tag.color} data-tag={tag.idx}>
                       #{tag.title}
                     </S.TagTitle>
-                    <TaskList taskList={getFilteredTaskListbyTag(tag.idx)} activeTask={activeTask} completionFilter={completionCheckBoxStatus} fetchTaskList={fetchTaskList} />
+                    <TaskList taskList={getFilteredTaskListbyTag(tag.idx)} activeTask={activeTask} completionFilter={completionCheckBoxStatus} fetchTaskList={fetchTaskList} setIsEditModalOpen={setIsEditModalOpen} />
                   </S.TagWrap>
                 );
             })}
@@ -227,8 +233,25 @@ const Log = () => {
           </S.LogMainSection>
           {currentVisit.isMe && <S.NewTaskButton onClick={() => setIsModalOpen(true)} />}
           {isModalOpen && (
-            <Modal component={<TaskModal handleCloseButtonClick={handleCloseButtonClick} tagList={tagList} fetchTagList={fetchTagList} />} zIndex={1001} top="50%" left="50%" transform="translate(-50%, -50%)" handleDimmedClick={() => {}} />
-          )}        
+            <Modal
+              component={<TaskModal handleCloseButtonClick={handleCloseButtonClick} tagList={tagList} fetchTagList={fetchTagList} currentTask={null} />}
+              zIndex={1001}
+              top="50%"
+              left="50%"
+              transform="translate(-50%, -50%)"
+              handleDimmedClick={() => {}}
+            />
+          )}
+          {isEditModalOpen && (
+            <Modal
+              component={<TaskModal handleCloseButtonClick={handleCloseButtonClick} tagList={tagList} fetchTagList={fetchTagList} currentTask={taskList.find((el) => el.idx === activeTask)!} />}
+              zIndex={1001}
+              top="50%"
+              left="50%"
+              transform="translate(-50%, -50%)"
+              handleDimmedClick={() => {}}
+            />
+          )}
         </S.Grid>
       </S.LogContainer>
     </>

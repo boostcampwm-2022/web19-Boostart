@@ -45,7 +45,7 @@ export const ProfileBox = styled.div<{
 `;
 
 export const FriendMenuModal = styled.div`
-  height: 3.5rem;
+  height: 4rem;
   display: flex;
   flex-direction: column;
   justify-content: space-evenly;
@@ -85,7 +85,7 @@ export const FriendMenuModal = styled.div`
 
 export const FriendMenuModalItem = styled.div`
   color: var(--color-main);
-  font-size: 0.75rem;
+  font-size: 1rem;
   cursor: pointer;
   &:hover {
     font-weight: 700;
@@ -94,22 +94,22 @@ export const FriendMenuModalItem = styled.div`
 `;
 
 export const DoubleCheckContainer = styled.div`
-width: 31rem;
-height:13rem;
-border-radius: 2rem;
-background: white;
-display: flex;
-flex-direction: column;
-align-items: center;
-justify-content: center;
-gap:2rem;
-user-select: none;
-& span{
-  color: var(--color-main);
-  font-size: 1.25rem;
-  font-weight: 700;
-}
-`
+  width: 31rem;
+  height: 13rem;
+  border-radius: 2rem;
+  background: white;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2rem;
+  user-select: none;
+  & span {
+    color: var(--color-main);
+    font-size: 1.25rem;
+    font-weight: 700;
+  }
+`;
 
 export const StyledButton = styled.div`
   width: 10rem;
@@ -121,4 +121,31 @@ export const StyledButton = styled.div`
   font-family: 'Press Start 2P';
   font-size: 0.875rem;
   text-align: center;
-  cursor: pointer;`
+  cursor: pointer;
+`;
+export const FriendProfileContainer = styled.div`
+  width: 31rem;
+  height: 13rem;
+  border-radius: 1rem;
+  background: white;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+`;
+export const FriendProfileInfo = styled.div`
+  width: 15rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 0.75rem;
+`;
+export const FriendProfileName = styled.span`
+  font-size: 1.5rem;
+  font-family: 'Noto Sans KR', sans-serif;
+`;
+export const FriendProfileId = styled.span`
+  margin-bottom: 2rem;
+  color: #707070;
+  font-size: 1rem;
+  font-family: 'Noto Sans KR', sans-serif;
+`;

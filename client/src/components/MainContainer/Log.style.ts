@@ -170,7 +170,8 @@ export const TagWrap = styled.div`
   z-index: 5;
   min-width: fit-content;
   height: 31rem;
-  overflow: overlay;
+  overflow-x: hidden;
+  overflow-y: overlay;
 `;
 export const TagTitle = styled.div<{ color: string }>`
   width: 11rem;
@@ -193,8 +194,8 @@ export const TaskItem = styled.div<{
 }>`
   width: 12.5rem;
   min-height: 2.1rem;
-  max-height: 3rem;
-  transition: min-height 0.4s ease-out;
+  max-height: 3.1rem;
+  transition: min-height ${(props) => (props.cols < 3.6 ? '0.3s' : '0.4s')} ease-out;
 
   margin: 0.25rem 0.25rem;
   display: flex;
@@ -240,6 +241,7 @@ export const TaskDetailIcon = styled.label`
   color: var(--color-gray7);
   justify-content: center;
   text-align: center;
+  cursor: pointer;
 `;
 export const TaskTime = styled.span`
   margin: 0 0.25rem 0 0;
@@ -351,4 +353,78 @@ export const LabelListItem = styled.div`
   border-radius: 20px;
   font-size: 0.7rem;
   margin: 2px 3px;
+`;
+
+export const EmoticonContainer = styled.div`
+  display: flex;
+  position: relative;
+`;
+
+export const Emoticon = styled.div<{ authorName: string; index: number }>`
+  width: 29.5px;
+  height: 36.5px;
+  margin-right: 0.2px;
+  display: flex;
+  background: url('/comment.svg');
+  font-size: 1rem;
+  background-size: contain;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.35s ease-in-out;
+
+  &:hover::after {
+    content: '${(props) => props.authorName}';
+    width: fit-content;
+    min-height: 17px;
+    background: rgb(170, 170, 170, 0.5);
+    padding: 0px 5px;
+    line-height: 13px;
+    font-size: 12px;
+    display: inline;
+
+    //right: calc(${(props) => 6 - props.index} * 30px + 3px);
+
+    border: 1px solid var(--color-gray5);
+    border-radius: 3px;
+    position: absolute;
+    text-align: left;
+
+    margin-left: ${(props) => (props.index > 3 ? '-30px' : '30px')};
+    margin-top: 60px;
+
+    color: white;
+  }
+`;
+
+export const Count = styled.div`
+  position: absolute;
+  margin-left: 25.5px;
+  margin-top: 3.5px;
+  z-index: 1;
+  width: 14.5px;
+  min-height: 14.5px;
+  font-size: 0.5px;
+  zoom: 0.8;
+  line-height: 14.5px;
+  text-align: center;
+  color: white;
+  border-radius: 10rem;
+  background-color: #ccd5e7;
+`;
+export const EmoticonInput = styled.div`
+  width: 12.8rem;
+  min-height: 45px;
+  margin-left: 2px;
+  display: flex;
+  background: url('/commentInput.svg');
+  font-size: 16px;
+  background-size: contain;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  span {
+    padding-top: 3px;
+    margin: 5.5px;
+    cursor: pointer;
+  }
 `;
