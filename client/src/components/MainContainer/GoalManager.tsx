@@ -422,7 +422,7 @@ const Goal = ({ goal }: GoalProps) => {
   const { title: labelTitle, color: labelColor, unit: labelUnit } = label;
 
   const isPast = true;
-  const rate = over ? currentAmount / goalAmount : currentAmount <= goalAmount ? 1 : isPast ? 0 : 0.5;
+  const rate = over ? Math.min(currentAmount / goalAmount, 1) : currentAmount <= goalAmount ? 1 : isPast ? 0 : 0.5;
   const rateString = rate >= 1 ? 'success' : over ? (100 * rate).toFixed(0).toString() + '%' : isPast ? 'failed' : 'progress';
 
   return (
