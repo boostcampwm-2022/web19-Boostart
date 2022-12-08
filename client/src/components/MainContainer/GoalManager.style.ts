@@ -62,11 +62,11 @@ export const Wrap = styled.div<{ color: string }>`
 
 export const Wave = styled.div<{ percentage: number }>`
   position: absolute;
-  top: -13rem;
-  left: calc(-33rem + ${(props) => props.percentage * 11.5}rem);
+  top: -9rem;
+  left: calc(-20.9rem + ${(props) => props.percentage * 10.4}rem);
 
-  width: 31rem;
-  height: 31rem;
+  width: 20rem;
+  height: 20rem;
 
   background: linear-gradient(#a7a5e734, #99b1db34);
   border-radius: 44%;
