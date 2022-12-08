@@ -80,10 +80,6 @@ export const Map = () => {
     };
   }, [taskList]);
 
-  useEffect(() => {
-    setCurrentMenu('MAP');
-  }, []);
-
   const ValidTaskList = () => {
     const focusSelectedTask = (lat: number, lng: number) => {
       const focusPosition = new kakao.maps.LatLng(lat, lng);
