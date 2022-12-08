@@ -5,15 +5,17 @@ import { HOST } from '../../constants';
 import * as S from './Log.style';
 import { visitState } from '../common/atoms';
 import { useRecoilState } from 'recoil';
+import TaskModal from '../TaskModal/TaskModal';
 
 interface taskListProps {
   taskList: Task[];
   activeTask: number | null;
   completionFilter: CompletionCheckBoxStatus;
   fetchTaskList: () => Promise<void>;
+  setIsEditModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-const TaskList = ({ taskList, activeTask, completionFilter, fetchTaskList }: taskListProps) => {
+const TaskList = ({ taskList, activeTask, completionFilter, fetchTaskList, setIsEditModalOpen }: taskListProps) => {
   const [currentVisit, setCurrentVisit] = useRecoilState(visitState);
 
   const isTaskFiltered = (done: boolean) => {
@@ -33,6 +35,17 @@ const TaskList = ({ taskList, activeTask, completionFilter, fetchTaskList }: tas
     }
   };
 
+  const deleteTask = async (taskIdx: number) => {
+    if (window.confirm('일정을 삭제하시겠습니까?')) {
+      try {
+        const a = await axios.delete(`${HOST}/api/v1/task/${taskIdx}`);
+        fetchTaskList();
+      } catch (error) {
+        console.log(error);
+      }
+    }
+  };
+
   const CalcHeight = (task: Task) => {
     let count = 0;
     if (task.location) count++;
@@ -42,6 +55,10 @@ const TaskList = ({ taskList, activeTask, completionFilter, fetchTaskList }: tas
     return count;
   };
 
+  const taskChange = (task: Task) => {
+    setIsEditModalOpen(true);
+    //modal...
+  };
   const DetailInfo = ({ task }: { task: Task }) => {
     return (
       <>
@@ -76,7 +93,7 @@ const TaskList = ({ taskList, activeTask, completionFilter, fetchTaskList }: tas
             <S.TaskDetailInfos flex="row">
               {task.labels.map((label) => {
                 return (
-                  <S.LabelListItem key={label.title} color={label.color}>
+                  <S.LabelListItem key={label.labelIdx} color={label.color}>
                     {label.title} {label.amount} {label.unit}
                   </S.LabelListItem>
                 );
@@ -96,11 +113,11 @@ const TaskList = ({ taskList, activeTask, completionFilter, fetchTaskList }: tas
                   완료
                 </S.TaskDetailIcon>
 
-                <S.TaskDetailIcon>
+                <S.TaskDetailIcon onClick={(e) => taskChange(task)}>
                   <S.EditIcon />
                   수정
                 </S.TaskDetailIcon>
-                <S.TaskDetailIcon>
+                <S.TaskDetailIcon onClick={(e) => deleteTask(task.idx)}>
                   <S.DeleteIcon />
                   삭제
                 </S.TaskDetailIcon>
@@ -118,7 +135,7 @@ const TaskList = ({ taskList, activeTask, completionFilter, fetchTaskList }: tas
       {taskList.map((task: Task) => {
         return (
           !isTaskFiltered(task.done) && (
-            <>
+            <div key={task.idx}>
               <S.TaskItem key={'task' + task.idx} data-idx={task.idx} data-tag={task.tagIdx} data-active={task.idx === activeTask} done={Number(task.done)} cols={CalcHeight(task)}>
                 <S.TaskMainInfos>
                   <S.TaskTime>{task.startedAt}</S.TaskTime>
@@ -128,7 +145,7 @@ const TaskList = ({ taskList, activeTask, completionFilter, fetchTaskList }: tas
                 {task.idx === activeTask && <DetailInfo task={task} />}
               </S.TaskItem>
               {task.idx === activeTask && <EmoticonList key={task.idx} task={task} isMe={currentVisit.isMe} />}
-            </>
+            </div>
           )
         );
       })}
@@ -174,7 +191,9 @@ const EmoticonList = ({ task, isMe }: { task: Task; isMe: boolean }) => {
       {!isMe && (
         <S.EmoticonInput>
           {emoticonSample.map((el, index) => (
-            <span onClick={(e) => postEmoticon(index)}>{el}</span>
+            <span key={index} onClick={(e) => postEmoticon(index)}>
+              {el}
+            </span>
           ))}
         </S.EmoticonInput>
       )}

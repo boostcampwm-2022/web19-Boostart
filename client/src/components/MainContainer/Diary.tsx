@@ -1,12 +1,17 @@
-import { useRecoilValue } from 'recoil';
-import { visitState } from '../common/atoms';
+import { useEffect } from 'react';
+import { useRecoilValue, useRecoilState } from 'recoil';
+import { visitState, menuState } from '../common/atoms';
 import Canvas from './Canvas';
 import * as S from './Diary.style';
 import DateSelector from './DateSelector';
 
 const Diary = () => {
   const currentVisit = useRecoilValue(visitState);
+  const [currentMenu, setCurrentMenu] = useRecoilState(menuState);
 
+  useEffect(() => {
+    setCurrentMenu('DIARY');
+  }, []);
   return (
     <>
       <S.DiaryTitle>
