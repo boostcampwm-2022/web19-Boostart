@@ -33,6 +33,17 @@ const TaskList = ({ taskList, activeTask, completionFilter, fetchTaskList }: tas
     }
   };
 
+  const deleteTask = async (taskIdx: number) => {
+    if (window.confirm('일정을 삭제하시겠습니까?')) {
+      try {
+        const a = await axios.delete(`${HOST}/api/v1/task/${taskIdx}`);
+        fetchTaskList();
+      } catch (error) {
+        console.log(error);
+      }
+    }
+  };
+
   const CalcHeight = (task: Task) => {
     let count = 0;
     if (task.location) count++;
@@ -100,7 +111,7 @@ const TaskList = ({ taskList, activeTask, completionFilter, fetchTaskList }: tas
                   <S.EditIcon />
                   수정
                 </S.TaskDetailIcon>
-                <S.TaskDetailIcon>
+                <S.TaskDetailIcon onClick={(e) => deleteTask(task.idx)}>
                   <S.DeleteIcon />
                   삭제
                 </S.TaskDetailIcon>
