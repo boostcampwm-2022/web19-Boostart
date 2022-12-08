@@ -107,12 +107,17 @@ io.on('connection', (socket: AuthorizedSocket) => {
     socket.join(roomName);
     if (io.sockets.adapter.rooms.get(roomName).size === 1) {
       const diaryData = (await getDiary(roomName)) || {};
+      console.log(roomName, diaryData);
       diaryObjects[roomName] = diaryData;
+      io.to(socket.id).emit('initReady');
+    } else {
+      io.to(socket.id).emit('initReady');
     }
   });
   socket.on('leaveCurrentRoom', async (destId, date) => {
     const roomName = destId + date;
     socket.leave(roomName);
+    console.log(io.sockets.adapter.rooms.get(roomName));
     if (!io.sockets.adapter.rooms.get(roomName)) {
       const diaryData = diaryObjects[roomName] || {};
       await setDiary(roomName, diaryData);
