@@ -14,34 +14,28 @@ interface ClientToServerEvents {
   requestCurrentObjects: () => void;
   joinToNewRoom: (destId: string, date: string) => void;
   leaveCurrentRoom: (destId: string, date: string) => void;
+  authenticate: () => void;
 }
 
 class GlobalSocket {
-  private socket: Socket<ServerToClientEvents, ClientToServerEvents> = io(HOST!);
-  private static _instance: GlobalSocket;
+  private _instance: Socket<ServerToClientEvents, ClientToServerEvents>;
 
-  static get instance() {
-    GlobalSocket._instance ??= new GlobalSocket();
-    return GlobalSocket._instance.socket;
+  constructor() {
+    this._instance = io(HOST!);
   }
 
-  private constructor() {
-    this.init();
+  get instance() {
+    if (!this._instance) {
+      throw new Error('socket must be initialized');
+    }
+    return this._instance;
   }
 
-  init() {
-    this.socket.on('connect', () => {
-      console.log('connected');
-    });
-    this.socket.on('disconnect', () => {
-      console.log('disconnected');
-    });
-  }
-
-  disconnect() {
-    this.socket.disconnect();
+  initialize() {
+    this._instance = io(HOST!);
   }
 }
 
-const globalSocket = GlobalSocket.instance;
+const globalSocket = new GlobalSocket();
+
 export default globalSocket;

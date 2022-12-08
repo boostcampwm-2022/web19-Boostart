@@ -4,7 +4,7 @@ import { AuthorizedRequest } from '../types/index';
 import { Response, NextFunction } from 'express';
 
 export const generateAccessToken = (data: object) => {
-  return jwt.sign(data, TOKEN_SECRET, { expiresIn: '1800s' });
+  return jwt.sign(data, TOKEN_SECRET, { expiresIn: '180s' });
 };
 
 export const authenticateToken = (req: AuthorizedRequest, res: Response, next: NextFunction) => {
