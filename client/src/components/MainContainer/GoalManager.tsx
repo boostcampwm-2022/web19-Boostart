@@ -93,6 +93,7 @@ const GoalManager = () => {
   };
 
   const handleCloseButtonClick = () => {
+    fetchLabelMap().then();
     setIsGoalModalOpen(false);
   };
 
@@ -105,9 +106,11 @@ const GoalManager = () => {
       <S.GoalHead>
         <span>목표</span> <span>제목</span> <span>현황</span> <span>달성률</span>
       </S.GoalHead>
-      {goalList.map((goal) => (
-        <Goal key={goal.idx} goal={goal} />
-      ))}
+      <S.GoalList>
+        {goalList.map((goal) => (
+          <Goal key={goal.idx} goal={goal} />
+        ))}
+      </S.GoalList>
       <NewTaskButton onClick={handleNewGoalButtonClick} />
       {isGoalModalOpen && (
         <Modal
