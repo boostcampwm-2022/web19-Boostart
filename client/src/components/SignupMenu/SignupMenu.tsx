@@ -78,13 +78,13 @@ const SignupMenu = () => {
             </S.EditRound>
           </S.ProfileImage>
           <S.InputBar {...register('userId')} placeholder="ID" />
-          <h3>{errors.userId?.message as string}</h3>
+          {errors.userId && <h3>{errors.userId?.message as string}</h3>}
           <S.InputBar {...register('password')} placeholder="PASSWORD" type="password" />
-          <h3>{errors.password?.message as string}</h3>
+          {errors.password && <h3>{errors.password?.message as string}</h3>}
           <S.InputBar {...register('confirmPassword')} placeholder="PASSWORD" type="password" />
-          <h3>{errors.confirmPassword?.message as string}</h3>
+          {errors.confirmPassword && <h3>{errors.confirmPassword?.message as string}</h3>}
           <S.InputBar {...register('username')} placeholder="NICKNAME" />
-          <h3>{errors.username?.message as string}</h3>
+          {errors.username && <h3>{errors.username?.message as string}</h3>}
 
           <h3>{messageFromServer}</h3>
           <S.SignupButton>SIGN UP</S.SignupButton>
