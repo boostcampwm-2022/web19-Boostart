@@ -147,11 +147,11 @@ const FriendMenuModal = ({ setIsDoubleCheckMdoalOpen, setIsFriendProfileOpen }: 
 };
 
 const UnfriendDoubleCheckModal = ({ friend, handleAcceptClick, handleCancleClick }: DoubleCheckModalProps) => {
-  const stop = (e: React.MouseEvent) => {
+  const removePointerEvents = (e: React.MouseEvent) => {
     e.stopPropagation();
   };
   return (
-    <S.DoubleCheckContainer onClick={(e) => stop(e)}>
+    <S.DoubleCheckContainer onClick={(e) => removePointerEvents(e)}>
       <span>정말로 {friend.username}님을 친구에서 삭제하시겠습니까?</span>
       <S.StyledButton onClick={(e) => handleAcceptClick(e, friend.idx)}> Accept </S.StyledButton>
       <S.StyledButton onClick={(e) => handleCancleClick(e)}> Cancle </S.StyledButton>
@@ -159,8 +159,11 @@ const UnfriendDoubleCheckModal = ({ friend, handleAcceptClick, handleCancleClick
   );
 };
 const FriendProfileModal = ({ userId, username, profileImg }: FriendProfileModalProps) => {
+  const removePointerEvents = (e: React.MouseEvent) => {
+    e.stopPropagation();
+  };
   return (
-    <S.FriendProfileContainer>
+    <S.FriendProfileContainer onClick={(e) => removePointerEvents(e)}>
       <ProfileImage padding="2rem" size="10rem" src={HOST + '/' + profileImg}></ProfileImage>
       <S.FriendProfileInfo>
         <S.FriendProfileName>
