@@ -112,6 +112,12 @@ declare module 'GlobalType' {
   interface FabricObject extends fabric.Object {
     id: string;
   }
+
+  interface Emoticon {
+    idx: number;
+    emoticon: string;
+    authorName: string;
+  }
 }
 
 type FreindRequestAction = 'accept' | 'deny';
