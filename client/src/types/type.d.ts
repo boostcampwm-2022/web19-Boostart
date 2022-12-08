@@ -7,7 +7,7 @@ declare module 'GlobalType' {
   }
 
   interface LabelData {
-    idx: number;
+    labelIdx: number;
     title: string;
     color: string;
     amount: number;
@@ -132,4 +132,8 @@ interface ModalProps {
   transform?: string;
   dimmedBorderRadius?: string;
   handleDimmedClick: React.MouseEventHandler;
+}
+
+interface Window {
+  kakao: any;
 }

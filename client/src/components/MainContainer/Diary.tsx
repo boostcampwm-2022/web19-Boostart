@@ -1,24 +1,18 @@
 import { useEffect } from 'react';
-import { useRecoilValue } from 'recoil';
-import { visitState } from '../common/atoms';
-import globalSocket from '../common/Socket';
+import { useRecoilValue, useRecoilState } from 'recoil';
+import { visitState, menuState } from '../common/atoms';
 import Canvas from './Canvas';
 import * as S from './Diary.style';
 import DateSelector from './DateSelector';
-import useCurrentDate from '../../hooks/useCurrentDate';
 
 const Diary = () => {
   const currentVisit = useRecoilValue(visitState);
-  const { currentDate, dateToString } = useCurrentDate();
-  const socket = globalSocket.instance;
+  const [currentMenu, setCurrentMenu] = useRecoilState(menuState);
 
   useEffect(() => {
-    const currentDateString = dateToString();
-    socket.emit('joinToNewRoom', currentVisit.userId, currentDateString);
-    return () => {
-      socket.emit('leaveCurrentRoom', currentVisit.userId, currentDateString);
-    };
-  }, [currentVisit, currentDate]);
+    setCurrentMenu('DIARY');
+  }, []);
+  
   return (
     <>
       <S.DiaryTitle>

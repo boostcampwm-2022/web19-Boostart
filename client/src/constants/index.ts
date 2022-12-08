@@ -39,6 +39,7 @@ export const RoutePath: RoutePathType = {
   LOG: '/main/log',
   DIARY: '/main/diary',
   GOAL: '/main/goal',
+  MAP: '/main/map',
 };
 
 export const MODAL_CENTER_TOP = '50%';
@@ -63,3 +64,5 @@ export const FRIEND_REQUEST_ACTION = {
   ACCEPT: axios.patch,
   REJECT: axios.delete,
 };
+
+export const API_VERSION = 'api/v1'

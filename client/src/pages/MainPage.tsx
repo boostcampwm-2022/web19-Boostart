@@ -109,7 +109,7 @@ const MainPage = () => {
     <>
       <Container>
         <TopBar handleMenuClick={() => setIsDrawerOpen(true)} />
-        <FriendsBar myProfile={myProfile} friendsList={friendsList} handlePlusButtonClick={() => setIsFriendSearchFormOpen(true)} />
+        <FriendsBar myProfile={myProfile} friendsList={friendsList} setFriendsList={setFriendsList} handlePlusButtonClick={() => setIsFriendSearchFormOpen(true)} />
         <MainContents />
         {isDrawerOpen && <Dimmed zIndex={DRAWER_Z_INDEX - 1} onClick={() => setIsDrawerOpen(false)} />}
         <Drawer isOpen={isDrawerOpen} myProfile={myProfile} friendRequests={friendRequests} handleFriendRequests={handleFriendRequests} handleLogoutButtonClick={() => requestLogout()} />

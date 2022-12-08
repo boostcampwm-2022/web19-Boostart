@@ -6,6 +6,7 @@ interface ServerToClientEvents {
   updateModifiedObject: (objectData: FabricLine | FabricText | Shape) => void;
   applyObjectRemoving: (objectId: string) => void;
   offerCurrentObjects: (objectDataMap: ObjectData) => void;
+  initReady: () => void;
 }
 
 interface ClientToServerEvents {

@@ -1,4 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
+import { useRecoilValue } from 'recoil';
+import { visitState } from '../common/atoms';
+import useCurrentDate from '../../hooks/useCurrentDate';
 import globalSocket from '../common/Socket';
 import { DEFAULT_OBJECT_VALUE } from '../../constants';
 import { Shape, FabricText, FabricLine, ShapeType, FabricObject, ObjectData } from 'GlobalType';
@@ -9,6 +12,8 @@ import styled from 'styled-components';
 const Canvas = () => {
   const canvasRef = useRef<fabric.Canvas | null>(null);
   const colorRef = useRef<HTMLInputElement | null>(null);
+  const currentVisit = useRecoilValue(visitState);
+  const { currentDate, dateToString } = useCurrentDate();
   const canvasBackground = '/canvasBackground.png';
   const diaryObjects = new Map();
   const socket = globalSocket.instance;
@@ -260,7 +265,13 @@ const Canvas = () => {
     socket.emit('sendModifiedObject', objectData);
   };
 
+  const joinSocketRoom = () => {
+    const currentDateString = dateToString();
+    globalSocket.emit('joinToNewRoom', currentVisit.userId, currentDateString);
+  };
+
   const presentPresetObjects = (objectDataMap: ObjectData) => {
+    if (!objectDataMap) return;
     Object.values(objectDataMap).forEach((objectData) => {
       updateModifiedObject(objectData);
     });
@@ -276,8 +287,12 @@ const Canvas = () => {
       img.setCoords();
       if (!canvasRef.current) return;
       canvasRef.current.add(img);
-      socket.emit('requestCurrentObjects');
+      joinSocketRoom();
     });
+  };
+
+  const requestInitObjects = () => {
+    globalSocket.emit('requestCurrentObjects');
   };
 
   useEffect(() => {
@@ -288,6 +303,7 @@ const Canvas = () => {
     socket.on('offerCurrentObjects', presentPresetObjects);
     socket.on('updateModifiedObject', updateModifiedObject);
     socket.on('applyObjectRemoving', removeObject);
+    socket.on('initReady', requestInitObjects);
     window.addEventListener('keydown', handleKeydown);
 
     return () => {
@@ -297,7 +313,9 @@ const Canvas = () => {
       socket.off('offerCurrentObjects', presentPresetObjects);
       socket.off('updateModifiedObject', updateModifiedObject);
       socket.off('applyObjectRemoving', removeObject);
+      socket.off('initReady', requestInitObjects);
       window.removeEventListener('keydown', handleKeydown);
+      globalSocket.emit('leaveCurrentRoom', currentVisit.userId, dateToString());
       canvasRef.current.clear();
     };
   });
@@ -342,7 +360,7 @@ const ForeignerScreen = styled.div<{
   top: 3.5rem;
   left: 0;
   background: rgba(0, 0, 0, 0);
-  z-index: 1000;
+  z-index: 500;
   display: ${(props) => (props.isActive ? 'none' : 'block')};
 `;
 
