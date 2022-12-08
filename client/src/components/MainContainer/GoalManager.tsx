@@ -27,7 +27,7 @@ const httpPostGoal = async (body: FieldValues) => {
 const GoalManager = () => {
   const [isGoalModalOpen, setIsGoalModalOpen] = useState(false);
   const [isLabelModalOpen, setIsLabelModalOpen] = useState(false);
-  const { dateToString } = useCurrentDate();
+  const { currentDate, dateToString } = useCurrentDate();
   const [goalList, setGoalList] = useState<Goal[]>([]);
 
   const fetchLabelMap = async () => {
@@ -51,13 +51,15 @@ const GoalManager = () => {
 
   useEffect(() => {
     try {
-      fetchLabelMap().then(() => {
-        fetchGoalList();
-      });
+      fetchLabelMap();
     } catch (error) {
       console.log(error);
     }
   }, []);
+
+  useEffect(() => {
+    fetchGoalList();
+  }, [currentDate]);
 
   const handleNewGoalButtonClick = () => {
     setIsGoalModalOpen(true);
