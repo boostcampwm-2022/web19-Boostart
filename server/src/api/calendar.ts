@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import { RowDataPacket } from 'mysql2';
+import { API_VERSION } from '../constants';
 import { executeSql } from '../db';
 import { AuthorizedRequest } from '../types';
 import { authenticateToken } from '../utils/auth';
@@ -60,6 +61,45 @@ router.get('/task', authenticateToken, async (req: AuthorizedRequest, res) => {
   const result = Array.from({ length: lastDay }, () => false);
   try {
     const datesTaskExists = (await executeSql('select date_format(date, "%d") as date, count(idx) from task where user_idx = ? and date like ? group by date', [userIdx, dateSearchFormat])) as RowDataPacket;
+    datesTaskExists.forEach(({ date }) => {
+      result[parseInt(date) - 1] = true;
+    });
+
+    res.json(result);
+  } catch {
+    res.sendStatus(500);
+  }
+});
+
+router.get('/task/:user_id', authenticateToken, async (req: AuthorizedRequest, res) => {
+  const { userIdx } = req.user;
+  const { user_id: friendId } = req.params;
+
+  try {
+    Object.values(CalendarQueryKeys).forEach((key) => validate(key, req.query[key] as string));
+  } catch (error) {
+    return res.status(400).send({ msg: error.message });
+  }
+
+  const year = parseInt(req.query.year as string);
+  const month = parseInt(req.query.month as string);
+
+  const dateSearchFormat = `${year}-${month}-%`;
+  const lastDate = new Date(year, month, 0);
+  const lastDay = lastDate.getDate();
+
+  const result = Array.from({ length: lastDay }, () => false);
+  try {
+    const friend = (await executeSql('select idx from user where user_id = ?', [friendId])) as RowDataPacket;
+    if (friend.length === 0) return res.status(404).send({ msg: '존재하지 않는 사용자예요.' });
+
+    const { idx: friendIdx } = friend[0];
+    if (userIdx === friendIdx) return res.redirect(`/api/${API_VERSION}/calendar/task?year=${year}&month=${month}`);
+
+    const isNotFriend = ((await executeSql('select * from friendship where (sender_idx = ? and receiver_idx = ?) or (sender_idx = ? and receiver_idx = ?)', [userIdx, friendIdx, friendIdx, userIdx])) as RowDataPacket).length === 0;
+    if (isNotFriend) return res.status(403).send({ msg: '친구가 아닌 사용자의 태스크를 조회할 수 없어요.' });
+
+    const datesTaskExists = (await executeSql('select date_format(date, "%d") as date, count(idx) from task where user_idx = ? and date like ? group by date', [friendIdx, dateSearchFormat])) as RowDataPacket;
     datesTaskExists.forEach(({ date }) => {
       result[parseInt(date) - 1] = true;
     });
