@@ -22,7 +22,7 @@ const MenuSelector = () => {
     <S.MenuSelector>
       {Menus.map((menu) => {
         return (
-          <S.MenuButton data-menu={menu} onClick={handleMenuClick} isActivatedMenu={menu === currentMenu}>
+          <S.MenuButton key={menu} data-menu={menu} onClick={handleMenuClick} isActivatedMenu={menu === currentMenu}>
             {menu}
           </S.MenuButton>
         );
