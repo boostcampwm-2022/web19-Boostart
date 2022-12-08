@@ -10,29 +10,58 @@ import { FieldValues, useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
 import useCurrentDate from '../../hooks/useCurrentDate';
+import { visitState, menuState } from '../common/atoms';
+import { useRecoilValue, useRecoilState } from 'recoil';
 
-const httpGetGoalList = async (dateString: string) => {
-  const response = await axios.get(`${HOST}/api/v1/goal?date=${dateString}`);
+const labelMap = new Map<number, Label>();
+
+const httpGetGoalList = async (userId: string, dateString: string) => {
+  const response = await axios.get(`${HOST}/api/v1/goal/${userId}?date=${dateString}`);
   const goalList = response.data;
   return goalList;
 };
-
-const labelMap = new Map<number, Label>();
 
 const httpPostGoal = async (body: FieldValues) => {
   const response = await axios.post(`${HOST}/api/v1/goal`, body);
   return response;
 };
 
+const httpGetLabelList = async (userId: string = '') => {
+  // TODO: 전역 상태로 분리 고려
+  const response = await axios.get(`${HOST}/api/v1/label/${userId}`);
+  const labelList = response.data;
+  return labelList;
+};
+
+const httpDeleteLabel = async (idx: number) => {
+  const response = await axios.delete(`${HOST}/api/v1/label/${idx}`);
+  return response;
+};
+
+const httpPatchLabel = async (idx: number, { title, color }: { title?: string; color?: string }) => {
+  const response = await axios.patch(`${HOST}/api/v1/label/${idx}`, { title, color });
+  return response;
+};
+
+const generateRandomHexColor = () => {
+  const R = Math.floor(Math.random() * 127 + 128).toString(16);
+  const G = Math.floor(Math.random() * 127 + 128).toString(16);
+  const B = Math.floor(Math.random() * 127 + 128).toString(16);
+  return `#${[R, G, B].join('')}`;
+};
+
 const GoalManager = () => {
   const [isGoalModalOpen, setIsGoalModalOpen] = useState(false);
   const [isLabelModalOpen, setIsLabelModalOpen] = useState(false);
-  const { dateToString } = useCurrentDate();
+  const { currentDate, dateToString } = useCurrentDate();
   const [goalList, setGoalList] = useState<Goal[]>([]);
+  const currentVisit = useRecoilValue(visitState);
+
+  const [currentMenu, setCurrentMenu] = useRecoilState(menuState);
 
   const fetchLabelMap = async () => {
     try {
-      const labelList = await httpGetLabelList();
+      const labelList = await httpGetLabelList(currentVisit.userId);
       labelList.forEach((label: Label) => {
         labelMap.set(label.idx, label);
       });
@@ -43,21 +72,21 @@ const GoalManager = () => {
 
   const fetchGoalList = async () => {
     try {
-      httpGetGoalList(dateToString()).then(setGoalList);
+      httpGetGoalList(currentVisit.userId, dateToString()).then(setGoalList);
     } catch (error) {
       console.log(error);
     }
   };
 
   useEffect(() => {
-    try {
-      fetchLabelMap().then(() => {
-        fetchGoalList();
-      });
-    } catch (error) {
-      console.log(error);
-    }
-  }, []);
+    fetchLabelMap().then(() => {
+      fetchGoalList();
+    });
+  }, [currentVisit]);
+
+  useEffect(() => {
+    fetchGoalList();
+  }, [currentDate]);
 
   const handleNewGoalButtonClick = () => {
     setIsGoalModalOpen(true);
@@ -66,6 +95,10 @@ const GoalManager = () => {
   const handleCloseButtonClick = () => {
     setIsGoalModalOpen(false);
   };
+
+  useEffect(() => {
+    setCurrentMenu('GOAL');
+  }, []);
 
   return (
     <>
@@ -90,23 +123,6 @@ const GoalManager = () => {
       )}
     </>
   );
-};
-
-const httpGetLabelList = async () => {
-  // TODO: 전역 상태로 분리 고려
-  const response = await axios.get(`${HOST}/api/v1/label`);
-  const labelList = response.data;
-  return labelList;
-};
-
-const httpDeleteLabel = async (idx: number) => {
-  const response = await axios.delete(`${HOST}/api/v1/label/${idx}`);
-  return response;
-};
-
-const httpPatchLabel = async ({ title, color }: { title?: string; color?: string }) => {
-  const response = await axios.post(`${HOST}/api/v1/label/color`, { title, color });
-  return response;
 };
 
 const GOAL_MODAL_Z_INDEX = 1000;
@@ -207,8 +223,14 @@ const GoalModal = ({ isLabelModalOpen, setIsLabelModalOpen, handleCloseButtonCli
   };
 
   const handleColorInputBlur = async () => {
+    if (!selectedLabelIndex) return;
+    if (!color) return;
     try {
-      httpPatchLabel({ color });
+      httpPatchLabel(selectedLabelIndex, { color });
+      const label = labelList.find((label) => label.idx === selectedLabelIndex);
+      if (!label) return;
+      label.color = color;
+      setLabelList([...labelList]);
     } catch (error) {
       console.log(error);
     }
@@ -260,16 +282,10 @@ const GoalModal = ({ isLabelModalOpen, setIsLabelModalOpen, handleCloseButtonCli
 
 const LABEL_MODAL_Z_INDEX = 1002;
 
-const generateRandomHexColor = () => {
-  const R = Math.floor(Math.random() * 127 + 128).toString(16);
-  const G = Math.floor(Math.random() * 127 + 128).toString(16);
-  const B = Math.floor(Math.random() * 127 + 128).toString(16);
-  return `#${[R, G, B].join('')}`;
-};
-
 interface LabelModalProps {
   handleCloseButtonClick: () => void;
 }
+
 const LabelModal = ({ handleCloseButtonClick }: LabelModalProps) => {
   const schema = yup.object().shape({
     title: yup.string().required(),
@@ -316,7 +332,7 @@ const LabelModal = ({ handleCloseButtonClick }: LabelModalProps) => {
         <S.VertialRule />
         <S.LabelModalLabelColorInput value={color} type="color" {...register('color')} onChange={handleLabelColorChange} />
       </S.LabelModalLabel>
-      <S.LabelModalLabelCreateButton>ADD LABEL</S.LabelModalLabelCreateButton>
+      <S.LabelModalLabelCreateButton>ADD LABEL!</S.LabelModalLabelCreateButton>
     </S.LabelModal>
   );
 };
@@ -339,60 +355,6 @@ const WaveContainer = ({ textContent, percentage }: WaveProps) => {
     </S.WaveContainer>
   );
 };
-
-const dummyGoals = [
-  {
-    idx: 1,
-    title: '커피 줄이기',
-    labelIdx: 1,
-    goalAmount: 2,
-    currentAmount: 4,
-    over: false,
-  },
-  {
-    idx: 2,
-    title: '잠좀자기',
-    labelIdx: 3,
-    goalAmount: 680,
-    currentAmount: 300,
-    over: true,
-  },
-  {
-    idx: 3,
-    title: '절약',
-    labelIdx: 2,
-    goalAmount: 2,
-    currentAmount: 1.2,
-    over: false,
-  },
-];
-
-const dummyLabels: Label[] = [
-  {
-    idx: 1,
-    title: '',
-    color: '',
-    unit: '',
-  },
-  {
-    idx: 2,
-    title: '커피',
-    color: '#4A6CC3',
-    unit: '잔',
-  },
-  {
-    idx: 3,
-    title: '지출',
-    color: '#D092E2',
-    unit: '만',
-  },
-  {
-    idx: 4,
-    title: '잠',
-    color: '#B9D58C',
-    unit: '분',
-  },
-];
 
 interface Goal {
   idx: number;
