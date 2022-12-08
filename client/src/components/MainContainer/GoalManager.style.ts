@@ -301,3 +301,8 @@ export const GoalModalOverInput = styled.div`
   width: 2rem;
   text-align: center;
 `;
+
+export const GoalList = styled.div`
+  overflow-y: scroll;
+  height: 28rem;
+`;
