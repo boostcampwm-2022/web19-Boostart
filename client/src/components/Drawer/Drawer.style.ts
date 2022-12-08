@@ -93,7 +93,7 @@ export const PROFILE_EDIT_FORM_Z_INDEX = 1001;
 export const PROFILE_EDIT_FORM_TOP = '50%';
 export const PROFILE_EDIT_FORM_LEFT = '50%';
 export const PROFILE_EDIT_FORM_TRANFORM = 'translate(-50%, -50%)';
-export const ProfileEditForm = styled.div`
+export const ProfileEditForm = styled.form`
   display: flex;
   flex-direction: column;
   background-color: white;
@@ -170,7 +170,7 @@ export const InputBar = styled.input`
   }
 `;
 
-export const ProfileEditApplyButton = styled.div<{ isDone: boolean }>`
+export const ProfileEditApplyButton = styled.button<{ isDone: boolean }>`
   width: 18.5rem;
   height: 2rem;
   border: none;

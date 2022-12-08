@@ -51,7 +51,7 @@ const Drawer = ({ isOpen, myProfile, friendRequests, handleFriendRequests, handl
       </S.Drawer>
       {isProfileEditModalOpen && (
         <Modal
-          component={<ProfileEditForm myProfile={myProfile!} />}
+          component={<ProfileEditForm myProfile={myProfile!} setIsProfileEditModalOpen={setIsProfileEditModalOpen} />}
           top={PROFILE_EDIT_FORM_TOP}
           left={PROFILE_EDIT_FORM_LEFT}
           transform={PROFILE_EDIT_FORM_TRANFORM}
@@ -63,7 +63,7 @@ const Drawer = ({ isOpen, myProfile, friendRequests, handleFriendRequests, handl
   );
 };
 
-const ProfileEditForm = ({ myProfile }: { myProfile: Friend }) => {
+const ProfileEditForm = ({ myProfile, setIsProfileEditModalOpen }: { myProfile: Friend; setIsProfileEditModalOpen: React.Dispatch<React.SetStateAction<boolean>> }) => {
   //api 연결
   const [profileImg, setProfileImg] = useState<File | null>(null);
   const [username, onUsernameChange, setUsername] = useInput(myProfile.username);
@@ -74,11 +74,23 @@ const ProfileEditForm = ({ myProfile }: { myProfile: Friend }) => {
     }
   };
 
-  const postProfileChange = () => {
-    const formData = new FormData();
-    formData.append('username', username);
-    if (profileImg) formData.append('profileImg', profileImg);
-    //axios
+  const postProfileChange = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    if (username === '') return;
+    const profileFormData = new FormData();
+    profileFormData.append('username', username);
+    if (profileImg) profileFormData.append('profileImg', profileImg);
+    try {
+      await fetch(`${HOST}/api/v1/user/me`, {
+        method: 'PATCH',
+        credentials: 'include',
+        body: profileFormData,
+      }).then((res) => {
+        if (res.status == 200) setIsProfileEditModalOpen(false);
+      });
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   return (
@@ -98,7 +110,9 @@ const ProfileEditForm = ({ myProfile }: { myProfile: Friend }) => {
           <S.UserId>@{myProfile.userId}</S.UserId>
         </S.ProfileInfo>
       </S.Profile>
-      <S.ProfileEditApplyButton isDone={true}>PROFILE CHANGE</S.ProfileEditApplyButton>
+      <S.ProfileEditApplyButton type="submit" isDone={username === ''}>
+        PROFILE CHANGE
+      </S.ProfileEditApplyButton>
     </S.ProfileEditForm>
   );
 };
