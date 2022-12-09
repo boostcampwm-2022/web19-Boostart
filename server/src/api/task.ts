@@ -195,6 +195,8 @@ router.post('/', authenticateToken, async (req: AuthorizedRequest, res) => {
 
   const { title, date, importance, startedAt, endedAt, lat, lng, location, isPublic, tagIdx, content, done, labels } = req.body;
 
+  if (startedAt > endedAt) return res.sendStatus(400);
+
   try {
     if (labels.length > 0) {
       let labelCheckSql = 'select idx from label where user_idx = ? and ';
@@ -257,14 +259,17 @@ router.patch('/update/:task_idx', authenticateToken, async (req: AuthorizedReque
 
   try {
     Object.values(TaskBodyKeys).forEach((key) => {
-      if (!req.body[key]) return;
+      if (req.body[key] === undefined) return;
       if (key === TaskBodyKeys.date || key === TaskBodyKeys.done) return;
       if (!validate(key, req.body[key])) req.body[key] = TaskBodyDefaultValues[key];
 
       if (key === TaskBodyKeys.labels) return;
+
       if (updateValue.length > 0) updateSql += ',';
       updateSql += ` ${TaskColumnKeys[key]} = ? `;
-      updateValue.push(req.body[key]);
+
+      if (req.body[key] === null || req.body[key] === '') updateValue.push(null);
+      else updateValue.push(req.body[key]);
     });
     updateSql += 'where idx = ?';
     updateValue.push(taskIdx);
@@ -363,6 +368,7 @@ router.delete('/:task_idx', authenticateToken, async (req: AuthorizedRequest, re
     if (notExistTask) return res.status(404).json({ msg: '존재하지 않는 태스크예요.' });
 
     await executeSql('delete from task_label where task_idx = ?', [taskIdx]);
+    await executeSql('delete from task_social_action where task_idx = ?', [taskIdx]);
     await executeSql('delete from task where user_idx = ? and idx = ?', [userIdx, taskIdx]);
     res.sendStatus(200);
   } catch (error) {

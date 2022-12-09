@@ -1,15 +1,19 @@
 import express from 'express';
 import cookieParser from 'cookie-parser';
-import { CLIENT, PORT, API_VERSION, REDIS_HOST, REDIS_USERNAME, REDIS_PORT, REDIS_PASSWORD } from './src/constants';
+import { CLIENT, PORT, API_VERSION, REDIS_HOST, REDIS_USERNAME, REDIS_PORT, REDIS_PASSWORD, TOKEN_SECRET } from './src/constants';
 import apiRouter from './src/api/index';
 import cors from 'cors';
 import path from 'path';
-import { Server } from 'socket.io';
+import { Server, Socket } from 'socket.io';
 import http from 'http';
 import * as redis from 'redis';
+import jwt from 'jsonwebtoken';
 
 const app = express();
 const httpServer = http.createServer(app);
+
+const connectionIdToUserIdx = {};
+const userIdxToSocketId = {};
 
 const corsOptions = {
   origin: CLIENT,
@@ -54,19 +58,67 @@ app.get('*', (req, res) => {
 const diaryObjects = {};
 const visitingRoom = new Map();
 
-io.on('connection', (socket) => {
+// handshake 과정에서 원시소켓이 가지고 있는 쿠키를 확인
+io.engine.on('headers', async (_, request) => {
+  const { rawHeaders } = request;
+  const connectionId = request._query.sid;
+
+  if (connectionIdToUserIdx[connectionId]) return;
+  if (!rawHeaders) return;
+  const headerCookieIndex = rawHeaders.indexOf('Cookie');
+  if (headerCookieIndex === -1) return;
+
+  const cookies = rawHeaders[headerCookieIndex + 1].split('; ');
+  const tokenCookie = cookies.find((cookie) => cookie.substring(0, 6) === 'token=');
+  const token = tokenCookie.substring(6);
+
+  jwt.verify(token, TOKEN_SECRET, (error, { userIdx }) => {
+    if (error) {
+      console.log(error);
+      return;
+    }
+    connectionIdToUserIdx[connectionId] = userIdx;
+  });
+});
+
+interface AuthorizedSocket extends Socket {
+  uid: string;
+}
+
+io.on('connection', (socket: AuthorizedSocket) => {
+  // 코드 중복을 줄이기 위해 미들 웨어로 인증 처리
+  socket.use((_, next) => {
+    const connectionId = (socket.conn as any).id;
+    socket.uid = connectionIdToUserIdx[connectionId];
+    next();
+  });
+
+  // 유저 index로 소켓 ID를 알아낼 수 있게 등록하는 과정. 클라이언트에서 별도로 호출해주어야함
+  socket.on('authenticate', () => {
+    const connectionId = (socket.conn as any).id;
+    const userIdx = connectionIdToUserIdx[connectionId];
+    userIdxToSocketId[userIdx] = socket.id;
+  });
+
   socket.on('joinToNewRoom', async (destId, date) => {
+    console.log(`유저 ${socket.uid} 다이어리 ${destId}${date} 입장`);
+    console.log(`해당 유저의 소켓 ID는 ${userIdxToSocketId[socket.uid]}(${socket.id}) 입니다.`);
     const roomName = destId + date;
     visitingRoom.set(socket.id, roomName);
     socket.join(roomName);
     if (io.sockets.adapter.rooms.get(roomName).size === 1) {
       const diaryData = (await getDiary(roomName)) || {};
+      console.log(roomName, diaryData);
       diaryObjects[roomName] = diaryData;
+      io.to(socket.id).emit('initReady');
+    } else {
+      io.to(socket.id).emit('initReady');
     }
   });
   socket.on('leaveCurrentRoom', async (destId, date) => {
     const roomName = destId + date;
     socket.leave(roomName);
+    console.log(io.sockets.adapter.rooms.get(roomName));
     if (!io.sockets.adapter.rooms.get(roomName)) {
       const diaryData = diaryObjects[roomName] || {};
       await setDiary(roomName, diaryData);

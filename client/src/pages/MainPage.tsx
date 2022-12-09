@@ -12,6 +12,7 @@ import FriendSearchForm, { FRIEND_SEARCH_MODAL_ZINDEX } from '../components/Frie
 import { DRAWER_Z_INDEX } from '../components/Drawer/Drawer.style';
 import { MODAL_CENTER_TOP, MODAL_CENTER_LEFT, MODAL_CENTER_TRANSFORM, HOST } from '../constants';
 import styled from 'styled-components';
+import globalSocket from '../components/common/Socket';
 
 const MainPage = () => {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
@@ -99,11 +100,16 @@ const MainPage = () => {
     });
   }, []);
 
+  useEffect(() => {
+    globalSocket.initialize();
+    globalSocket.instance.emit('authenticate');
+  }, []);
+
   return (
     <>
       <Container>
         <TopBar handleMenuClick={() => setIsDrawerOpen(true)} />
-        <FriendsBar myProfile={myProfile} friendsList={friendsList} handlePlusButtonClick={() => setIsFriendSearchFormOpen(true)} />
+        <FriendsBar myProfile={myProfile} friendsList={friendsList} setFriendsList={setFriendsList} handlePlusButtonClick={() => setIsFriendSearchFormOpen(true)} />
         <MainContents />
         {isDrawerOpen && <Dimmed zIndex={DRAWER_Z_INDEX - 1} onClick={() => setIsDrawerOpen(false)} />}
         <Drawer isOpen={isDrawerOpen} myProfile={myProfile} friendRequests={friendRequests} handleFriendRequests={handleFriendRequests} handleLogoutButtonClick={() => requestLogout()} />

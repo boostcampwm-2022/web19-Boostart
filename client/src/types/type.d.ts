@@ -7,7 +7,7 @@ declare module 'GlobalType' {
   }
 
   interface LabelData {
-    idx: number;
+    labelIdx: number;
     title: string;
     color: string;
     amount: number;
@@ -112,6 +112,12 @@ declare module 'GlobalType' {
   interface FabricObject extends fabric.Object {
     id: string;
   }
+
+  interface Emoticon {
+    idx: number;
+    emoticon: string;
+    authorName: string;
+  }
 }
 
 type FreindRequestAction = 'accept' | 'deny';
@@ -126,4 +132,8 @@ interface ModalProps {
   transform?: string;
   dimmedBorderRadius?: string;
   handleDimmedClick: React.MouseEventHandler;
+}
+
+interface Window {
+  kakao: any;
 }

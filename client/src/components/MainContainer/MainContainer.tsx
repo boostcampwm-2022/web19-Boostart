@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { Route, Routes } from 'react-router-dom';
 import Calendar from './Calendar';
 import Diary from './Diary';
@@ -6,6 +5,7 @@ import GoalManager from './GoalManager';
 import Log from './Log';
 import * as S from './MainContainer.style';
 import SubContainer from './SubContainer';
+import Map from './Map';
 
 const MainContents = () => {
   return (
@@ -19,6 +19,7 @@ const MainContents = () => {
             <Route path="log/" element={<Log />} />
             <Route path="diary/" element={<Diary />} />
             <Route path="goal" element={<SubContainer title="GOAL" element={<GoalManager />} />} />
+            <Route path="map/" element={<Map />} />
           </Routes>
         </S.RightSection>
       </S.MainContentContainer>

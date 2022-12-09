@@ -1,13 +1,17 @@
 import React, { useEffect, useState } from 'react';
 import useCurrentDate from '../../hooks/useCurrentDate';
-import { EngMonth, Days, WEEK_LENGTH } from '../../constants';
+import { EngMonth, Days, WEEK_LENGTH, HOST } from '../../constants';
 import MenuSelector from './MenuSelector';
 import * as S from './Calendar.style';
+import { useRecoilState } from 'recoil';
+import { menuState } from '../common/atoms';
+import axios from 'axios';
 
 interface DateContainerProps {
   calendarYear: number;
   calendarMonth: number;
   calendarDate: number;
+  percent: number;
 }
 
 const createArray = (count: number) => {
@@ -18,6 +22,8 @@ const Calendar = () => {
   //States
   const { currentDate, getFirstDay, getLastDate } = useCurrentDate();
   const [calendarDate, setCalendarDate] = useState(currentDate);
+  const [currentMenu, setCurrentMenu] = useRecoilState(menuState);
+
   //Vars
   const firstDay = getFirstDay(calendarDate);
   const lastDate = getLastDate(calendarDate);
@@ -33,13 +39,31 @@ const Calendar = () => {
 
   const handleNextMonthClick = () => {
     calendarDate.setMonth(calendarDate.getMonth() + 1);
-    console.log(calendarDate.getFullYear());
     setCalendarDate(new Date(calendarDate));
   };
 
   useEffect(() => {
     setCalendarDate(new Date(currentDate));
   }, [currentDate]);
+
+  const [calendarPercent, setCalendarPercent] = useState([]);
+
+  useEffect(() => {
+    const getEmoticon = async () => {
+      try {
+        if (currentMenu == 'LOG' || currentMenu == 'MAP' || currentMenu == 'DIARY') {
+          const result = await axios.get(`${HOST}/api/v1/calendar/task?year=${calendarDate.getFullYear()}&month=${calendarDate.getMonth() + 1}`);
+          setCalendarPercent(result.data);
+        } else if (currentMenu == 'GOAL') {
+          const result = await axios.get(`${HOST}/api/v1/calendar/goal?year=${calendarDate.getFullYear()}&month=${calendarDate.getMonth() + 1}`);
+          setCalendarPercent(result.data);
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    };
+    getEmoticon();
+  }, [calendarDate.getMonth(), currentMenu]);
 
   return (
     <>
@@ -65,7 +89,7 @@ const Calendar = () => {
             return <div key={'emptyBox' + idx}></div>;
           })}
           {monthDays.map((_, idx) => {
-            return <DateContainer key={'date' + (idx + 1)} calendarYear={calendarDate.getFullYear()} calendarDate={idx + 1} calendarMonth={calendarDate.getMonth()}></DateContainer>;
+            return <DateContainer key={'date' + (idx + 1)} calendarYear={calendarDate.getFullYear()} calendarDate={idx + 1} calendarMonth={calendarDate.getMonth()} percent={calendarPercent[idx]}></DateContainer>;
           })}
         </S.DateSelector>
         <MenuSelector />
@@ -74,7 +98,7 @@ const Calendar = () => {
   );
 };
 
-const DateContainer = ({ calendarYear, calendarMonth, calendarDate }: DateContainerProps) => {
+const DateContainer = ({ calendarYear, calendarMonth, calendarDate, percent }: DateContainerProps) => {
   const { getNewDate, getYear, getMonth, getDate } = useCurrentDate();
   const isToday = calendarYear === getYear() && calendarMonth === getMonth() && calendarDate === getDate();
   const selectCurrentDate = () => {
@@ -84,7 +108,7 @@ const DateContainer = ({ calendarYear, calendarMonth, calendarDate }: DateContai
     <>
       <S.DateBox onClick={selectCurrentDate}>
         <S.TodayMarker isToday={isToday}>
-          <S.DateLogo percentage={100}>B</S.DateLogo>
+          <S.DateLogo percentage={percent * 100}>B</S.DateLogo>
         </S.TodayMarker>
         <S.Date>{calendarDate}</S.Date>
       </S.DateBox>

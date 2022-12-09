@@ -9,7 +9,7 @@ export const Container = styled.div`
 `;
 export const SignupContainer = styled.div`
   width: 39rem;
-  height: 39rem;
+  height: 43rem;
   background: white;
   border: 1px solid var(--color-gray1);
   display: flex;

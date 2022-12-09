@@ -62,11 +62,11 @@ export const Wrap = styled.div<{ color: string }>`
 
 export const Wave = styled.div<{ percentage: number }>`
   position: absolute;
-  top: -13rem;
-  left: calc(-33rem + ${(props) => props.percentage * 11.5}rem);
+  top: -9rem;
+  left: calc(-20.9rem + ${(props) => props.percentage * 10.4}rem);
 
-  width: 31rem;
-  height: 31rem;
+  width: 20rem;
+  height: 20rem;
 
   background: linear-gradient(#a7a5e734, #99b1db34);
   border-radius: 44%;
@@ -165,7 +165,7 @@ export const GoalModalLabel = styled.div<{ color?: string }>`
   align-items: center;
   border: solid 1px ${(props) => (props.color ? 'transparent' : 'black')};
 
-  width: 15rem;
+  width: 20rem;
   height: 1.5rem;
   padding: 0.4rem;
   border-radius: 20rem;
@@ -198,6 +198,7 @@ export const GoalModalLabelSetButton = styled.button`
 export const GoalModalAmountInput = styled.input`
   width: 3.2rem;
 
+  font-size: 1.3rem;
   text-align: center;
 
   background-color: transparent;
@@ -207,9 +208,10 @@ export const GoalModalAmountInput = styled.input`
 
 export const GoalModalSubmitButton = styled.button`
   border-radius: 2rem;
-  margin-top: 2rem;
+  margin-top: 4rem;
 
-  padding: 1.5rem;
+  width: 18rem;
+  padding: 0.8rem;
   background-color: var(--color-main);
   color: white;
   outline: none;
@@ -272,13 +274,15 @@ export const LabelModalLabelCreateButton = styled.button`
   font-family: 'Press Start 2P', cursive;
   background-color: var(--color-main);
   color: white;
-  padding: 0.5rem;
+  padding: 0.8rem;
   border-radius: 3rem;
   width: max-content;
 `;
 
 export const GoalModalLabelName = styled.input<{ filled: boolean }>`
   width: 6rem;
+  font-size: ${(props) => (props.filled ? '1.5rem' : '0.8rem')};
+  color: black;
 
   background-color: transparent;
   border: none;
@@ -296,4 +300,9 @@ export const VertialRule = styled.div`
 export const GoalModalOverInput = styled.div`
   width: 2rem;
   text-align: center;
+`;
+
+export const GoalList = styled.div`
+  overflow-y: scroll;
+  height: 28rem;
 `;

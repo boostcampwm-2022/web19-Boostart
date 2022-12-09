@@ -1,19 +1,21 @@
 import axios from 'axios';
-import { Task, CompletionCheckBoxStatus } from 'GlobalType';
-import { useEffect } from 'react';
+import { Task, CompletionCheckBoxStatus, Emoticon } from 'GlobalType';
+import { useEffect, useState } from 'react';
 import { HOST } from '../../constants';
 import * as S from './Log.style';
 import { visitState } from '../common/atoms';
 import { useRecoilState } from 'recoil';
+import TaskModal from '../TaskModal/TaskModal';
 
 interface taskListProps {
   taskList: Task[];
   activeTask: number | null;
   completionFilter: CompletionCheckBoxStatus;
   fetchTaskList: () => Promise<void>;
+  setIsEditModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-const TaskList = ({ taskList, activeTask, completionFilter, fetchTaskList }: taskListProps) => {
+const TaskList = ({ taskList, activeTask, completionFilter, fetchTaskList, setIsEditModalOpen }: taskListProps) => {
   const [currentVisit, setCurrentVisit] = useRecoilState(visitState);
 
   const isTaskFiltered = (done: boolean) => {
@@ -26,10 +28,21 @@ const TaskList = ({ taskList, activeTask, completionFilter, fetchTaskList }: tas
     e.stopPropagation();
     const taskIdx = e.target.dataset.idx;
     try {
-      const a = await axios.patch(`${HOST}/api/v1/task/status/${taskIdx}`, { done: e.target.checked });
+      const response = await axios.patch(`${HOST}/api/v1/task/status/${taskIdx}`, { done: e.target.checked });
       fetchTaskList();
     } catch (error) {
       console.log(error);
+    }
+  };
+
+  const deleteTask = async (taskIdx: number) => {
+    if (window.confirm('일정을 삭제하시겠습니까?')) {
+      try {
+        const a = await axios.delete(`${HOST}/api/v1/task/${taskIdx}`);
+        fetchTaskList();
+      } catch (error) {
+        console.log(error);
+      }
     }
   };
 
@@ -42,9 +55,11 @@ const TaskList = ({ taskList, activeTask, completionFilter, fetchTaskList }: tas
     return count;
   };
 
+  const taskChange = (task: Task) => {
+    setIsEditModalOpen(true);
+    //modal...
+  };
   const DetailInfo = ({ task }: { task: Task }) => {
-    //코멘트 조회
-
     return (
       <>
         <hr />
@@ -55,7 +70,7 @@ const TaskList = ({ taskList, activeTask, completionFilter, fetchTaskList }: tas
           </S.TaskDetailInfosCol>
           <S.TaskDetailInfosCol>
             <S.ImportanceIcon />
-            {[1, 2, 3, 4, 5].map((d, index) => d >= task.importance && <div key={index}>{'⭐️ '}</div>)}
+            {[1, 2, 3, 4, 5].map((d, index) => d <= task.importance && <div key={index}>{'⭐️ '}</div>)}
           </S.TaskDetailInfosCol>
           {task.location && (
             <S.TaskDetailInfosCol>
@@ -78,7 +93,7 @@ const TaskList = ({ taskList, activeTask, completionFilter, fetchTaskList }: tas
             <S.TaskDetailInfos flex="row">
               {task.labels.map((label) => {
                 return (
-                  <S.LabelListItem key={label.title} color={label.color}>
+                  <S.LabelListItem key={label.labelIdx} color={label.color}>
                     {label.title} {label.amount} {label.unit}
                   </S.LabelListItem>
                 );
@@ -98,11 +113,11 @@ const TaskList = ({ taskList, activeTask, completionFilter, fetchTaskList }: tas
                   완료
                 </S.TaskDetailIcon>
 
-                <S.TaskDetailIcon>
+                <S.TaskDetailIcon onClick={(e) => taskChange(task)}>
                   <S.EditIcon />
                   수정
                 </S.TaskDetailIcon>
-                <S.TaskDetailIcon>
+                <S.TaskDetailIcon onClick={(e) => deleteTask(task.idx)}>
                   <S.DeleteIcon />
                   삭제
                 </S.TaskDetailIcon>
@@ -120,18 +135,84 @@ const TaskList = ({ taskList, activeTask, completionFilter, fetchTaskList }: tas
       {taskList.map((task: Task) => {
         return (
           !isTaskFiltered(task.done) && (
-            <S.TaskItem key={'task' + task.idx} data-idx={task.idx} data-tag={task.tagIdx} data-active={task.idx === activeTask} done={Number(task.done)} cols={CalcHeight(task)}>
-              <S.TaskMainInfos>
-                <S.TaskTime>{task.startedAt}</S.TaskTime>
-                <S.TaskTitle>{task.title}</S.TaskTitle>
-                {!task.isPublic && <S.LockerImage src="/lock.svg" />}
-              </S.TaskMainInfos>
-              {/*해당 메뉴는 상세 정보가 열려 있을 때만 표시 */}
-              {task.idx === activeTask && <DetailInfo task={task} />}
-            </S.TaskItem>
+            <div key={task.idx}>
+              <S.TaskItem key={'task' + task.idx} data-idx={task.idx} data-tag={task.tagIdx} data-active={task.idx === activeTask} done={Number(task.done)} cols={CalcHeight(task)}>
+                <S.TaskMainInfos>
+                  <S.TaskTime>{task.startedAt}</S.TaskTime>
+                  <S.TaskTitle>{task.title}</S.TaskTitle>
+                  {!task.isPublic && <S.LockerImage src="/lock.svg" />}
+                </S.TaskMainInfos>
+                {task.idx === activeTask && <DetailInfo task={task} />}
+              </S.TaskItem>
+              {task.idx === activeTask && <EmoticonList key={task.idx} task={task} isMe={currentVisit.isMe} />}
+            </div>
           )
         );
       })}
+    </>
+  );
+};
+
+const EmoticonList = ({ task, isMe }: { task: Task; isMe: boolean }) => {
+  const [emoticonList, setEmoticonList] = useState<Emoticon[]>([]);
+  const [emoticonSet, setEmoticonSet] = useState<Emoticon[]>([]);
+
+  useEffect(() => {
+    getEmoticon();
+  }, []);
+
+  const getEmoticon = async () => {
+    try {
+      const result = await axios.get(`${HOST}/api/v1/emoticon/task/${task.idx}`);
+      setEmoticonList(result.data);
+      setEmoticonSet(
+        result.data.filter((element: Emoticon, index: any) => {
+          return result.data.findIndex((el: Emoticon) => el.emoticon == element.emoticon) === index;
+        })
+      );
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const emoticonSample = ['🙂', '❤️', '😭', '👍', '👎', '🔥', '🎉'];
+
+  const postEmoticon = async (index: number) => {
+    try {
+      const response = await axios.put(`${HOST}/api/v1/emoticon/task/${task.idx}`, { emoticon: index + 1 });
+      getEmoticon();
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  return (
+    <>
+      {!isMe && (
+        <S.EmoticonInput>
+          {emoticonSample.map((el, index) => (
+            <span key={index} onClick={(e) => postEmoticon(index)}>
+              {el}
+            </span>
+          ))}
+        </S.EmoticonInput>
+      )}
+      <S.EmoticonContainer>
+        {emoticonSet.map((i, index) => (
+          <div key={i.idx}>
+            {emoticonList.filter((el) => el.emoticon === i.emoticon).length > 1 && <S.Count> {emoticonList.filter((el) => el.emoticon === i.emoticon).length} </S.Count>}
+            <S.Emoticon
+              authorName={`${emoticonList
+                .filter((el) => el.emoticon === i.emoticon)
+                .map((el_) => el_.authorName)
+                .join(',')}`}
+              index={index}
+            >
+              {i.emoticon}
+            </S.Emoticon>
+          </div>
+        ))}
+      </S.EmoticonContainer>
     </>
   );
 };
