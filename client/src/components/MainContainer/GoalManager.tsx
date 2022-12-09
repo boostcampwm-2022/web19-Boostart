@@ -93,6 +93,7 @@ const GoalManager = () => {
   };
 
   const handleCloseButtonClick = () => {
+    fetchLabelMap().then();
     setIsGoalModalOpen(false);
   };
 
@@ -105,9 +106,11 @@ const GoalManager = () => {
       <S.GoalHead>
         <span>목표</span> <span>제목</span> <span>현황</span> <span>달성률</span>
       </S.GoalHead>
-      {goalList.map((goal) => (
-        <Goal key={goal.idx} goal={goal} />
-      ))}
+      <S.GoalList>
+        {goalList.map((goal) => (
+          <Goal key={goal.idx} goal={goal} />
+        ))}
+      </S.GoalList>
       <NewTaskButton onClick={handleNewGoalButtonClick} />
       {isGoalModalOpen && (
         <Modal
@@ -159,7 +162,7 @@ const GoalModal = ({ isLabelModalOpen, setIsLabelModalOpen, handleCloseButtonCli
   const setValues = () => {
     setValue('date', dateToString());
     if (typeof selectedLabelIndex === 'number') setValue('labelIdx', selectedLabelIndex);
-    if (over) setValue('over', over);
+    if (over !== undefined) setValue('over', over);
   };
 
   useEffect(() => {
@@ -376,7 +379,7 @@ const Goal = ({ goal }: GoalProps) => {
   const { title: labelTitle, color: labelColor, unit: labelUnit } = label;
 
   const isPast = true;
-  const rate = over ? currentAmount / goalAmount : currentAmount <= goalAmount ? 1 : isPast ? 0 : 0.5;
+  const rate = over ? Math.min(currentAmount / goalAmount, 1) : currentAmount <= goalAmount ? 1 : isPast ? 0 : 0.5;
   const rateString = rate >= 1 ? 'success' : over ? (100 * rate).toFixed(0).toString() + '%' : isPast ? 'failed' : 'progress';
 
   return (
