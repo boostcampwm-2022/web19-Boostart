@@ -16,16 +16,15 @@ interface FriendsBarProps {
 }
 
 interface FriendMenuModalProps {
-  friendIdx: number;
   setIsDoubleCheckMdoalOpen: React.Dispatch<boolean>;
   setIsFriendProfileOpen: React.Dispatch<boolean>;
 }
+
 interface DoubleCheckModalProps {
   friend: Friend;
   handleAcceptClick: (e: React.MouseEvent, idx: number) => Promise<void>;
   handleCancleClick: (e: React.MouseEvent) => void;
 }
-interface FriendMenuModalProps {}
 interface FriendProfileModalProps {
   userId: string;
   username: string;
@@ -127,6 +126,7 @@ const FriendsBar = ({ myProfile, friendsList, setFriendsList, handlePlusButtonCl
 
 export default FriendsBar;
 
+
 const FriendMenuModal = ({ setIsDoubleCheckMdoalOpen, setIsFriendProfileOpen }: FriendMenuModalProps) => {
   const openDoubleCheckModal = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -145,6 +145,7 @@ const FriendMenuModal = ({ setIsDoubleCheckMdoalOpen, setIsFriendProfileOpen }: 
     </>
   );
 };
+
 
 const UnfriendDoubleCheckModal = ({ friend, handleAcceptClick, handleCancleClick }: DoubleCheckModalProps) => {
   const removePointerEvents = (e: React.MouseEvent) => {
