@@ -62,7 +62,7 @@ const FriendsBar = ({ myProfile, friendsList, setFriendsList, handlePlusButtonCl
             onContextMenu={(e) => handleRightClick(e)}
             nowVisiting={currentVisit.userId === userId}
           ></S.ProfileBox>
-          {currentFriendOnMenu?.userId === userId && userId !== myProfile?.userId && <FriendMenuModal friendIdx={idx} setIsDoubleCheckMdoalOpen={setIsDoubleCheckMdoalOpen} setIsFriendProfileOpen={setIsFriendProfileOpen}></FriendMenuModal>}
+          {currentFriendOnMenu?.userId === userId && userId !== myProfile?.userId && <FriendMenuModal setIsDoubleCheckMdoalOpen={setIsDoubleCheckMdoalOpen} setIsFriendProfileOpen={setIsFriendProfileOpen}></FriendMenuModal>}
         </div>
       </>
     );
@@ -126,7 +126,6 @@ const FriendsBar = ({ myProfile, friendsList, setFriendsList, handlePlusButtonCl
 
 export default FriendsBar;
 
-
 const FriendMenuModal = ({ setIsDoubleCheckMdoalOpen, setIsFriendProfileOpen }: FriendMenuModalProps) => {
   const openDoubleCheckModal = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -145,7 +144,6 @@ const FriendMenuModal = ({ setIsDoubleCheckMdoalOpen, setIsFriendProfileOpen }: 
     </>
   );
 };
-
 
 const UnfriendDoubleCheckModal = ({ friend, handleAcceptClick, handleCancleClick }: DoubleCheckModalProps) => {
   const removePointerEvents = (e: React.MouseEvent) => {
