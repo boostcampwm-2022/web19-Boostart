@@ -12,27 +12,34 @@ const { kakao } = window;
 export const Map = () => {
   const [currentMenu, setCurrentMenu] = useRecoilState(menuState);
   const { currentDate, dateToString } = useCurrentDate();
-  const [taskList, setTaskList] = useState<Task[]>([]);
+  const [mytaskList, setMyTaskList] = useState<Task[]>([]);
+  const [friendsTaskList, setFriendsTaskList] = useState<Task[]>([]);
   const [markers, setMarkers] = useState<any[]>([]);
   const [isTaskNull, setIsTaskNull] = useState(false);
   const currentVisit = useRecoilValue(visitState);
   const mapRef = useRef<HTMLDivElement | null>(null);
   const kakaoMapRef = useRef<any>(null);
-  const boundRef = useRef<any>(null);
-  const imageSrc = '/mapMarkerPurple.png';
+  const myMarkerImage = '/mapMarkerPurple.png';
+  const focusTarget = {
+    Me: 'me',
+    Friend: 'frined',
+    Both: 'both',
+  };
 
-  const fetchTaskList = async () => {
+  const fetchMyTaskList = async () => {
     const date = dateToString();
     const response = currentVisit.isMe ? await axios.get(`${HOST}/api/v1/task?date=${date}`) : await axios.get(`${HOST}/api/v1/task/${currentVisit.userId}?date=${date}`);
     const tasks: Task[] = response.data;
     const validTasks = tasks.filter(({ lat }) => lat);
-    setTaskList(validTasks);
+    setMyTaskList(validTasks);
   };
 
-  const focusAllTasks = () => {
-    taskList.forEach(({ title, lat, lng }) => {
+  const focusAllTasks = (target: 'me' | 'friend' | 'both') => {
+    const focusList = target === 'me' ? mytaskList : target === 'friend' ? friendsTaskList : [mytaskList, friendsTaskList];
+    const bound = new kakao.maps.LatLngBounds();
+    mytaskList.forEach(({ title, lat, lng }) => {
       const imageSize = new kakao.maps.Size(35, 35);
-      const markerImage = new kakao.maps.MarkerImage(imageSrc, imageSize);
+      const markerImage = new kakao.maps.MarkerImage(myMarkerImage, imageSize);
       const markerPosition = new kakao.maps.LatLng(lat, lng);
       const marker = new kakao.maps.Marker({
         map: kakaoMapRef.current,
@@ -41,9 +48,9 @@ export const Map = () => {
         image: markerImage,
       });
       setMarkers((markers) => [...markers, marker]);
-      boundRef.current.extend(markerPosition);
+      bound.extend(markerPosition);
     });
-    kakaoMapRef.current.setBounds(boundRef.current);
+    kakaoMapRef.current.setBounds(bound);
   };
 
   useEffect(() => {
@@ -53,9 +60,7 @@ export const Map = () => {
       level: 5,
     };
     const map = new kakao.maps.Map(mapRef.current, options);
-    const bound = new kakao.maps.LatLngBounds();
     kakaoMapRef.current = map;
-    boundRef.current = bound;
   }, []);
 
   useEffect(() => {
@@ -64,21 +69,18 @@ export const Map = () => {
       markers.forEach((marker) => marker.setMap(null));
       setMarkers([]);
     }
-    fetchTaskList();
+    fetchMyTaskList();
   }, [currentVisit, currentDate]);
 
   useEffect(() => {
     if (!mapRef.current) return;
-    if (taskList.length === 0) {
+    if (mytaskList.length === 0) {
       setIsTaskNull(true);
       return;
     }
     setIsTaskNull(false);
-    focusAllTasks();
-    return () => {
-      boundRef.current = new kakao.maps.LatLngBounds();
-    };
-  }, [taskList]);
+    focusAllTasks('me');
+  }, [mytaskList]);
 
   const ValidTaskList = () => {
     const focusSelectedTask = (lat: number, lng: number) => {
@@ -88,9 +90,9 @@ export const Map = () => {
     };
     return (
       <TaskListOnMap>
-        <TaskListTitleOnMap>Task 목록</TaskListTitleOnMap>
-        {taskList &&
-          taskList.map(({ title, lat, lng, tagName }) => {
+        <TaskListTitleOnMap>나의 Task 목록</TaskListTitleOnMap>
+        {mytaskList &&
+          mytaskList.map(({ title, lat, lng, tagName }) => {
             return (
               <TaskItemOnMap onClick={() => focusSelectedTask(lat, lng)}>
                 <span>{title}</span>
@@ -98,7 +100,7 @@ export const Map = () => {
               </TaskItemOnMap>
             );
           })}
-        <TaskItemOnMap onClick={() => focusAllTasks()}>전체보기</TaskItemOnMap>
+        <TaskItemOnMap onClick={() => focusAllTasks('me')}>전체보기</TaskItemOnMap>
       </TaskListOnMap>
     );
   };
@@ -110,8 +112,9 @@ export const Map = () => {
         <DateSelector />
         <KakaoContainer>
           <div ref={mapRef} style={{ width: '41rem', height: '31rem' }}></div>
-          {taskList.length > 0 && <ValidTaskList />}
+          {mytaskList.length > 0 && <ValidTaskList />}
           {isTaskNull && <TaskAlertBox>위치정보가 있는 Task를 추가해주세요</TaskAlertBox>}
+          {}
         </KakaoContainer>
       </MapContainer>
     </>
@@ -121,7 +124,7 @@ export const Map = () => {
 export default Map;
 
 const TaskListOnMap = styled.div`
-  width: 10rem;
+  width: 7rem;
   max-height: 80%;
   display: flex;
   position: absolute;
@@ -141,16 +144,17 @@ const TaskListTitleOnMap = styled.div`
   height: 2rem;
   line-height: 2rem;
   text-align: center;
+  font-size: 0.75rem;
   font-weight: 700;
 `;
 
 const TaskItemOnMap = styled.div`
   width: 100%;
   height: 3.5rem;
-  padding: 0 1.5rem;
+  padding: 0 0.75rem;
   border-top: 1px solid var(--color-gray5);
+  font-size: 0.75rem;
   font-family: 'Noto Sans KR';
-
   display: flex;
   flex-direction: column;
   justify-content: center;
