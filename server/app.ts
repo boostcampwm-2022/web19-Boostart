@@ -4,16 +4,15 @@ import { CLIENT, PORT, API_VERSION, REDIS_HOST, REDIS_USERNAME, REDIS_PORT, REDI
 import apiRouter from './src/api/index';
 import cors from 'cors';
 import path from 'path';
-import { Server, Socket } from 'socket.io';
+import { Socket } from 'socket.io';
 import http from 'http';
 import * as redis from 'redis';
 import jwt from 'jsonwebtoken';
+import { connectionIdToUserIdx, userIdxToSocketId } from './src/core/store';
+import { globalSocket } from './src/core/socket';
 
 const app = express();
 const httpServer = http.createServer(app);
-
-const connectionIdToUserIdx = {};
-const userIdxToSocketId = {};
 
 const corsOptions = {
   origin: CLIENT,
@@ -21,9 +20,12 @@ const corsOptions = {
   methods: ['GET', 'POST', 'DELETE', 'PUT', 'PATCH'],
 };
 
-const io = new Server(httpServer, {
+globalSocket.initialize(httpServer, {
   cors: corsOptions,
 });
+
+const io = globalSocket.instance;
+
 const redisclient = redis.createClient({
   url: `redis://${REDIS_USERNAME}:${REDIS_PASSWORD}@${REDIS_HOST}:${REDIS_PORT}/0`,
   legacyMode: true,
