@@ -49,7 +49,7 @@ const Calendar = () => {
   const [calendarPercent, setCalendarPercent] = useState([]);
 
   useEffect(() => {
-    const getEmoticon = async () => {
+    const getCalendarData = async () => {
       try {
         if (currentMenu == 'LOG' || currentMenu == 'MAP' || currentMenu == 'DIARY') {
           const result = await axios.get(`${HOST}/api/v1/calendar/task?year=${calendarDate.getFullYear()}&month=${calendarDate.getMonth() + 1}`);
@@ -62,7 +62,7 @@ const Calendar = () => {
         console.log(error);
       }
     };
-    getEmoticon();
+    getCalendarData();
   }, [calendarDate.getMonth(), currentMenu]);
 
   return (
