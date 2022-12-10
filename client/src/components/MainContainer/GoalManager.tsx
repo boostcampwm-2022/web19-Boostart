@@ -43,6 +43,11 @@ const httpPatchLabel = async (idx: number, { title, color }: { title?: string; c
   return response;
 };
 
+const httpPutGoal = async (idx: number, body: FieldValues) => {
+  const response = await axios.put(`${HOST}/api/v1/goal/${idx}`, body);
+  return response;
+};
+
 const generateRandomHexColor = () => {
   const R = Math.floor(Math.random() * 127 + 128).toString(16);
   const G = Math.floor(Math.random() * 127 + 128).toString(16);
@@ -56,6 +61,7 @@ const GoalManager = () => {
   const { currentDate, dateToString } = useCurrentDate();
   const [goalList, setGoalList] = useState<Goal[]>([]);
   const currentVisit = useRecoilValue(visitState);
+  const [selectedGoal, setSelectedGoal] = useState<Goal>();
 
   const [currentMenu, setCurrentMenu] = useRecoilState(menuState);
 
@@ -89,12 +95,18 @@ const GoalManager = () => {
   }, [currentDate]);
 
   const handleNewGoalButtonClick = () => {
+    setSelectedGoal(undefined);
     setIsGoalModalOpen(true);
   };
 
   const handleCloseButtonClick = () => {
     fetchLabelMap().then();
     setIsGoalModalOpen(false);
+  };
+
+  const handleGoalClick = (goal: Goal) => () => {
+    setSelectedGoal(goal);
+    setIsGoalModalOpen(true);
   };
 
   useEffect(() => {
@@ -108,13 +120,15 @@ const GoalManager = () => {
       </S.GoalHead>
       <S.GoalList>
         {goalList.map((goal) => (
-          <Goal key={goal.idx} goal={goal} />
+          <div key={goal.idx} onClick={handleGoalClick(goal)}>
+            <Goal goal={goal} />
+          </div>
         ))}
       </S.GoalList>
       <NewTaskButton onClick={handleNewGoalButtonClick} />
       {isGoalModalOpen && (
         <Modal
-          component={<GoalModal isLabelModalOpen={isLabelModalOpen} setIsLabelModalOpen={setIsLabelModalOpen} handleCloseButtonClick={handleCloseButtonClick} />}
+          component={<GoalModal isLabelModalOpen={isLabelModalOpen} setIsLabelModalOpen={setIsLabelModalOpen} handleCloseButtonClick={handleCloseButtonClick} selectedGoal={selectedGoal} />}
           zIndex={GOAL_MODAL_Z_INDEX}
           top="50%"
           left="50%"
@@ -134,12 +148,13 @@ interface GoalModalProps {
   isLabelModalOpen: boolean;
   setIsLabelModalOpen: React.Dispatch<boolean>;
   handleCloseButtonClick: () => void;
+  selectedGoal?: Goal;
 }
 
-const GoalModal = ({ isLabelModalOpen, setIsLabelModalOpen, handleCloseButtonClick }: GoalModalProps) => {
-  const [selectedLabelIndex, setSelectedLabelIndex] = useState<number>();
+const GoalModal = ({ isLabelModalOpen, setIsLabelModalOpen, handleCloseButtonClick, selectedGoal }: GoalModalProps) => {
+  const [selectedLabelIndex, setSelectedLabelIndex] = useState<number | null>(selectedGoal ? selectedGoal.labelIdx : null);
   const [labelList, setLabelList] = useState<Label[]>([]);
-  const [over, setOver] = useState(true);
+  const [over, setOver] = useState(selectedGoal ? selectedGoal.over : true);
   const { dateToString } = useCurrentDate();
 
   const schema = yup.object().shape({
@@ -162,12 +177,14 @@ const GoalModal = ({ isLabelModalOpen, setIsLabelModalOpen, handleCloseButtonCli
   const setValues = () => {
     setValue('date', dateToString());
     if (typeof selectedLabelIndex === 'number') setValue('labelIdx', selectedLabelIndex);
-    if (over !== undefined) setValue('over', over);
+    setValue('over', over);
   };
 
   useEffect(() => {
     try {
-      httpGetLabelList().then(setLabelList);
+      httpGetLabelList().then((labelList) => {
+        setLabelList(labelList);
+      });
     } catch (error) {
       console.log(error);
     }
@@ -204,7 +221,7 @@ const GoalModal = ({ isLabelModalOpen, setIsLabelModalOpen, handleCloseButtonCli
 
   const goalSubmit = async (goalData: FieldValues) => {
     try {
-      const response = await httpPostGoal(goalData);
+      const response = await (selectedGoal ? httpPutGoal(selectedGoal.idx, goalData) : httpPostGoal(goalData));
       handleCloseButtonClick();
     } catch (error) {
       if (axios.isAxiosError(error)) {
@@ -216,7 +233,8 @@ const GoalModal = ({ isLabelModalOpen, setIsLabelModalOpen, handleCloseButtonCli
     }
   };
 
-  const label = labelList.find((label) => label.idx === selectedLabelIndex);
+  const label = selectedGoal ? labelMap.get(selectedGoal.labelIdx) : labelList.find((label) => label.idx === selectedLabelIndex);
+  const amount = selectedGoal ? selectedGoal.goalAmount : undefined;
 
   const [color, setColor] = useState(label?.color);
 
@@ -242,18 +260,18 @@ const GoalModal = ({ isLabelModalOpen, setIsLabelModalOpen, handleCloseButtonCli
   return (
     <>
       <S.GoalModal onSubmit={handleSubmit(goalSubmit)}>
-        <S.GoalModalLabelTitleInput placeholder="제목을 설정하세요" {...register('title')} />
-        <S.GoalModalLabel color={label ? color : 'white'}>
+        <S.GoalModalLabelTitleInput defaultValue={selectedGoal?.title ?? ''} placeholder="제목을 설정하세요" {...register('title')} />
+        <S.GoalModalLabel color={color}>
           <S.LabelModalLabelColorInput value={color ?? '#ffffff'} type="color" {...register('color')} onChange={handleColorInputChange} onBlur={handleColorInputBlur} />
-          <S.GoalModalLabelName value={label ? label.title : ''} placeholder="라벨을 설정하세요" filled={!!label} disabled={true} />
-          <S.GoalModalAmountInput type="number" min="0" disabled={selectedLabelIndex === undefined} placeholder="목표량" {...register('amount')} />
+          <S.GoalModalLabelName value={label?.title ?? ''} placeholder="라벨을 설정하세요" filled={!!label} disabled={true} />
+          <S.GoalModalAmountInput type="number" defaultValue={amount} min="0" disabled={selectedLabelIndex === undefined} placeholder="목표량" {...register('amount')} />
           <div>{label ? label.unit : ''}</div>
           <S.GoalModalOverInput onClick={handleOverInputClick}>{over ? '▲' : '▼'}</S.GoalModalOverInput>
         </S.GoalModalLabel>
         <S.LabelListContainer>
           <LabelList labelList={labelList} handlePlusButtonClick={handleLabelAddButtonClick} handleItemClick={handleLabelClick} handleDeleteButtonClick={handleDeleteButtonClick} />
         </S.LabelListContainer>
-        <S.GoalModalSubmitButton onClick={setValues}>NEW GOAL!</S.GoalModalSubmitButton>
+        <S.GoalModalSubmitButton onClick={setValues}>{selectedGoal ? 'APPLY' : 'NEW GOAL'}!</S.GoalModalSubmitButton>
       </S.GoalModal>
       {isLabelModalOpen && (
         <Modal
