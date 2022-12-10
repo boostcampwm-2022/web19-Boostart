@@ -9,37 +9,46 @@ import { visitState, menuState } from '../common/atoms';
 import { Task } from 'GlobalType';
 const { kakao } = window;
 
+type TaskTargetType = 'my' | 'friend' | 'both';
+
 export const Map = () => {
-  const [currentMenu, setCurrentMenu] = useRecoilState(menuState);
-  const { currentDate, dateToString } = useCurrentDate();
-  const [mytaskList, setMyTaskList] = useState<Task[]>([]);
-  const [friendsTaskList, setFriendsTaskList] = useState<Task[]>([]);
-  const [markers, setMarkers] = useState<any[]>([]);
-  const [isTaskNull, setIsTaskNull] = useState(false);
-  const currentVisit = useRecoilValue(visitState);
   const mapRef = useRef<HTMLDivElement | null>(null);
   const kakaoMapRef = useRef<any>(null);
-  const myMarkerImage = '/mapMarkerPurple.png';
-  const focusTarget = {
-    Me: 'me',
-    Friend: 'frined',
-    Both: 'both',
-  };
+  const [currentMenu, setCurrentMenu] = useRecoilState(menuState);
+  const { currentDate, dateToString } = useCurrentDate();
+  const [myTaskList, setMyTaskList] = useState<Task[]>([]);
+  const [friendTaskList, setFriendTaskList] = useState<Task[]>([]);
+  const [markers, setMarkers] = useState<any[]>([]);
+  const currentVisit = useRecoilValue(visitState);
+  const MyimageSrc = '/mapMarkerPurple.png';
+  const FriendImageSrc = '/mapMarkerYellow.png';
 
-  const fetchMyTaskList = async () => {
+  const fetchTaskList = async (target: TaskTargetType) => {
     const date = dateToString();
-    const response = currentVisit.isMe ? await axios.get(`${HOST}/api/v1/task?date=${date}`) : await axios.get(`${HOST}/api/v1/task/${currentVisit.userId}?date=${date}`);
+    const response = target === 'my' ? await axios.get(`${HOST}/api/v1/task?date=${date}`) : await axios.get(`${HOST}/api/v1/task/${currentVisit.userId}?date=${date}`);
     const tasks: Task[] = response.data;
     const validTasks = tasks.filter(({ lat }) => lat);
-    setMyTaskList(validTasks);
+    if (target === 'my') setMyTaskList(validTasks);
+    else if (target === 'friend') setFriendTaskList(validTasks);
   };
 
-  const focusAllTasks = (target: 'me' | 'friend' | 'both') => {
-    const focusList = target === 'me' ? mytaskList : target === 'friend' ? friendsTaskList : [mytaskList, friendsTaskList];
-    const bound = new kakao.maps.LatLngBounds();
-    mytaskList.forEach(({ title, lat, lng }) => {
-      const imageSize = new kakao.maps.Size(35, 35);
-      const markerImage = new kakao.maps.MarkerImage(myMarkerImage, imageSize);
+  const selectTaskList = (focusType: TaskTargetType) => {
+    switch (focusType) {
+      case 'both':
+        return [...myTaskList, ...friendTaskList];
+      case 'friend':
+        return friendTaskList;
+      case 'my':
+        return myTaskList;
+    }
+  };
+
+  const setMarkerOnMap = (focusType: TaskTargetType) => {
+    const markerImageSrc = focusType === 'my' ? MyimageSrc : FriendImageSrc;
+    let taskList = selectTaskList(focusType);
+    taskList.forEach(({ title, lat, lng }) => {
+      const imageSize = new kakao.maps.Size(50, 50);
+      const markerImage = new kakao.maps.MarkerImage(markerImageSrc, imageSize);
       const markerPosition = new kakao.maps.LatLng(lat, lng);
       const marker = new kakao.maps.Marker({
         map: kakaoMapRef.current,
@@ -48,6 +57,14 @@ export const Map = () => {
         image: markerImage,
       });
       setMarkers((markers) => [...markers, marker]);
+    });
+  };
+
+  const setMapBoundary = (focusType: TaskTargetType) => {
+    let taskList = selectTaskList(focusType);
+    const bound = new kakao.maps.LatLngBounds();
+    taskList.forEach(({ lat, lng }) => {
+      const markerPosition = new kakao.maps.LatLng(lat, lng);
       bound.extend(markerPosition);
     });
     kakaoMapRef.current.setBounds(bound);
@@ -64,57 +81,68 @@ export const Map = () => {
   }, []);
 
   useEffect(() => {
-    setIsTaskNull(false);
     if (markers.length > 0) {
       markers.forEach((marker) => marker.setMap(null));
       setMarkers([]);
     }
-    fetchMyTaskList();
+    fetchTaskList('my');
+    if (!currentVisit.isMe) {
+      fetchTaskList('friend');
+    } else {
+      setFriendTaskList([]);
+    }
   }, [currentVisit, currentDate]);
 
   useEffect(() => {
     if (!mapRef.current) return;
-    if (mytaskList.length === 0) {
-      setIsTaskNull(true);
-      return;
-    }
-    setIsTaskNull(false);
-    focusAllTasks('me');
-  }, [mytaskList]);
+    setMarkerOnMap('my');
+  }, [myTaskList]);
+  useEffect(() => {
+    if (!mapRef.current) return;
+    setMarkerOnMap('friend');
+  }, [friendTaskList]);
+  useEffect(() => {
+    if (!mapRef.current) return;
+    if (myTaskList.length > 0 || friendTaskList.length > 0) setMapBoundary('both');
+  }, [myTaskList, friendTaskList]);
 
-  const ValidTaskList = () => {
+  const TaskList = ({ isMyList }: { isMyList: boolean }) => {
+    const taskList = isMyList ? myTaskList : friendTaskList;
     const focusSelectedTask = (lat: number, lng: number) => {
       const focusPosition = new kakao.maps.LatLng(lat, lng);
       kakaoMapRef.current.setCenter(focusPosition);
       kakaoMapRef.current.setLevel(3);
     };
     return (
-      <TaskListOnMap>
-        <TaskListTitleOnMap>나의 Task 목록</TaskListTitleOnMap>
-        {mytaskList &&
-          mytaskList.map(({ title, lat, lng, tagName }) => {
+      <TaskListOnMap isMyList={isMyList}>
+        <TaskListTitleOnMap>{isMyList ? '나의 하루' : '친구의 하루'}</TaskListTitleOnMap>
+        {taskList &&
+          taskList.map(({ idx, title, lat, lng, tagName, startedAt }) => {
             return (
-              <TaskItemOnMap onClick={() => focusSelectedTask(lat, lng)}>
+              <TaskItemOnMap key={idx} onClick={() => focusSelectedTask(lat, lng)}>
                 <span>{title}</span>
-                <span>#{tagName}</span>
+                <span>
+                  #{tagName} {startedAt}
+                </span>
               </TaskItemOnMap>
             );
           })}
-        <TaskItemOnMap onClick={() => focusAllTasks('me')}>전체보기</TaskItemOnMap>
+        <TaskItemOnMap onClick={() => setMapBoundary(isMyList ? 'my' : 'friend')}>전체보기</TaskItemOnMap>
       </TaskListOnMap>
     );
   };
 
   return (
     <>
-      <MapTitle>MAP</MapTitle>
+      <MapTitle>MAP{!currentVisit.isMe && <span> width {currentVisit.userId}</span>}</MapTitle>
       <MapContainer>
         <DateSelector />
         <KakaoContainer>
           <div ref={mapRef} style={{ width: '41rem', height: '31rem' }}></div>
-          {mytaskList.length > 0 && <ValidTaskList />}
-          {isTaskNull && <TaskAlertBox>위치정보가 있는 Task를 추가해주세요</TaskAlertBox>}
-          {}
+          {myTaskList.length > 0 && <TaskList isMyList={true} />}
+          {friendTaskList.length > 0 && <TaskList isMyList={false} />}
+          {myTaskList.length === 0 && friendTaskList.length === 0 && <TaskAlertBox>위치정보가 있는 Task를 추가해주세요</TaskAlertBox>}
+          {friendTaskList.length > 0 && myTaskList.length > 0 && <BothFocusButton onClick={() => setMapBoundary('both')}>전체보기</BothFocusButton>}
         </KakaoContainer>
       </MapContainer>
     </>
@@ -123,14 +151,16 @@ export const Map = () => {
 
 export default Map;
 
-const TaskListOnMap = styled.div`
-  width: 7rem;
+const TaskListOnMap = styled.div<{
+  isMyList: boolean;
+}>`
+  width: 9rem;
   max-height: 80%;
   display: flex;
   position: absolute;
   border-radius: 1rem;
   top: 50%;
-  left: 0;
+  ${(props) => (props.isMyList ? 'left: 0;' : 'right:0;')}
   transform: translate(0, -50%);
   flex-direction: column;
   background: rgba(255, 255, 255, 0.8);
@@ -144,17 +174,16 @@ const TaskListTitleOnMap = styled.div`
   height: 2rem;
   line-height: 2rem;
   text-align: center;
-  font-size: 0.75rem;
   font-weight: 700;
 `;
 
 const TaskItemOnMap = styled.div`
   width: 100%;
-  height: 3.5rem;
-  padding: 0 0.75rem;
+  height: fit-content;
+  padding: 0.5rem 0.75rem;
   border-top: 1px solid var(--color-gray5);
-  font-size: 0.75rem;
   font-family: 'Noto Sans KR';
+  font-size: 0.875rem;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -206,4 +235,19 @@ const TaskAlertBox = styled.div`
   line-height: 5rem;
   text-align: center;
   z-index: 600;
+`;
+
+const BothFocusButton = styled.div`
+  width: 7rem;
+  height: 2rem;
+  line-height: 2rem;
+  text-align: center;
+  background: rgba(255, 255, 255, 0.8);
+  border-radius: 1rem;
+  position: absolute;
+  top: 0.5rem;
+  left: 50%;
+  transform: translate(-50%, 0);
+  z-index: 600;
+  cursor: pointer;
 `;
