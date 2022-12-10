@@ -95,6 +95,15 @@ io.on('connection', (socket: AuthorizedSocket) => {
     const connectionId = (socket.conn as any).id;
     const userIdx = connectionIdToUserIdx[connectionId];
     userIdxToSocketId[userIdx] = socket.id;
+
+    // 테스트하시기 쉽게 우선 주석으로 남겨두겠습니다.
+    // console.log(`유저 ${userIdx} 로그인`);
+    // console.log(`-- 서버와 연결되어 있는 소켓 목록 --`);
+    // console.log(io.sockets.sockets.keys());
+    // console.log(`-- 접속중인 유저의 소켓 아이디 목록 --`);
+    // console.log(userIdxToSocketId);
+    // console.log(`-- 연결중인 소켓 커넥션에 대한 유저 아이디 목록 --`);
+    // console.log(connectionIdToUserIdx);
   });
 
   socket.on('joinToNewRoom', async (destId, date) => {
@@ -142,6 +151,8 @@ io.on('connection', (socket: AuthorizedSocket) => {
 
   socket.on('disconnect', () => {
     visitingRoom.delete(socket.id);
+    delete connectionIdToUserIdx[(socket.conn as any).id];
+    delete userIdxToSocketId[socket.uid];
   });
 });
 
