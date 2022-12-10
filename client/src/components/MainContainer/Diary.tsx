@@ -12,6 +12,7 @@ const Diary = () => {
   useEffect(() => {
     setCurrentMenu('DIARY');
   }, []);
+  
   return (
     <>
       <S.DiaryTitle>

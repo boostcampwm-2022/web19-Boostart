@@ -168,7 +168,7 @@ const TaskModal = ({ handleCloseButtonClick, tagList, fetchTagList, currentTask 
             />
             <input type="number" {...register('importance')} hidden={true} />
             <Row title="중요도" content={<ImportanceInput importance={importance} handleStarClick={handleStarClick} />} />
-            <Row title="공개" content={<input type="checkbox" defaultChecked={currentTask ? currentTask.isPublic : true} {...register('isPublic')} />} />
+            <Row title="공개" content={<input type="checkbox" {...register('isPublic')} />} />
           </tbody>
         </S.FormTable>
         <S.DetailButton onClick={() => setIsDetailOpen(!isDetailOpen)}>

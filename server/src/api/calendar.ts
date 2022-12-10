@@ -99,7 +99,7 @@ router.get('/task/:user_id', authenticateToken, async (req: AuthorizedRequest, r
     const isNotFriend = ((await executeSql('select * from friendship where (sender_idx = ? and receiver_idx = ?) or (sender_idx = ? and receiver_idx = ?)', [userIdx, friendIdx, friendIdx, userIdx])) as RowDataPacket).length === 0;
     if (isNotFriend) return res.status(403).send({ msg: '친구가 아닌 사용자의 태스크를 조회할 수 없어요.' });
 
-    const datesTaskExists = (await executeSql('select date_format(date, "%d") as date, count(idx) from task where user_idx = ? and date like ? group by date', [friendIdx, dateSearchFormat])) as RowDataPacket;
+    const datesTaskExists = (await executeSql('select date_format(date, "%d") as date, count(idx) from task where public = true and user_idx = ? and date like ? group by date', [friendIdx, dateSearchFormat])) as RowDataPacket;
     datesTaskExists.forEach(({ date }) => {
       result[parseInt(date) - 1] = true;
     });
@@ -128,9 +128,9 @@ router.get('/goal', authenticateToken, async (req: AuthorizedRequest, res) => {
 
   const result = Array.from({ length: lastDay }, () => 0);
   try {
-    const taskLabelSql = 'select label_idx, amount from task_label inner join task on task_label.task_idx = task.idx where done = true and user_idx = ? and date like ?';
+    const taskLabelSql = 'select date, label_idx, amount from task_label inner join task on task_label.task_idx = task.idx where done = true and user_idx = ? and date like ?';
     const currentAmountSql = 'cast(ifnull(sum(task_label.amount), 0) as unsigned)';
-    const dailyRateSql = `select date, case when over then if(${currentAmountSql} / goal.amount > 1, 1, ${currentAmountSql} / goal.amount) when ${currentAmountSql} > goal.amount then 0 else 1 end as rate from goal left join (${taskLabelSql}) task_label on goal.label_idx = task_label.label_idx where user_idx = ? and date like ? group by idx`;
+    const dailyRateSql = `select goal.date, case when over then if(${currentAmountSql} / goal.amount > 1, 1, ${currentAmountSql} / goal.amount) when ${currentAmountSql} > goal.amount then 0 else 1 end as rate from goal left join (${taskLabelSql}) task_label on goal.label_idx = task_label.label_idx and goal.date = task_label.date where user_idx = ? and goal.date like ? group by idx, date`;
 
     const dailyAverageRate = (await executeSql(`select date_format(date, "%d") as date, avg(rate) as averageRate from (${dailyRateSql}) daily_rate group by date`, [userIdx, dateSearchFormat, userIdx, dateSearchFormat])) as RowDataPacket;
     dailyAverageRate.forEach(({ date, averageRate }) => {

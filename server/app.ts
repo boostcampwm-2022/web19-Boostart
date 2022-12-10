@@ -72,12 +72,9 @@ io.engine.on('headers', async (_, request) => {
   const tokenCookie = cookies.find((cookie) => cookie.substring(0, 6) === 'token=');
   const token = tokenCookie.substring(6);
 
-  jwt.verify(token, TOKEN_SECRET, (error, { userIdx }) => {
-    if (error) {
-      console.log(error);
-      return;
-    }
-    connectionIdToUserIdx[connectionId] = userIdx;
+  jwt.verify(token, TOKEN_SECRET, (error, user) => {
+    if (error || !user) return;
+    connectionIdToUserIdx[connectionId] = user.userIdx;
   });
 });
 
@@ -94,7 +91,7 @@ io.on('connection', (socket: AuthorizedSocket) => {
   });
 
   // 유저 index로 소켓 ID를 알아낼 수 있게 등록하는 과정. 클라이언트에서 별도로 호출해주어야함
-  socket.on('connect', () => {
+  socket.on('authenticate', () => {
     const connectionId = (socket.conn as any).id;
     const userIdx = connectionIdToUserIdx[connectionId];
     userIdxToSocketId[userIdx] = socket.id;
@@ -102,6 +99,7 @@ io.on('connection', (socket: AuthorizedSocket) => {
 
   socket.on('joinToNewRoom', async (destId, date) => {
     console.log(`유저 ${socket.uid} 다이어리 ${destId}${date} 입장`);
+    console.log(`해당 유저의 소켓 ID는 ${userIdxToSocketId[socket.uid]}(${socket.id}) 입니다.`);
     const roomName = destId + date;
     visitingRoom.set(socket.id, roomName);
     socket.join(roomName);

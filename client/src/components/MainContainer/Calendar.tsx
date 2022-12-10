@@ -50,7 +50,7 @@ const Calendar = () => {
   const [calendarPercent, setCalendarPercent] = useState([]);
 
   useEffect(() => {
-    const getEmoticon = async () => {
+    const getCalendarData = async () => {
       try {
         if (currentMenu == 'LOG' || currentMenu == 'MAP' || currentMenu == 'DIARY') {
           const result = currentVisit.isMe
@@ -65,7 +65,7 @@ const Calendar = () => {
         console.log(error);
       }
     };
-    getEmoticon();
+    getCalendarData();
   }, [calendarDate.getMonth(), currentMenu, currentVisit]);
 
   return (
