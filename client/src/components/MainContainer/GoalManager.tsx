@@ -111,7 +111,7 @@ const GoalManager = () => {
           <Goal key={goal.idx} goal={goal} />
         ))}
       </S.GoalList>
-      <NewTaskButton onClick={handleNewGoalButtonClick} />
+      {currentVisit.isMe && <NewTaskButton onClick={handleNewGoalButtonClick} />}
       {isGoalModalOpen && (
         <Modal
           component={<GoalModal isLabelModalOpen={isLabelModalOpen} setIsLabelModalOpen={setIsLabelModalOpen} handleCloseButtonClick={handleCloseButtonClick} />}
