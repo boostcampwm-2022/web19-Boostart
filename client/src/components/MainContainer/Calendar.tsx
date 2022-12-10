@@ -4,7 +4,7 @@ import { EngMonth, Days, WEEK_LENGTH, HOST } from '../../constants';
 import MenuSelector from './MenuSelector';
 import * as S from './Calendar.style';
 import { useRecoilState } from 'recoil';
-import { menuState } from '../common/atoms';
+import { menuState, visitState } from '../common/atoms';
 import axios from 'axios';
 
 interface DateContainerProps {
@@ -23,6 +23,7 @@ const Calendar = () => {
   const { currentDate, getFirstDay, getLastDate } = useCurrentDate();
   const [calendarDate, setCalendarDate] = useState(currentDate);
   const [currentMenu, setCurrentMenu] = useRecoilState(menuState);
+  const [currentVisit, setCurrentVisit] = useRecoilState(visitState);
 
   //Vars
   const firstDay = getFirstDay(calendarDate);
@@ -52,7 +53,9 @@ const Calendar = () => {
     const getCalendarData = async () => {
       try {
         if (currentMenu == 'LOG' || currentMenu == 'MAP' || currentMenu == 'DIARY') {
-          const result = await axios.get(`${HOST}/api/v1/calendar/task?year=${calendarDate.getFullYear()}&month=${calendarDate.getMonth() + 1}`);
+          const result = currentVisit.isMe
+            ? await axios.get(`${HOST}/api/v1/calendar/task?year=${calendarDate.getFullYear()}&month=${calendarDate.getMonth() + 1}`)
+            : await axios.get(`${HOST}/api/v1/calendar/task/${currentVisit.userId}?year=${calendarDate.getFullYear()}&month=${calendarDate.getMonth() + 1}`);
           setCalendarPercent(result.data);
         } else if (currentMenu == 'GOAL') {
           const result = await axios.get(`${HOST}/api/v1/calendar/goal?year=${calendarDate.getFullYear()}&month=${calendarDate.getMonth() + 1}`);
@@ -63,7 +66,7 @@ const Calendar = () => {
       }
     };
     getCalendarData();
-  }, [calendarDate.getMonth(), currentMenu]);
+  }, [calendarDate.getMonth(), currentMenu, currentVisit]);
 
   return (
     <>
