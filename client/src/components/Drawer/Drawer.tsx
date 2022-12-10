@@ -81,13 +81,12 @@ const ProfileEditForm = ({ myProfile, setIsProfileEditModalOpen }: { myProfile: 
     profileFormData.append('username', username);
     if (profileImg) profileFormData.append('profileImg', profileImg);
     try {
-      await fetch(`${HOST}/api/v1/user/me`, {
+      const response = await fetch(`${HOST}/api/v1/user/me`, {
         method: 'PATCH',
         credentials: 'include',
         body: profileFormData,
-      }).then((res) => {
-        if (res.status == 200) setIsProfileEditModalOpen(false);
       });
+      if (response.status == 200) setIsProfileEditModalOpen(false);
     } catch (error) {
       console.log(error);
     }
