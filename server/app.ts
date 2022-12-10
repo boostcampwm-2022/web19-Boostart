@@ -72,12 +72,9 @@ io.engine.on('headers', async (_, request) => {
   const tokenCookie = cookies.find((cookie) => cookie.substring(0, 6) === 'token=');
   const token = tokenCookie.substring(6);
 
-  jwt.verify(token, TOKEN_SECRET, (error, { userIdx }) => {
-    if (error) {
-      console.log(error);
-      return;
-    }
-    connectionIdToUserIdx[connectionId] = userIdx;
+  jwt.verify(token, TOKEN_SECRET, (error, user) => {
+    if (error || !user) return;
+    connectionIdToUserIdx[connectionId] = user.userIdx;
   });
 });
 
