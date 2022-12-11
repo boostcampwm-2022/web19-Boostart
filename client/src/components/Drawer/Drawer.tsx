@@ -1,11 +1,11 @@
-import React, { useState } from 'react';
-import { dummyNotifications } from '../common/dummy';
+import React, { useEffect, useState } from 'react';
 import { PROFILE_EDIT_FORM_Z_INDEX, PROFILE_EDIT_FORM_TOP, PROFILE_EDIT_FORM_LEFT, PROFILE_EDIT_FORM_TRANFORM } from './Drawer.style';
 import { FRIEND_REQUEST_ACTION, HOST } from '../../constants';
 import Modal from '../common/Modal';
 import { Friend } from 'GlobalType';
 import * as S from './Drawer.style';
 import useInput from '../../hooks/useInput';
+import axios from 'axios';
 
 interface DrawerProps {
   isOpen: boolean;
@@ -168,12 +168,24 @@ const ReceivedFriendRequest = ({ idx, userId, username, profileImg, handleFriend
   );
 };
 
+const httpGetFeed = async () => {
+  const response = await axios.get(`${HOST}/api/v1/alarm`);
+  const feed = response.data;
+  return feed;
+};
+
 const NotificationSection = () => {
+  const [feed, setFeed] = useState([]);
+
+  useEffect(() => {
+    httpGetFeed().then(setFeed);
+  }, []);
+
   return (
     <S.NotificationSection>
       <S.SectionHeader>알림</S.SectionHeader>
       <div>
-        {dummyNotifications.map(({ idx, content }) => (
+        {feed.map(({ idx, content }) => (
           <S.Notification key={idx}>{content}</S.Notification>
         ))}
       </div>
