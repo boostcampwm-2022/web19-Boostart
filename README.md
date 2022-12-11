@@ -11,6 +11,7 @@
 |김진아|박경찬|박수연|하현우|
 |:---:|:---:|:---:|:---:|
 |<img src="https://user-images.githubusercontent.com/73420533/201267459-8392e1f7-ca7b-4afd-bae0-c32df21fa33a.png" width="300"/>|<img src="https://user-images.githubusercontent.com/73420533/201267890-7279a33e-e194-4f1e-b6e2-bdf3608d05b5.png" width="300"/>|<img src="https://user-images.githubusercontent.com/73420533/201267785-f60f85b2-2cbe-4e09-a7f7-dd4bf39bb0c2.png" width="300"/>|<img src="https://user-images.githubusercontent.com/73420533/201267569-f7f5a95b-62b1-4d5a-8700-0b92da29d909.png" width="300"/>|
+|[@mikaniz](https://github.com/mikaniz)|[@ParkKyungChan](https://github.com/ParkKyungChan)|[@sooyeon73](https://github.com/sooyeon73)|[@high2092](https://github.com/high2092)|
 
 ## 개발 환경에서의 실행 방법
 ```sh
