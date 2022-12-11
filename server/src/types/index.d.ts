@@ -24,6 +24,8 @@ declare interface SignupRequest extends Request {
   };
 }
 
+declare interface UpdateProfileRequest extends AuthorizedRequest, SignupRequest {}
+
 declare interface PutEmoticonRequest extends AuthorizedRequest {
   emoticon?: number;
 }
