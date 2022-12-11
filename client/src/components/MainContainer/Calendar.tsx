@@ -58,7 +58,9 @@ const Calendar = () => {
             : await axios.get(`${HOST}/api/v1/calendar/task/${currentVisit.userId}?year=${calendarDate.getFullYear()}&month=${calendarDate.getMonth() + 1}`);
           setCalendarPercent(result.data);
         } else if (currentMenu == 'GOAL') {
-          const result = await axios.get(`${HOST}/api/v1/calendar/goal?year=${calendarDate.getFullYear()}&month=${calendarDate.getMonth() + 1}`);
+          const result = currentVisit.isMe
+            ? await axios.get(`${HOST}/api/v1/calendar/goal?year=${calendarDate.getFullYear()}&month=${calendarDate.getMonth() + 1}`)
+            : await axios.get(`${HOST}/api/v1/calendar/goal/${currentVisit.userId}?year=${calendarDate.getFullYear()}&month=${calendarDate.getMonth() + 1}`);
           setCalendarPercent(result.data);
         }
       } catch (error) {
