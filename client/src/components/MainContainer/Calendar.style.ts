@@ -120,9 +120,17 @@ export const Date = styled.span`
   pointer-events: none;
 `;
 
+export const LogoWrapper = styled.div`
+  height: 2rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+`;
+
 export const DateLogo = styled.span<{
   percentage: number;
 }>`
+  line-height: 1.5rem;
   font-size: 2rem;
   font-family: 'Baumans', cursive;
   background: linear-gradient(to top, #99b1db ${(props) => props.percentage}%, #ddd 0%);

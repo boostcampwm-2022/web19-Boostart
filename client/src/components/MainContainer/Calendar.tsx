@@ -111,7 +111,9 @@ const DateContainer = ({ calendarYear, calendarMonth, calendarDate, percent }: D
     <>
       <S.DateBox onClick={selectCurrentDate}>
         <S.TodayMarker isToday={isToday}>
-          <S.DateLogo percentage={percent * 100}>B</S.DateLogo>
+          <S.LogoWrapper>
+            <S.DateLogo percentage={percent * 100}>B</S.DateLogo>
+          </S.LogoWrapper>
         </S.TodayMarker>
         <S.Date>{calendarDate}</S.Date>
       </S.DateBox>
