@@ -3,13 +3,13 @@ import { useRecoilValue, useRecoilState } from 'recoil';
 import styled from 'styled-components';
 import axios from 'axios';
 import DateSelector from './DateSelector';
-import { HOST, Menus } from '../../constants';
+import { HOST, TaskTargetType } from '../../constants';
 import useCurrentDate from '../../hooks/useCurrentDate';
 import { visitState, menuState } from '../common/atoms';
 import { Task } from 'GlobalType';
 const { kakao } = window;
 
-type TaskTargetType = 'my' | 'friend' | 'both';
+type TaskTargetType = typeof TaskTargetType[keyof typeof TaskTargetType];
 
 export const Map = () => {
   const mapRef = useRef<HTMLDivElement | null>(null);
@@ -25,26 +25,28 @@ export const Map = () => {
 
   const fetchTaskList = async (target: TaskTargetType) => {
     const date = dateToString();
-    const response = target === 'my' ? await axios.get(`${HOST}/api/v1/task?date=${date}`) : await axios.get(`${HOST}/api/v1/task/${currentVisit.userId}?date=${date}`);
+    const response = target === TaskTargetType.me ? await axios.get(`${HOST}/api/v1/task?date=${date}`) : await axios.get(`${HOST}/api/v1/task/${currentVisit.userId}?date=${date}`);
     const tasks: Task[] = response.data;
     const validTasks = tasks.filter(({ lat }) => lat);
-    if (target === 'my') setMyTaskList(validTasks);
-    else if (target === 'friend') setFriendTaskList(validTasks);
+    if (target === TaskTargetType.me) setMyTaskList(validTasks);
+    else if (target === TaskTargetType.friend) setFriendTaskList(validTasks);
   };
 
   const selectTaskList = (focusType: TaskTargetType) => {
     switch (focusType) {
-      case 'both':
+      case TaskTargetType.both:
         return [...myTaskList, ...friendTaskList];
-      case 'friend':
+      case TaskTargetType.friend:
         return friendTaskList;
-      case 'my':
+      case TaskTargetType.me:
         return myTaskList;
+      default:
+        return [];
     }
   };
 
   const setMarkerOnMap = (focusType: TaskTargetType) => {
-    const markerImageSrc = focusType === 'my' ? MyimageSrc : FriendImageSrc;
+    const markerImageSrc = focusType === TaskTargetType.me ? MyimageSrc : FriendImageSrc;
     let taskList = selectTaskList(focusType);
     taskList.forEach(({ title, lat, lng }) => {
       const imageSize = new kakao.maps.Size(50, 50);
@@ -85,9 +87,9 @@ export const Map = () => {
       markers.forEach((marker) => marker.setMap(null));
       setMarkers([]);
     }
-    fetchTaskList('my');
+    fetchTaskList(TaskTargetType.me);
     if (!currentVisit.isMe) {
-      fetchTaskList('friend');
+      fetchTaskList(TaskTargetType.friend);
     } else {
       setFriendTaskList([]);
     }
@@ -95,15 +97,15 @@ export const Map = () => {
 
   useEffect(() => {
     if (!mapRef.current) return;
-    setMarkerOnMap('my');
+    setMarkerOnMap(TaskTargetType.me);
   }, [myTaskList]);
   useEffect(() => {
     if (!mapRef.current) return;
-    setMarkerOnMap('friend');
+    setMarkerOnMap(TaskTargetType.friend);
   }, [friendTaskList]);
   useEffect(() => {
     if (!mapRef.current) return;
-    if (myTaskList.length > 0 || friendTaskList.length > 0) setMapBoundary('both');
+    if (myTaskList.length > 0 || friendTaskList.length > 0) setMapBoundary(TaskTargetType.both);
   }, [myTaskList, friendTaskList]);
 
   const TaskList = ({ isMyList }: { isMyList: boolean }) => {
@@ -127,7 +129,7 @@ export const Map = () => {
               </TaskItemOnMap>
             );
           })}
-        <TaskItemOnMap onClick={() => setMapBoundary(isMyList ? 'my' : 'friend')}>전체보기</TaskItemOnMap>
+        <TaskItemOnMap onClick={() => setMapBoundary(isMyList ? TaskTargetType.me : TaskTargetType.friend)}>전체보기</TaskItemOnMap>
       </TaskListOnMap>
     );
   };
@@ -142,7 +144,7 @@ export const Map = () => {
           {myTaskList.length > 0 && <TaskList isMyList={true} />}
           {friendTaskList.length > 0 && <TaskList isMyList={false} />}
           {myTaskList.length === 0 && friendTaskList.length === 0 && <TaskAlertBox>위치정보가 있는 Task를 추가해주세요</TaskAlertBox>}
-          {friendTaskList.length > 0 && myTaskList.length > 0 && <BothFocusButton onClick={() => setMapBoundary('both')}>전체보기</BothFocusButton>}
+          {friendTaskList.length > 0 && myTaskList.length > 0 && <BothFocusButton onClick={() => setMapBoundary(TaskTargetType.both)}>전체보기</BothFocusButton>}
         </KakaoContainer>
       </MapContainer>
     </>
