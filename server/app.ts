@@ -1,16 +1,24 @@
 import express from 'express';
 import cookieParser from 'cookie-parser';
-import { CLIENT, PORT, API_VERSION, REDIS_HOST, REDIS_USERNAME, REDIS_PORT, REDIS_PASSWORD, TOKEN_SECRET } from './src/constants';
+import { CLIENT, HTTP_PORT, HTTPS_PORT, HOST, API_VERSION, REDIS_HOST, REDIS_USERNAME, REDIS_PORT, REDIS_PASSWORD, TOKEN_SECRET } from './src/constants';
 import apiRouter from './src/api/index';
 import cors from 'cors';
 import path from 'path';
 import { Server, Socket } from 'socket.io';
 import http from 'http';
+import https from 'https';
+import fs from 'fs';
 import * as redis from 'redis';
 import jwt from 'jsonwebtoken';
 
+const options = {
+  cert: fs.readFileSync('../rootca.pem'),
+  key: fs.readFileSync('../rootca-key.pem'),
+};
+
 const app = express();
 const httpServer = http.createServer(app);
+const httpsServer = https.createServer(options, app);
 
 const connectionIdToUserIdx = {};
 const userIdxToSocketId = {};
@@ -21,7 +29,7 @@ const corsOptions = {
   methods: ['GET', 'POST', 'DELETE', 'PUT', 'PATCH'],
 };
 
-const io = new Server(httpServer, {
+const io = new Server(httpsServer, {
   cors: corsOptions,
 });
 const redisclient = redis.createClient({
@@ -47,6 +55,10 @@ const getDiary = async (roomName: string) => {
 app.use(express.json());
 app.use(cookieParser());
 app.use(cors(corsOptions));
+app.use((req, res, next) => {
+  if (!req.secure) return res.redirect(HOST + req.url);
+  next();
+});
 app.use(`/api/${API_VERSION}`, apiRouter);
 app.use(express.static(path.join(__dirname, 'build')));
 app.use(express.static(path.join(__dirname, 'uploads')));
@@ -145,6 +157,9 @@ io.on('connection', (socket: AuthorizedSocket) => {
   });
 });
 
-httpServer.listen(PORT, () => {
-  console.log(`app listening to port ${PORT}`);
+httpServer.listen(HTTP_PORT, () => {
+  console.log(`app listening to port ${HTTP_PORT}`);
+});
+httpsServer.listen(HTTPS_PORT, () => {
+  console.log(`app listening to port ${HTTPS_PORT}`);
 });
