@@ -65,4 +65,10 @@ export const FRIEND_REQUEST_ACTION = {
   REJECT: axios.delete,
 };
 
-export const API_VERSION = 'api/v1'
+export const API_VERSION = 'api/v1';
+
+export const TaskTargetType = {
+  me: 'me',
+  friend: 'friend',
+  both: 'both',
+};
