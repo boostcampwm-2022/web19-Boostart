@@ -10,5 +10,5 @@ export const visitState = atom({
 });
 export const menuState = atom({
   key: 'currentMenu',
-  default: 'LOG',
+  default: '',
 });

@@ -93,7 +93,7 @@ const GoalManager = () => {
   };
 
   const handleCloseButtonClick = () => {
-    fetchLabelMap().then();
+    fetchLabelMap().then(fetchGoalList);
     setIsGoalModalOpen(false);
   };
 
@@ -111,7 +111,7 @@ const GoalManager = () => {
           <Goal key={goal.idx} goal={goal} />
         ))}
       </S.GoalList>
-      <NewTaskButton onClick={handleNewGoalButtonClick} />
+      {currentVisit.isMe && <NewTaskButton onClick={handleNewGoalButtonClick} />}
       {isGoalModalOpen && (
         <Modal
           component={<GoalModal isLabelModalOpen={isLabelModalOpen} setIsLabelModalOpen={setIsLabelModalOpen} handleCloseButtonClick={handleCloseButtonClick} />}
@@ -120,7 +120,7 @@ const GoalManager = () => {
           left="50%"
           transform="translate(-50%, -50%)"
           handleDimmedClick={() => {
-            isLabelModalOpen ? setIsLabelModalOpen(false) : setIsGoalModalOpen(false);
+            isLabelModalOpen ? setIsLabelModalOpen(false) : handleCloseButtonClick();
           }}
         />
       )}
