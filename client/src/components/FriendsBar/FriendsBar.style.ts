@@ -12,6 +12,7 @@ export const FriendsBarContainer = styled.div`
   align-items: center;
   transform: translateY(-0.35rem);
   box-shadow: 0px 0px 10px 5px rgba(175, 175, 175, 0.25);
+  z-index: 500;
 `;
 
 export const ProfileBox = styled.div<{
