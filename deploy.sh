@@ -2,9 +2,9 @@
 git fetch && git pull
 
 cd ./client
-npm ci
+npm install
 npm run build
 
 cd ../server
-npm ci
+npm install
 nohup npm start
