@@ -5,7 +5,7 @@ on:
     branches: [ release ]
 jobs:
   deploy:
-    runs-on: ubuntu-latest
+    runs-on: Ubuntu-20.04
     steps:
     - name: Deploy Boostart
       uses: appleboy/ssh-action@master
