@@ -29,7 +29,7 @@ router.get('/', authenticateToken, async (req: AuthorizedRequest, res) => {
 router.get('/me', authenticateToken, async (req: AuthorizedRequest, res) => {
   const { userIdx } = req.user;
   try {
-    const [userInfo] = (await executeSql('select user_id as userId, username, profile_img as profileImg from user where idx = ?', [userIdx])) as RowDataPacket[];
+    const [userInfo] = (await executeSql('select idx, user_id as userId, username, profile_img as profileImg from user where idx = ?', [userIdx])) as RowDataPacket[];
     res.json(userInfo);
   } catch {
     res.sendStatus(500);
