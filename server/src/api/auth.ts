@@ -1,15 +1,23 @@
 import express from 'express';
-import { CLIENT, GITHUB_CLIENT_ID, GITHUB_CLIENT_SECRET, KAKAO_CLIENT_ID, KAKAO_REDIRECT_URI, OAUTH_TYPES, TOKEN_SECRET } from '../constants';
+import { CLIENT, GITHUB_CLIENT_ID, GITHUB_CLIENT_SECRET, KAKAO_CLIENT_ID, KAKAO_REDIRECT_URI, OAUTH_TYPES, TOKEN_SECRET, DEFAULT_PROFILE } from '../constants';
 import axios from 'axios';
 import qs from 'qs';
 import { authenticateToken, generateAccessToken } from '../utils/auth';
 import { generateUnionTypeChecker } from '../utils/validate';
 import { executeSql } from '../db';
 import jwt from 'jsonwebtoken';
-import { AuthorizedRequest } from '../types';
+import { AuthorizedRequest, SignupRequest } from '../types';
 import crypto from 'crypto';
+import fileUpload from 'express-fileupload';
+import { RowDataPacket } from 'mysql2';
 
 const router = express.Router();
+
+router.use(
+  fileUpload({
+    createParentPath: true,
+  })
+);
 
 const generateSalt = () => {
   return crypto.randomBytes(64).toString('hex');
@@ -77,14 +85,14 @@ router.post('/login', async (req, res) => {
   const { userId, password } = req.body;
   if (!(userId && password)) return res.sendStatus(400);
   let user;
-  [user] = await executeSql('select * from user where user_id = ?', [userId]);
-  if (!user) return res.sendStatus(401);
+  [user] = (await executeSql('select * from user where user_id = ?', [userId])) as RowDataPacket[];
+  if (!user) return res.status(401).json({ msg: '아이디 또는 비밀번호가 틀렸어요.' });
 
   const encrypted = encrypt(password, user.salt);
-  [user] = await executeSql('select * from user where user_id = ? and password = ?', [userId, encrypted]);
-  if (!user) return res.sendStatus(401);
+  [user] = (await executeSql('select * from user where user_id = ? and password = ?', [userId, encrypted])) as RowDataPacket[];
+  if (!user) return res.status(401).json({ msg: '아이디 또는 비밀번호가 틀렸어요.' });
 
-  const token = generateAccessToken({ userId: user.user_id });
+  const token = generateAccessToken({ userIdx: user.idx });
   res.cookie('token', token, {
     httpOnly: true,
   });
@@ -108,8 +116,8 @@ router.get('/login/:oauth_type/callback', async (req, res) => {
   const accessToken = await httpGetAccessToken(oauthType, code);
   const oauthEmail = await httpGetOAuthUserIdentifier(oauthType, accessToken); // 변수 이름. (카카오에서는 이메일 얻기 위해 검수 필요)
 
-  const [user] = await executeSql('select * from user where oauth_type = ? and oauth_email = ?', [oauthType, oauthEmail]);
-  const token = generateAccessToken(user ? { userId: user.user_id } : { oauthType, oauthEmail });
+  const [user] = (await executeSql('select * from user where oauth_type = ? and oauth_email = ?', [oauthType, oauthEmail])) as RowDataPacket[];
+  const token = generateAccessToken(user ? { userIdx: user.idx } : { oauthType, oauthEmail });
 
   res.cookie('token', token, {
     httpOnly: true,
@@ -118,12 +126,17 @@ router.get('/login/:oauth_type/callback', async (req, res) => {
   res.redirect(`${CLIENT}/${user ? 'main' : 'signup'}`);
 });
 
-router.post('/signup', async (req, res) => {
+router.post('/signup', async (req: SignupRequest, res) => {
   const { userId, password, username } = req.body;
-  const profileImg = 'profile'; // TODO: multer
-  // req.file.filename;
+  let profileImgFilename = '';
+  if (!req.files) profileImgFilename = DEFAULT_PROFILE;
+  else {
+    const { profileImg } = req.files;
+    profileImgFilename = profileImg.name; // TODO: 해시하기
+    profileImg.mv('./uploads/' + profileImgFilename);
+  }
 
-  if (!(userId && password && username && profileImg)) return res.sendStatus(400);
+  if (!(userId && password && username)) return res.sendStatus(400);
   // TODO: 유효성 검증
 
   const token = req.cookies.token;
@@ -133,33 +146,37 @@ router.post('/signup', async (req, res) => {
   let oauthEmail: string;
   if (token) {
     ({ oauthType, oauthEmail } = jwt.verify(token, TOKEN_SECRET));
-    if (!(oauthType && oauthEmail)) return res.sendStatus(401);
-    if (!validateOAuthType(oauthType)) return res.sendStatus(401);
+    if (!(oauthType && oauthEmail)) return res.status(401).send({ msg: '잘못된 토큰이에요.' });
+    if (!validateOAuthType(oauthType)) return res.status(401).send({ msg: '잘못된 토큰이에요.' });
 
-    [user] = await executeSql('select * from user where oauth_type = ? and oauth_email = ?', [oauthType, oauthEmail]);
+    [user] = (await executeSql('select * from user where oauth_type = ? and oauth_email = ?', [oauthType, oauthEmail])) as RowDataPacket[];
     if (user) {
-      console.log(`이미 가입된 계정: ${oauthType}, ${oauthEmail}`);
-      return res.sendStatus(202);
+      return res.status(409).json({ msg: '해당 이메일은 이미 가입되어 있어요.' });
     }
   }
 
-  [user] = await executeSql('select * from user where user_id = ?', [userId]);
+  [user] = (await executeSql('select * from user where user_id = ?', [userId])) as RowDataPacket[];
   if (user) {
     console.log(`ID 중복: ${userId}`);
-    return res.sendStatus(202);
+    return res.status(409).json({ msg: '이미 존재하는 아이디예요.' });
   }
 
   const salt = generateSalt();
   const encrypted = encrypt(password, salt);
   await (oauthType
-    ? executeSql('insert into `user` (user_id, password, username, oauth_type, oauth_email, salt) values (?, ?, ?, ?, ?, ?)', [userId, encrypted, username, oauthType, oauthEmail, salt])
-    : executeSql('insert into `user` (user_id, password, username, salt) values (?, ?, ?, ?)', [userId, encrypted, username, salt]));
+    ? executeSql('insert into `user` (user_id, password, username, profile_img, oauth_type, oauth_email, salt) values (?, ?, ?, ?, ?, ?, ?)', [userId, encrypted, username, profileImgFilename, oauthType, oauthEmail, salt])
+    : executeSql('insert into `user` (user_id, password, username, profile_img, salt) values (?, ?, ?, ?, ?)', [userId, encrypted, username, profileImgFilename, salt]));
   console.log(`회원가입 성공: ${userId}, ${username}`);
   res.sendStatus(201);
 });
 
 router.get('/check-login', authenticateToken, (req: AuthorizedRequest, res) => {
   res.send(req.user ?? 401);
+});
+
+router.get('/logout', authenticateToken, (req, res) => {
+  res.clearCookie('token');
+  res.sendStatus(204);
 });
 
 export default router;
