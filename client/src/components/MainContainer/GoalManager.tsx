@@ -12,6 +12,7 @@ import * as yup from 'yup';
 import useCurrentDate from '../../hooks/useCurrentDate';
 import { visitState, menuState } from '../common/atoms';
 import { useRecoilValue, useRecoilState } from 'recoil';
+import { authorizedHttpRequest } from '../common/utils';
 
 const labelMap = new Map<number, Label>();
 
@@ -78,20 +79,18 @@ const GoalManager = () => {
 
   const fetchGoalList = async () => {
     try {
-      httpGetGoalList(currentVisit.userId, dateToString()).then(setGoalList);
+      authorizedHttpRequest(() => httpGetGoalList(currentVisit.userId, dateToString())).then(setGoalList);
     } catch (error) {
       console.log(error);
     }
   };
 
   useEffect(() => {
-    fetchLabelMap().then(() => {
-      fetchGoalList();
-    });
+    authorizedHttpRequest(fetchLabelMap).then(fetchGoalList);
   }, [currentVisit]);
 
   useEffect(() => {
-    fetchGoalList();
+    authorizedHttpRequest(fetchGoalList);
   }, [currentDate]);
 
   const handleNewGoalButtonClick = () => {
@@ -100,7 +99,7 @@ const GoalManager = () => {
   };
 
   const handleCloseButtonClick = () => {
-    fetchLabelMap().then(fetchGoalList);
+    authorizedHttpRequest(fetchLabelMap).then(fetchGoalList);
     setIsGoalModalOpen(false);
   };
 
@@ -182,7 +181,7 @@ const GoalModal = ({ isLabelModalOpen, setIsLabelModalOpen, handleCloseButtonCli
 
   useEffect(() => {
     try {
-      httpGetLabelList().then((labelList) => {
+      authorizedHttpRequest(httpGetLabelList).then((labelList) => {
         setLabelList(labelList);
       });
     } catch (error) {
@@ -207,29 +206,19 @@ const GoalModal = ({ isLabelModalOpen, setIsLabelModalOpen, handleCloseButtonCli
     e.stopPropagation();
     if (!window.confirm('라벨을 삭제하시겠습니까?')) return;
     try {
-      await httpDeleteLabel(label.idx);
-      httpGetLabelList().then(setLabelList);
+      await authorizedHttpRequest(() => httpDeleteLabel(label.idx));
+      authorizedHttpRequest(httpGetLabelList).then(setLabelList);
     } catch (error) {
-      if (axios.isAxiosError(error)) {
-        const { msg } = error.response?.data;
-        alert(msg);
-      } else {
-        console.log(error);
-      }
+      console.log(error);
     }
   };
 
   const goalSubmit = async (goalData: FieldValues) => {
     try {
-      const response = await (selectedGoal ? httpPutGoal(selectedGoal.idx, goalData) : httpPostGoal(goalData));
+      await authorizedHttpRequest(() => (selectedGoal ? httpPutGoal(selectedGoal.idx, goalData) : httpPostGoal(goalData)));
       handleCloseButtonClick();
     } catch (error) {
-      if (axios.isAxiosError(error)) {
-        const { msg } = error.response?.data;
-        alert(msg);
-      } else {
-        console.log(error);
-      }
+      console.log(error);
     }
   };
 
@@ -247,7 +236,7 @@ const GoalModal = ({ isLabelModalOpen, setIsLabelModalOpen, handleCloseButtonCli
     if (!selectedLabelIndex) return;
     if (!color) return;
     try {
-      httpPatchLabel(selectedLabelIndex, { color });
+      await authorizedHttpRequest(() => httpPatchLabel(selectedLabelIndex, { color }));
       const label = labelList.find((label) => label.idx === selectedLabelIndex);
       if (!label) return;
       label.color = color;
@@ -332,15 +321,10 @@ const LabelModal = ({ handleCloseButtonClick }: LabelModalProps) => {
 
   const labelSubmit = async (labelData: FieldValues) => {
     try {
-      await axios.post(`${HOST}/api/v1/label`, labelData);
+      await authorizedHttpRequest(() => axios.post(`${HOST}/api/v1/label`, labelData));
       handleCloseButtonClick();
     } catch (error) {
-      if (axios.isAxiosError(error)) {
-        const { msg } = error.response?.data;
-        alert(msg);
-      } else {
-        console.log(error);
-      }
+      console.log(error);
     }
   };
 
