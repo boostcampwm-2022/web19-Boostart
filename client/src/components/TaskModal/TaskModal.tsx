@@ -11,6 +11,8 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
 import axios from 'axios';
 import { HOST } from '../../constants';
+import { useRecoilState } from 'recoil';
+import { calendarState } from '../common/atoms';
 
 interface Props {
   handleCloseButtonClick: () => void;
@@ -42,6 +44,8 @@ const TaskModal = ({ handleCloseButtonClick, tagList, fetchTagList, currentTask 
   const { currentDate, getMonth, getDate } = useCurrentDate();
 
   const [importance, setImportance] = useState(currentTask ? currentTask.importance : DEFAULT_IMPORTANCE);
+
+  const [currentCalendar, setCurrentCalendar] = useRecoilState(calendarState);
 
   const contents = {
     close: '닫기 ▲',
@@ -100,6 +104,7 @@ const TaskModal = ({ handleCloseButtonClick, tagList, fetchTagList, currentTask 
   const createTask = async (body: FieldValues) => {
     await httpPostTask({ ...body, date: formatDate(currentDate) });
     handleCloseButtonClick();
+    await httpGetCalendar();
   };
 
   const editTask = async (body: FieldValues) => {
@@ -109,6 +114,11 @@ const TaskModal = ({ handleCloseButtonClick, tagList, fetchTagList, currentTask 
 
   const httpPostTask = async (body: FieldValues) => {
     await axios.post(`${HOST}/api/v1/task`, body);
+  };
+
+  const httpGetCalendar = async () => {
+    const result = await axios.get(`${HOST}/api/v1/calendar/task?year=${currentDate.getFullYear()}&month=${currentDate.getMonth() + 1}`);
+    setCurrentCalendar(result.data);
   };
 
   const httpPatchTask = async (body: FieldValues) => {
