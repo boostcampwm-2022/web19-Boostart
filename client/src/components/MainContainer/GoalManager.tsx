@@ -118,7 +118,7 @@ const GoalManager = () => {
   }, []);
 
   return (
-    <>
+    <S.Container>
       <S.GoalHead>
         <span>목표</span> <span>제목</span> <span>현황</span> <span>달성률</span>
       </S.GoalHead>
@@ -142,7 +142,7 @@ const GoalManager = () => {
           }}
         />
       )}
-    </>
+    </S.Container>
   );
 };
 
