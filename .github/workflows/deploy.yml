@@ -15,6 +15,8 @@ jobs:
         password: ${{ secrets.PASSWORD }}
         port: ${{ secrets.PORT }}
         script: | 
+          export NVM_DIR=~/.nvm
+          source ~/.nvm/nvm.sh
           killall node
           cd /home/boostart/boostart
           ./deploy.sh
