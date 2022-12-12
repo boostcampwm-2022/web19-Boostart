@@ -10,7 +10,7 @@ import { FieldValues, useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
 import useCurrentDate from '../../hooks/useCurrentDate';
-import { visitState, menuState } from '../common/atoms';
+import { visitState, menuState, calendarState } from '../common/atoms';
 import { useRecoilValue, useRecoilState } from 'recoil';
 import { authorizedHttpRequest } from '../common/utils';
 
@@ -47,6 +47,11 @@ const httpPatchLabel = async (idx: number, { title, color }: { title?: string; c
 const httpPutGoal = async (idx: number, body: FieldValues) => {
   const response = await axios.put(`${HOST}/api/v1/goal/${idx}`, body);
   return response;
+};
+
+const httpGetCalendar = async (currentDate: Date) => {
+  const response = await axios.get(`${HOST}/api/v1/calendar/goal?year=${currentDate.getFullYear()}&month=${currentDate.getMonth() + 1}`);
+  return response.data;
 };
 
 const generateRandomHexColor = () => {
@@ -154,7 +159,8 @@ const GoalModal = ({ isLabelModalOpen, setIsLabelModalOpen, handleCloseButtonCli
   const [selectedLabelIndex, setSelectedLabelIndex] = useState<number | null>(selectedGoal ? selectedGoal.labelIdx : null);
   const [labelList, setLabelList] = useState<Label[]>([]);
   const [over, setOver] = useState(selectedGoal ? selectedGoal.over : true);
-  const { dateToString } = useCurrentDate();
+  const { currentDate, dateToString } = useCurrentDate();
+  const [currentCalendar, setCurrentCalendar] = useRecoilState(calendarState);
 
   const schema = yup.object().shape({
     title: yup.string().required(),
@@ -217,6 +223,7 @@ const GoalModal = ({ isLabelModalOpen, setIsLabelModalOpen, handleCloseButtonCli
     try {
       await authorizedHttpRequest(() => (selectedGoal ? httpPutGoal(selectedGoal.idx, goalData) : httpPostGoal(goalData)));
       handleCloseButtonClick();
+      await httpGetCalendar(currentDate).then((res) => setCurrentCalendar(res));
     } catch (error) {
       console.log(error);
     }

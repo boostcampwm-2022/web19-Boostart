@@ -12,3 +12,7 @@ export const menuState = atom({
   key: 'currentMenu',
   default: '',
 });
+export const calendarState = atom({
+  key: 'currentCalendar',
+  default: [],
+});

@@ -4,7 +4,7 @@ import { EngMonth, Days, WEEK_LENGTH, HOST } from '../../constants';
 import MenuSelector from './MenuSelector';
 import * as S from './Calendar.style';
 import { useRecoilState } from 'recoil';
-import { menuState, visitState } from '../common/atoms';
+import { menuState, visitState, calendarState } from '../common/atoms';
 import axios from 'axios';
 
 interface DateContainerProps {
@@ -24,6 +24,7 @@ const Calendar = () => {
   const [calendarDate, setCalendarDate] = useState(currentDate);
   const [currentMenu, setCurrentMenu] = useRecoilState(menuState);
   const [currentVisit, setCurrentVisit] = useRecoilState(visitState);
+  const [currentCalendar, setCurrentCalendar] = useRecoilState(calendarState);
 
   //Vars
   const firstDay = getFirstDay(calendarDate);
@@ -47,8 +48,6 @@ const Calendar = () => {
     setCalendarDate(new Date(currentDate));
   }, [currentDate]);
 
-  const [calendarPercent, setCalendarPercent] = useState([]);
-
   useEffect(() => {
     const getCalendarData = async () => {
       try {
@@ -56,12 +55,12 @@ const Calendar = () => {
           const result = currentVisit.isMe
             ? await axios.get(`${HOST}/api/v1/calendar/task?year=${calendarDate.getFullYear()}&month=${calendarDate.getMonth() + 1}`)
             : await axios.get(`${HOST}/api/v1/calendar/task/${currentVisit.userId}?year=${calendarDate.getFullYear()}&month=${calendarDate.getMonth() + 1}`);
-          setCalendarPercent(result.data);
+          setCurrentCalendar(result.data);
         } else if (currentMenu == 'GOAL') {
           const result = currentVisit.isMe
             ? await axios.get(`${HOST}/api/v1/calendar/goal?year=${calendarDate.getFullYear()}&month=${calendarDate.getMonth() + 1}`)
             : await axios.get(`${HOST}/api/v1/calendar/goal/${currentVisit.userId}?year=${calendarDate.getFullYear()}&month=${calendarDate.getMonth() + 1}`);
-          setCalendarPercent(result.data);
+          setCurrentCalendar(result.data);
         }
       } catch (error) {
         console.log(error);
@@ -70,6 +69,9 @@ const Calendar = () => {
     getCalendarData();
   }, [calendarDate.getMonth(), currentMenu, currentVisit]);
 
+  useEffect(() => {
+    console.log(currentCalendar);
+  }, [currentCalendar]);
   return (
     <>
       <S.CalendarTitle>CAL</S.CalendarTitle>
@@ -94,7 +96,7 @@ const Calendar = () => {
             return <div key={'emptyBox' + idx}></div>;
           })}
           {monthDays.map((_, idx) => {
-            return <DateContainer key={'date' + (idx + 1)} calendarYear={calendarDate.getFullYear()} calendarDate={idx + 1} calendarMonth={calendarDate.getMonth()} percent={calendarPercent[idx]}></DateContainer>;
+            return <DateContainer key={'date' + (idx + 1)} calendarYear={calendarDate.getFullYear()} calendarDate={idx + 1} calendarMonth={calendarDate.getMonth()} percent={currentCalendar[idx]}></DateContainer>;
           })}
         </S.DateSelector>
         <MenuSelector />
