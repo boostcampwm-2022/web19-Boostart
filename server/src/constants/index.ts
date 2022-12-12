@@ -3,7 +3,8 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 export const TOKEN_SECRET = process.env.TOKEN_SECRET;
-export const PORT = process.env.PORT;
+export const HTTP_PORT = process.env.HTTP_PORT;
+export const HTTPS_PORT = process.env.HTTPS_PORT;
 export const API_VERSION = process.env.API_VERSION;
 export const GITHUB_CLIENT_ID = process.env.GITHUB_CLIENT_ID;
 export const GITHUB_CLIENT_SECRET = process.env.GITHUB_CLIENT_SECRET;
