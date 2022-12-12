@@ -7,4 +7,4 @@ npm run build
 
 cd ../server
 npm ci
-nohup npm start
+pm2 reload boostart
