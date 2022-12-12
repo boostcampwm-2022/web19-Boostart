@@ -69,9 +69,6 @@ const Calendar = () => {
     getCalendarData();
   }, [calendarDate.getMonth(), currentMenu, currentVisit]);
 
-  useEffect(() => {
-    console.log(currentCalendar);
-  }, [currentCalendar]);
   return (
     <>
       <S.CalendarTitle>CAL</S.CalendarTitle>
