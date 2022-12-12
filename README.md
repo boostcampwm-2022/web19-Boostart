@@ -1,10 +1,17 @@
 # Boostart - 당신의 하루를 시작하라
 
 ## 소개
+![main](https://user-images.githubusercontent.com/92143119/206898726-0674735d-e03d-4c31-8dba-5c7fa6e405c3.gif)
 ### 놓치기 쉬운 하루의 일상을 예쁘게 기록하고 관리할 수 있어요
 - 가까운 계획을 확인할 수 있어요
 - 자신이 언제 무엇을 (+어디서 어떻게 왜) 했는지 알 수 있어요
 - 친구가 언제 무엇을 (+어디서 어떻게 왜) 했는지 알 수 있어요
+
+### 팀원 소개
+|김진아|박경찬|박수연|하현우|
+|:---:|:---:|:---:|:---:|
+|<img src="https://user-images.githubusercontent.com/73420533/201267459-8392e1f7-ca7b-4afd-bae0-c32df21fa33a.png" width="300"/>|<img src="https://user-images.githubusercontent.com/73420533/201267890-7279a33e-e194-4f1e-b6e2-bdf3608d05b5.png" width="300"/>|<img src="https://user-images.githubusercontent.com/73420533/201267785-f60f85b2-2cbe-4e09-a7f7-dd4bf39bb0c2.png" width="300"/>|<img src="https://user-images.githubusercontent.com/73420533/201267569-f7f5a95b-62b1-4d5a-8700-0b92da29d909.png" width="300"/>|
+|[@mikaniz](https://github.com/mikaniz)|[@ParkKyungChan](https://github.com/ParkKyungChan)|[@sooyeon73](https://github.com/sooyeon73)|[@high2092](https://github.com/high2092)|
 
 ## 개발 환경에서의 실행 방법
 ```sh

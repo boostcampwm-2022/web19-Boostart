@@ -4,12 +4,14 @@ import { CLIENT, HTTP_PORT, HTTPS_PORT, HOST, API_VERSION, REDIS_HOST, REDIS_USE
 import apiRouter from './src/api/index';
 import cors from 'cors';
 import path from 'path';
-import { Server, Socket } from 'socket.io';
+import { Socket } from 'socket.io';
 import http from 'http';
 import https from 'https';
 import fs from 'fs';
 import * as redis from 'redis';
 import jwt from 'jsonwebtoken';
+import { connectionIdToUserIdx, userIdxToSocketId } from './src/core/store';
+import { globalSocket } from './src/core/socket';
 
 const options = {
   cert: fs.readFileSync('../rootca.pem'),
@@ -20,18 +22,18 @@ const app = express();
 const httpServer = http.createServer(app);
 const httpsServer = https.createServer(options, app);
 
-const connectionIdToUserIdx = {};
-const userIdxToSocketId = {};
-
 const corsOptions = {
   origin: CLIENT,
   credentials: true,
   methods: ['GET', 'POST', 'DELETE', 'PUT', 'PATCH'],
 };
 
-const io = new Server(httpsServer, {
+globalSocket.initialize(httpsServer, {
   cors: corsOptions,
 });
+
+const io = globalSocket.instance;
+
 const redisclient = redis.createClient({
   url: `redis://${REDIS_USERNAME}:${REDIS_PASSWORD}@${REDIS_HOST}:${REDIS_PORT}/0`,
   legacyMode: true,
@@ -107,6 +109,15 @@ io.on('connection', (socket: AuthorizedSocket) => {
     const connectionId = (socket.conn as any).id;
     const userIdx = connectionIdToUserIdx[connectionId];
     userIdxToSocketId[userIdx] = socket.id;
+
+    // 테스트하시기 쉽게 우선 주석으로 남겨두겠습니다.
+    // console.log(`유저 ${userIdx} 로그인`);
+    // console.log(`-- 서버와 연결되어 있는 소켓 목록 --`);
+    // console.log(io.sockets.sockets.keys());
+    // console.log(`-- 접속중인 유저의 소켓 아이디 목록 --`);
+    // console.log(userIdxToSocketId);
+    // console.log(`-- 연결중인 소켓 커넥션에 대한 유저 아이디 목록 --`);
+    // console.log(connectionIdToUserIdx);
   });
 
   socket.on('joinToNewRoom', async (destId, date) => {
@@ -154,6 +165,8 @@ io.on('connection', (socket: AuthorizedSocket) => {
 
   socket.on('disconnect', () => {
     visitingRoom.delete(socket.id);
+    delete connectionIdToUserIdx[(socket.conn as any).id];
+    delete userIdxToSocketId[socket.uid];
   });
 });
 

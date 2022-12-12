@@ -58,7 +58,9 @@ const Calendar = () => {
             : await axios.get(`${HOST}/api/v1/calendar/task/${currentVisit.userId}?year=${calendarDate.getFullYear()}&month=${calendarDate.getMonth() + 1}`);
           setCalendarPercent(result.data);
         } else if (currentMenu == 'GOAL') {
-          const result = await axios.get(`${HOST}/api/v1/calendar/goal?year=${calendarDate.getFullYear()}&month=${calendarDate.getMonth() + 1}`);
+          const result = currentVisit.isMe
+            ? await axios.get(`${HOST}/api/v1/calendar/goal?year=${calendarDate.getFullYear()}&month=${calendarDate.getMonth() + 1}`)
+            : await axios.get(`${HOST}/api/v1/calendar/goal/${currentVisit.userId}?year=${calendarDate.getFullYear()}&month=${calendarDate.getMonth() + 1}`);
           setCalendarPercent(result.data);
         }
       } catch (error) {
@@ -111,7 +113,9 @@ const DateContainer = ({ calendarYear, calendarMonth, calendarDate, percent }: D
     <>
       <S.DateBox onClick={selectCurrentDate}>
         <S.TodayMarker isToday={isToday}>
-          <S.DateLogo percentage={percent * 100}>B</S.DateLogo>
+          <S.LogoWrapper>
+            <S.DateLogo percentage={percent * 100}>B</S.DateLogo>
+          </S.LogoWrapper>
         </S.TodayMarker>
         <S.Date>{calendarDate}</S.Date>
       </S.DateBox>
