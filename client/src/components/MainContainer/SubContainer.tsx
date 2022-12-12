@@ -1,5 +1,7 @@
 import DateSelector from './DateSelector';
 import * as S from './SubContainer.style';
+import { useRecoilState } from 'recoil';
+import { visitState } from '../common/atoms';
 
 interface SubContainerProps {
   title: string;
@@ -7,9 +9,14 @@ interface SubContainerProps {
 }
 
 const SubContainer = ({ title, element }: SubContainerProps) => {
+  const [currentVisit, setCurrentVisit] = useRecoilState(visitState);
+
   return (
     <>
-      <S.Title>{title}</S.Title>
+      <S.Title>
+        {title}
+        <span> {currentVisit.isMe || `~${currentVisit.userId}`}</span>
+      </S.Title>
       <S.Content>
         <S.NavBarSection>
           <DateSelector />
