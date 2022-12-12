@@ -44,6 +44,7 @@ const TaskModal = ({ handleCloseButtonClick, tagList, fetchTagList, currentTask 
   const { currentDate, getMonth, getDate } = useCurrentDate();
 
   const [importance, setImportance] = useState(currentTask ? currentTask.importance : DEFAULT_IMPORTANCE);
+  const [isPublic, setIsPublic] = useState(currentTask ? currentTask.isPublic : false);
 
   const [currentCalendar, setCurrentCalendar] = useRecoilState(calendarState);
 
@@ -130,6 +131,10 @@ const TaskModal = ({ handleCloseButtonClick, tagList, fetchTagList, currentTask 
     setImportance(k);
   };
 
+  const handlePublicInputClick = () => {
+    setIsPublic(!isPublic);
+  };
+
   const setValues = () => {
     if (locationObject) {
       const { lat, lng, location } = locationObject;
@@ -178,7 +183,7 @@ const TaskModal = ({ handleCloseButtonClick, tagList, fetchTagList, currentTask 
             />
             <input type="number" {...register('importance')} hidden={true} />
             <Row title="중요도" content={<ImportanceInput importance={importance} handleStarClick={handleStarClick} />} />
-            <Row title="공개" content={<input type="checkbox" {...register('isPublic')} />} />
+            <Row title="공개" content={<input type="checkbox" checked={isPublic} {...register('isPublic')} onClick={handlePublicInputClick} />} />
           </tbody>
         </S.FormTable>
         <S.DetailButton onClick={() => setIsDetailOpen(!isDetailOpen)}>
