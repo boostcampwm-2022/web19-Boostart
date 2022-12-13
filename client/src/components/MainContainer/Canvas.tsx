@@ -90,8 +90,13 @@ const Canvas = ({ setAuthorList, setOnlineList }: CanvasProps) => {
     console.log(`${userIdx}번 유저가 입장했어요.`);
   };
 
+  const handleEditorLeft = (userIdx: number) => {
+    console.log(`${userIdx}번 유저가 퇴장했어요.`);
+  };
+
   const registAuthor = () => {
     if (isJoined) {
+      socket.emit('leaveEditing');
     } else if (!isJoined) {
       // if (!myProfile) return;
       socket.emit('joinEditing');
@@ -112,6 +117,7 @@ const Canvas = ({ setAuthorList, setOnlineList }: CanvasProps) => {
     socket.on('offerCurrentObjects', handleObjectsOffer);
     socket.on('objectDeleted', handleObjectDeleted);
     socket.on('newEditor', handleNewEditorEvent);
+    socket.on('editorLeft', handleEditorLeft);
 
     return () => {
       if (!canvasRef.current) return;
@@ -122,6 +128,7 @@ const Canvas = ({ setAuthorList, setOnlineList }: CanvasProps) => {
       socket.off('offerCurrentObjects', handleObjectsOffer);
       socket.off('objectDeleted', handleObjectDeleted);
       socket.on('newEditor', handleNewEditorEvent);
+      socket.on('editorLeft', handleEditorLeft);
     };
   }, [currentDate, currentVisit]);
 

@@ -176,6 +176,14 @@ io.on('connection', (socket: AuthorizedSocket) => {
     io.to(roomName).emit('newEditor', userIdx);
   });
 
+  socket.on('leaveEditing', () => {
+    const userIdx = socket.uid;
+    const roomName = visitingRoom.get(userIdx);
+
+    currentParticipantStore[roomName] = currentParticipantStore[roomName].filter((idx) => idx !== userIdx);
+    io.to(roomName).emit('editorLeft', userIdx);
+  });
+
   socket.on('clientStatusChange', (fabricData) => {
     const userIdx = socket.uid;
     const roomName = visitingRoom.get(userIdx);
