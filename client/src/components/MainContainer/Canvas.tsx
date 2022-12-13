@@ -93,7 +93,6 @@ const Canvas = ({ setAuthorList, setOnlineList }: CanvasProps) => {
       id: v4(),
     };
     dispatchCanvasChange(shapeData);
-    drawShapeOnCanvas(shapeData);
   };
 
   const createNewText = () => {
@@ -112,10 +111,6 @@ const Canvas = ({ setAuthorList, setOnlineList }: CanvasProps) => {
       id: v4(),
     };
     dispatchCanvasChange(textData);
-    const fabricText = drawTextOnCanvas(textData);
-    if (!fabricText || !canvasRef.current) return;
-    canvasRef.current.setActiveObject(fabricText);
-    fabricText.enterEditing();
   };
 
   //Draw Objects
@@ -315,7 +310,6 @@ const Canvas = ({ setAuthorList, setOnlineList }: CanvasProps) => {
   };
 
   const updateAuthorList = (authorList: Friend[], onlineList: number[]) => {
-    console.log('updat', new Date(), authorList);
     setAuthorList(authorList);
     setOnlineList(onlineList);
   };
@@ -339,9 +333,9 @@ const Canvas = ({ setAuthorList, setOnlineList }: CanvasProps) => {
       canvasRef.current.off('object:modified', dispatchModifiedObject);
       socket.off('offerCurrentObjects', presentPresetObjects);
       socket.off('updateModifiedObject', updateModifiedObject);
-      socket.off('updateModifiedObject', updateModifiedObject);
       socket.off('applyObjectRemoving', removeObject);
       socket.off('initReady', requestInitObjects);
+      socket.off('updateAuthorList', updateAuthorList);
       window.removeEventListener('keydown', handleKeydown);
       socket.emit('leaveCurrentRoom');
       canvasRef.current.clear();
@@ -382,9 +376,9 @@ const ForeignerScreen = styled.div<{
   isActive: boolean;
 }>`
   width: 100%;
-  height: 25.5rem;
+  height: 26rem;
   position: absolute;
-  top: 7rem;
+  top: 3.5rem;
   left: 0;
   background: rgba(0, 0, 0, 0);
   z-index: 500;

@@ -1,0 +1,22 @@
+name: Deploy
+on:
+  workflow_dispatch:
+  push:
+    branches: [ release ]
+jobs:
+  deploy:
+    runs-on: Ubuntu-20.04
+    steps:
+    - name: Deploy Boostart
+      uses: appleboy/ssh-action@master
+      with:
+        host: ${{ secrets.HOST }}
+        username: ${{ secrets.USERNAME }}
+        password: ${{ secrets.PASSWORD }}
+        port: ${{ secrets.PORT }}
+        script: | 
+          export NVM_DIR=~/.nvm
+          source ~/.nvm/nvm.sh
+          killall node
+          cd /home/boostart/boostart
+          ./deploy.sh

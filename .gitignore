@@ -3,3 +3,5 @@ node_modules
 !.env.example
 build
 uploads/
+rootca.pem
+rootca-key.pem

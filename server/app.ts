@@ -1,19 +1,28 @@
 import express from 'express';
 import cookieParser from 'cookie-parser';
-import { CLIENT, PORT, API_VERSION, REDIS_HOST, REDIS_USERNAME, REDIS_PORT, REDIS_PASSWORD, TOKEN_SECRET } from './src/constants';
+import { CLIENT, HTTP_PORT, HTTPS_PORT, HOST, API_VERSION, REDIS_HOST, REDIS_USERNAME, REDIS_PORT, REDIS_PASSWORD, TOKEN_SECRET, MODE } from './src/constants';
 import apiRouter from './src/api/index';
 import cors from 'cors';
 import path from 'path';
-import { Server, Socket } from 'socket.io';
+import { Socket } from 'socket.io';
 import http from 'http';
+import https from 'https';
+import fs from 'fs';
 import * as redis from 'redis';
 import jwt from 'jsonwebtoken';
+import { connectionIdToUserIdx, userIdxToSocketId } from './src/core/store';
+import { globalSocket } from './src/core/socket';
+
+const options = {
+  cert: fs.readFileSync('../rootca.pem'),
+  key: fs.readFileSync('../rootca-key.pem'),
+};
 
 const app = express();
 const httpServer = http.createServer(app);
+const httpsServer = https.createServer(options, app);
 
-const connectionIdToUserIdx = {};
-const userIdxToSocketId = {};
+const server = MODE === 'dev' ? httpServer : httpsServer;
 
 const corsOptions = {
   origin: CLIENT,
@@ -21,9 +30,12 @@ const corsOptions = {
   methods: ['GET', 'POST', 'DELETE', 'PUT', 'PATCH'],
 };
 
-const io = new Server(httpServer, {
+globalSocket.initialize(server, {
   cors: corsOptions,
 });
+
+const io = globalSocket.instance;
+
 const redisclient = redis.createClient({
   url: `redis://${REDIS_USERNAME}:${REDIS_PASSWORD}@${REDIS_HOST}:${REDIS_PORT}/0`,
   legacyMode: true,
@@ -47,6 +59,10 @@ const getDiary = async (roomName: string): Promise<string> => {
 app.use(express.json());
 app.use(cookieParser());
 app.use(cors(corsOptions));
+app.use((req, res, next) => {
+  if (MODE !== 'dev' && !req.secure) return res.redirect(HOST + req.url);
+  next();
+});
 app.use(`/api/${API_VERSION}`, apiRouter);
 app.use(express.static(path.join(__dirname, 'build')));
 app.use(express.static(path.join(__dirname, 'uploads')));
@@ -101,13 +117,20 @@ io.on('connection', (socket: AuthorizedSocket) => {
     const connectionId = (socket.conn as any).id;
     const userIdx = connectionIdToUserIdx[connectionId];
     userIdxToSocketId[userIdx] = socket.id;
+
+    // 테스트하시기 쉽게 우선 주석으로 남겨두겠습니다.
+    // console.log(`유저 ${userIdx} 로그인`);
+    // console.log(`-- 서버와 연결되어 있는 소켓 목록 --`);
+    // console.log(io.sockets.sockets.keys());
+    // console.log(`-- 접속중인 유저의 소켓 아이디 목록 --`);
+    // console.log(userIdxToSocketId);
+    // console.log(`-- 연결중인 소켓 커넥션에 대한 유저 아이디 목록 --`);
+    // console.log(connectionIdToUserIdx);
   });
 
   socket.on('joinToNewRoom', async (destId, date) => {
-    console.log('join');
     const roomName = destId + date;
     visitingRoom.set(socket.id, roomName);
-    console.log(visitingRoom);
     socket.join(roomName);
     if (io.sockets.adapter.rooms.get(roomName).size === 1) {
       let diaryData = JSON.parse(await getDiary(roomName)) || { author: [], objects: {} };
@@ -115,20 +138,17 @@ io.on('connection', (socket: AuthorizedSocket) => {
       diaryData['online'] = [];
       diaryObjects[roomName] = diaryData;
       io.to(socket.id).emit('initReady');
-      console.log(diaryObjects);
     } else {
       io.to(socket.id).emit('initReady');
     }
   });
 
   socket.on('leaveCurrentRoom', async () => {
-    console.log('leave');
-    console.log(socket.id);
     const roomName = visitingRoom.get(socket.id);
+    if (!roomName || !diaryObjects[roomName]) return;
     const userIdx = socket.uid;
     const authorList = diaryObjects[roomName].author;
     const onlineList = diaryObjects[roomName].online;
-    if (!roomName) return;
     if (authorList.some(({ idx }) => idx === parseInt(userIdx))) {
       diaryObjects[roomName].online = [...onlineList].filter((idx) => idx !== parseInt(userIdx));
       updateAuthorList(roomName);
@@ -164,6 +184,7 @@ io.on('connection', (socket: AuthorizedSocket) => {
 
   socket.on('requestCurrentObjects', () => {
     const roomName = visitingRoom.get(socket.id);
+    if (!roomName || !diaryObjects[roomName]) return;
     const targetObjects = diaryObjects[roomName].objects;
     io.to(socket.id).emit('offerCurrentObjects', targetObjects);
     updateAuthorList(roomName);
@@ -171,10 +192,11 @@ io.on('connection', (socket: AuthorizedSocket) => {
 
   socket.on('sendModifiedObject', (objectData) => {
     const roomName = visitingRoom.get(socket.id);
+    if (!roomName || !diaryObjects[roomName]) return;
     const targetObjects = diaryObjects[roomName].objects;
     const objectId = objectData.id;
     targetObjects[objectId] = objectData;
-    socket.to(roomName).emit('updateModifiedObject', objectData);
+    io.to(roomName).emit('updateModifiedObject', objectData);
   });
   socket.on('sendRemovedObjectId', (objectId) => {
     const roomName = visitingRoom.get(socket.id);
@@ -183,11 +205,31 @@ io.on('connection', (socket: AuthorizedSocket) => {
     socket.to(roomName).emit('applyObjectRemoving', objectId);
   });
 
-  socket.on('disconnect', () => {
+  socket.on('disconnect', async () => {
+    const roomName = visitingRoom.get(socket.id);
+    if (!roomName || !diaryObjects[roomName]) return;
+    const userIdx = socket.uid;
+    const authorList = diaryObjects[roomName].author;
+    const onlineList = diaryObjects[roomName].online;
+    if (authorList.some(({ idx }) => idx === parseInt(userIdx))) {
+      diaryObjects[roomName].online = [...onlineList].filter((idx) => idx !== parseInt(userIdx));
+      updateAuthorList(roomName);
+    }
+    socket.leave(roomName);
+    if (!io.sockets.adapter.rooms.get(roomName)) {
+      const diaryData = diaryObjects[roomName];
+      await setDiary(roomName, JSON.stringify(diaryData));
+      delete diaryObjects[roomName];
+    }
     visitingRoom.delete(socket.id);
+    delete connectionIdToUserIdx[(socket.conn as any).id];
+    delete userIdxToSocketId[socket.uid];
   });
 });
 
-httpServer.listen(PORT, () => {
-  console.log(`app listening to port ${PORT}`);
+httpServer.listen(HTTP_PORT, () => {
+  console.log(`app listening to port ${HTTP_PORT}`);
+});
+httpsServer.listen(HTTPS_PORT, () => {
+  console.log(`app listening to port ${HTTPS_PORT}`);
 });

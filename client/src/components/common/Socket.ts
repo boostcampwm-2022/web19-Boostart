@@ -36,6 +36,7 @@ class GlobalSocket {
   }
 
   initialize() {
+    this._instance.disconnect();
     this._instance = io(HOST!);
   }
 }

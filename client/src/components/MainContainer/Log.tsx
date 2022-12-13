@@ -203,12 +203,10 @@ const Log = () => {
             </S.TimeBar>
           </S.TimeBarSection>
           <S.LogNavBarSection>
-            <S.SortOptionSelect>
-              <option value="tag">태그순</option>
-              <option value="time">시간순</option>
-              <option value="importance">중요도순</option>
-            </S.SortOptionSelect>
-            <DateSelector />
+            <S.LogNavBarSectionItem></S.LogNavBarSectionItem>
+            <S.LogNavBarSectionItem>
+              <DateSelector />
+            </S.LogNavBarSectionItem>
             <S.CheckBoxContainer>
               <S.CheckBoxLabel htmlFor="complete">완료</S.CheckBoxLabel>
               <S.CheckBox type="checkbox" id="complete" defaultChecked={completionCheckBoxStatus.complete} onChange={(e) => handleCheckBoxChange(e, 'complete')} />

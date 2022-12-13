@@ -21,3 +21,7 @@ export const myInfo = atom<Friend | null>({
   key: 'myProfile',
   default: null,
 });
+export const calendarState = atom({
+  key: 'currentCalendar',
+  default: [],
+});

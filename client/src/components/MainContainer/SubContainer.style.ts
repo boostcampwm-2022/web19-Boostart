@@ -1,14 +1,11 @@
 import styled from 'styled-components';
 
 export const Content = styled.div`
-  width: 100%;
+  width: 43.7rem;
   height: 36rem;
   background: white;
   border-radius: 1rem;
-  margin-top: 0rem;
-  margin-bottom: 1rem;
   padding: 0.5rem;
-  position: relative;
   box-shadow: 0px 0px 10px 5px rgba(175, 175, 175, 0.25);
   user-select: none;
 `;
@@ -20,6 +17,9 @@ export const Title = styled.span`
   font-family: 'Press Start 2P', cursive;
   transform: translate(1.75rem, 0.43rem);
   z-index: 1;
+  span {
+    font-size: 1.2rem;
+  }
 `;
 
 export const NavBarSection = styled.div`

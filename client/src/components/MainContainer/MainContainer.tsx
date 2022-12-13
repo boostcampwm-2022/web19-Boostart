@@ -17,9 +17,9 @@ const MainContents = () => {
         <S.RightSection>
           <Routes>
             <Route path="log/" element={<Log />} />
-            <Route path="diary/" element={<Diary />} />
+            <Route path="diary/" element={<SubContainer title="DIARY" element={<Diary />} />} />
             <Route path="goal" element={<SubContainer title="GOAL" element={<GoalManager />} />} />
-            <Route path="map/" element={<Map />} />
+            <Route path="map/" element={<SubContainer title="MAP" element={<Map />} />} />
           </Routes>
         </S.RightSection>
       </S.MainContentContainer>
