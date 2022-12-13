@@ -221,7 +221,7 @@ export const GoalModalSubmitButton = styled(Button)`
 
 export const GoalDeleteButton = styled(Button)`
   background-color: white;
-  border: 0.5px solid black;
+  border: 1px solid var(--color-main);
   color: var(--color-main);
 `;
 
