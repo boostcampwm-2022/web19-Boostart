@@ -27,12 +27,12 @@ const Diary = () => {
     };
   }, [currentVisit, currentDate]);
 
-  const AuthorList = ({ idx, profileImg }: AuthorListProps) => {
+  const AuthorList = ({ username, profileImg, isOnline }: any) => {
     return (
       <S.AuthorBox>
-        <S.ProfileBox key={idx} imgURL={profileImg} />
-        <S.OnlineMarker isOnline={onlineList.includes(idx)}>
-          <span>ON</span>
+        <S.ProfileBox imgURL={profileImg} />
+        <S.OnlineMarker isOnline={isOnline}>
+          <span>{username}</span>
         </S.OnlineMarker>
       </S.AuthorBox>
     );
@@ -45,8 +45,8 @@ const Diary = () => {
           <S.AuthorHeaderIcon src="/author.svg" alt="" />
           <S.AuthorHeaderSpan>참여자</S.AuthorHeaderSpan>
         </S.AuthorBox>
-        {authorList.map(({ idx, profileImg }) => {
-          return <AuthorList idx={idx} profileImg={profileImg} />;
+        {authorList.map(({ username, profileImg, isOnline }: any) => {
+          return <AuthorList username={username} profileImg={profileImg} isOnline={isOnline} />;
         })}
       </S.DiaryAuthorList>
       <Canvas setAuthorList={setAuthorList} setOnlineList={setOnlineList} />

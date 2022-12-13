@@ -156,7 +156,7 @@ io.on('connection', (socket: AuthorizedSocket) => {
     // const targetObjects = diaryObjects[roomName].objects;
     socket.emit('offerCurrentObjects', {
       objects: fooStore[roomName],
-      participants: participantStore[roomName],
+      participants: Object.values(participantStore[roomName]),
     });
     // updateAuthorList(roomName);
   });
@@ -167,7 +167,12 @@ io.on('connection', (socket: AuthorizedSocket) => {
 
     console.log(`user ${userIdx} join editing`);
 
-    participantStore[roomName][userIdx] = true;
+    participantStore[roomName][userIdx] = {
+      userId: '테스트 ID',
+      username: `${userIdx}`,
+      profileImg: 'default_profile.png',
+      isOnline: true,
+    };
     console.log(`${roomName}:`, participantStore[roomName]);
 
     io.to(roomName).emit('newEditor', userIdx);
@@ -177,7 +182,7 @@ io.on('connection', (socket: AuthorizedSocket) => {
     const userIdx = socket.uid;
     const roomName = visitingRoom.get(userIdx);
 
-    participantStore[roomName][userIdx] = false;
+    participantStore[roomName][userIdx].isOnline = false;
     console.log(`${roomName}:`, participantStore[roomName]);
     io.to(roomName).emit('editorLeft', userIdx);
   });

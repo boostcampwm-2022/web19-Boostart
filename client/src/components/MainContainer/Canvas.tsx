@@ -229,6 +229,8 @@ const Canvas = ({ setAuthorList, setOnlineList }: CanvasProps) => {
     console.log('-- 현재 참여자 목록 --');
     console.log(participants);
 
+    setAuthorList(participants);
+
     Object.values(objects).forEach((fabricData: any) => {
       updateDiary(fabricData);
     });
