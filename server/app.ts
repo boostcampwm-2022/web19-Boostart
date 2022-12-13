@@ -10,7 +10,7 @@ import https from 'https';
 import fs from 'fs';
 import * as redis from 'redis';
 import jwt from 'jsonwebtoken';
-import { connectionIdToUserIdx, userIdxToSocketId } from './src/core/store';
+import { connectionIdToUserIdx as connectionIdToUserInfo, userIdxToSocketId } from './src/core/store';
 import { globalSocket } from './src/core/socket';
 import { randomUUID } from 'crypto';
 
@@ -82,7 +82,7 @@ io.engine.on('headers', async (_, request) => {
   const { rawHeaders } = request;
   const connectionId = request._query.sid;
 
-  if (connectionIdToUserIdx[connectionId]) return;
+  if (connectionIdToUserInfo[connectionId]) return;
   if (!rawHeaders) return;
   const headerCookieIndex = rawHeaders.indexOf('Cookie');
   if (headerCookieIndex === -1) return;
@@ -93,26 +93,26 @@ io.engine.on('headers', async (_, request) => {
 
   jwt.verify(token, TOKEN_SECRET, (error, user) => {
     if (error || !user) return;
-    connectionIdToUserIdx[connectionId] = user.userIdx;
+    connectionIdToUserInfo[connectionId] = user;
   });
 });
 
 interface AuthorizedSocket extends Socket {
-  uid: string;
+  user: any;
 }
 
 io.on('connection', (socket: AuthorizedSocket) => {
   // 코드 중복을 줄이기 위해 미들 웨어로 인증 처리
   socket.use((_, next) => {
     const connectionId = (socket.conn as any).id;
-    socket.uid = connectionIdToUserIdx[connectionId];
+    socket.user = connectionIdToUserInfo[connectionId];
     next();
   });
 
   // 유저 index로 소켓 ID를 알아낼 수 있게 등록하는 과정. 클라이언트에서 별도로 호출해주어야함
   socket.on('authenticate', () => {
     const connectionId = (socket.conn as any).id;
-    const userIdx = connectionIdToUserIdx[connectionId];
+    const { userIdx } = connectionIdToUserInfo[connectionId];
     userIdxToSocketId[userIdx] = socket.id;
 
     // 테스트하시기 쉽게 우선 주석으로 남겨두겠습니다.
@@ -126,7 +126,7 @@ io.on('connection', (socket: AuthorizedSocket) => {
   });
 
   socket.on('joinToNewRoom', async (destId, date) => {
-    const userIdx = socket.uid;
+    const userIdx = socket.user?.userIdx;
     const roomName = destId + date;
     visitingRoom.set(userIdx, roomName);
 
@@ -146,17 +146,22 @@ io.on('connection', (socket: AuthorizedSocket) => {
   });
 
   socket.on('joinEditing', () => {
-    const userIdx = socket.uid;
+    const { user } = socket;
+
+    if (!user) return;
+
+    const { userId, userIdx, profileImg } = user;
+
     const roomName = visitingRoom.get(userIdx);
 
     if (!roomName) return;
 
-    console.log(`user ${userIdx} join editing`);
+    console.log(`user ${user.userIdx} join editing`);
 
     fooStore[roomName]['participants'][userIdx] = {
-      userId: '테스트 ID',
+      userId: userId,
       username: `${userIdx}`,
-      profileImg: 'default_profile.png',
+      profileImg: profileImg,
       isOnline: true,
     };
     console.log(`${roomName}:`, fooStore[roomName]['participants']);
@@ -165,7 +170,8 @@ io.on('connection', (socket: AuthorizedSocket) => {
   });
 
   socket.on('leaveEditing', () => {
-    const userIdx = socket.uid;
+    const userIdx = socket.user?.userIdx;
+    if (userIdx) return;
     const roomName = visitingRoom.get(userIdx);
 
     fooStore[roomName]['participants'][userIdx].isOnline = false;
@@ -174,7 +180,7 @@ io.on('connection', (socket: AuthorizedSocket) => {
   });
 
   socket.on('clientStatusChange', (fabricData) => {
-    const userIdx = socket.uid;
+    const userIdx = socket.user?.userIdx;
     const roomName = visitingRoom.get(userIdx);
 
     fabricData.id ??= randomUUID();
@@ -188,7 +194,7 @@ io.on('connection', (socket: AuthorizedSocket) => {
   });
 
   socket.on('leaveCurrentRoom', async () => {
-    const userIdx = socket.uid;
+    const userIdx = socket.user?.userIdx;
     const roomName = visitingRoom.get(userIdx);
     if (!roomName || !diaryObjects[roomName]) return;
 
@@ -201,7 +207,7 @@ io.on('connection', (socket: AuthorizedSocket) => {
   });
 
   socket.on('deleteObject', (id) => {
-    const userIdx = socket.uid;
+    const userIdx = socket.user?.userIdx;
     const roomName = visitingRoom.get(userIdx);
     console.log(`delete ${id}`);
     delete fooStore[roomName].id;
@@ -210,12 +216,12 @@ io.on('connection', (socket: AuthorizedSocket) => {
   });
 
   socket.on('disconnect', async () => {
-    const userIdx = socket.uid;
+    const userIdx = socket.user?.userIdx;
     if (!userIdx) return;
     const roomName = visitingRoom.get(userIdx);
     console.log(`${userIdx} disconnected`);
 
-    delete connectionIdToUserIdx[(socket.conn as any).id];
+    delete connectionIdToUserInfo[(socket.conn as any).id];
     delete userIdxToSocketId[userIdx];
 
     if (!roomName) return;

@@ -92,7 +92,7 @@ router.post('/login', async (req, res) => {
   [user] = (await executeSql('select * from user where user_id = ? and password = ?', [userId, encrypted])) as RowDataPacket[];
   if (!user) return res.status(401).json({ msg: '아이디 또는 비밀번호가 틀렸어요.' });
 
-  const token = generateAccessToken({ userIdx: user.idx });
+  const token = generateAccessToken({ userIdx: user.idx, userId: user.user_id, username: user.username, profileImg: user.profile_img });
   res.cookie('token', token, {
     httpOnly: true,
   });
@@ -117,7 +117,7 @@ router.get('/login/:oauth_type/callback', async (req, res) => {
   const oauthEmail = await httpGetOAuthUserIdentifier(oauthType, accessToken); // 변수 이름. (카카오에서는 이메일 얻기 위해 검수 필요)
 
   const [user] = (await executeSql('select * from user where oauth_type = ? and oauth_email = ?', [oauthType, oauthEmail])) as RowDataPacket[];
-  const token = generateAccessToken(user ? { userIdx: user.idx } : { oauthType, oauthEmail });
+  const token = generateAccessToken(user ? { userIdx: user.idx, userId: user.user_id, username: user.username, profileImg: user.profile_img } : { oauthType, oauthEmail });
 
   res.cookie('token', token, {
     httpOnly: true,
