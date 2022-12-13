@@ -1,4 +1,4 @@
-import { FabricText, Shape, FabricLine, ObjectData } from 'GlobalType';
+import { FabricText, Shape, FabricLine, ObjectData, Friend } from 'GlobalType';
 import { io, Socket } from 'socket.io-client';
 import { HOST } from '../../constants/index';
 
@@ -7,6 +7,7 @@ interface ServerToClientEvents {
   applyObjectRemoving: (objectId: string) => void;
   offerCurrentObjects: (objectDataMap: ObjectData) => void;
   initReady: () => void;
+  updateAuthorList: (authorList: Friend[], onlineList: number[]) => void;
 }
 
 interface ClientToServerEvents {
@@ -14,8 +15,10 @@ interface ClientToServerEvents {
   sendRemovedObjectId: (objectId: string) => void;
   requestCurrentObjects: () => void;
   joinToNewRoom: (destId: string, date: string) => void;
-  leaveCurrentRoom: (destId: string, date: string) => void;
+  leaveCurrentRoom: () => void;
   authenticate: () => void;
+  registAuthor: (myProfile: Friend) => void;
+  turnToOffline: () => void;
 }
 
 class GlobalSocket {

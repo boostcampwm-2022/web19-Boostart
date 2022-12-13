@@ -1,19 +1,26 @@
-import { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useRecoilValue } from 'recoil';
-import { visitState } from '../common/atoms';
+import { myInfo, visitState } from '../common/atoms';
 import useCurrentDate from '../../hooks/useCurrentDate';
 import globalSocket from '../common/Socket';
 import { DEFAULT_OBJECT_VALUE } from '../../constants';
-import { Shape, FabricText, FabricLine, ShapeType, FabricObject, ObjectData } from 'GlobalType';
+import { Shape, FabricText, FabricLine, ShapeType, FabricObject, ObjectData, Friend } from 'GlobalType';
 import { fabric } from 'fabric';
 import { v4 } from 'uuid';
 import styled from 'styled-components';
 
-const Canvas = () => {
+interface CanvasProps {
+  setAuthorList: React.Dispatch<Friend[]>;
+  setOnlineList: React.Dispatch<number[]>;
+}
+
+const Canvas = ({ setAuthorList, setOnlineList }: CanvasProps) => {
   const canvasRef = useRef<fabric.Canvas | null>(null);
   const colorRef = useRef<HTMLInputElement | null>(null);
+  const myProfile = useRecoilValue(myInfo);
   const currentVisit = useRecoilValue(visitState);
   const { currentDate, dateToString } = useCurrentDate();
+  const [isJoined, setIsJoined] = useState(false);
   const canvasBackground = '/canvasBackground.png';
   const diaryObjects = new Map();
   const socket = globalSocket.instance;
@@ -86,7 +93,6 @@ const Canvas = () => {
       id: v4(),
     };
     dispatchCanvasChange(shapeData);
-    drawShapeOnCanvas(shapeData);
   };
 
   const createNewText = () => {
@@ -105,10 +111,6 @@ const Canvas = () => {
       id: v4(),
     };
     dispatchCanvasChange(textData);
-    const fabricText = drawTextOnCanvas(textData);
-    if (!fabricText || !canvasRef.current) return;
-    canvasRef.current.setActiveObject(fabricText);
-    fabricText.enterEditing();
   };
 
   //Draw Objects
@@ -267,6 +269,7 @@ const Canvas = () => {
 
   const joinSocketRoom = () => {
     const currentDateString = dateToString();
+    if (!currentDateString || !currentVisit.userId) return;
     socket.emit('joinToNewRoom', currentVisit.userId, currentDateString);
   };
 
@@ -276,6 +279,7 @@ const Canvas = () => {
       updateModifiedObject(objectData);
     });
   };
+
   const setCanvasBackground = () => {
     fabric.Image.fromURL(canvasBackground, function (img) {
       img.set({
@@ -295,15 +299,32 @@ const Canvas = () => {
     socket.emit('requestCurrentObjects');
   };
 
+  const registAuthor = () => {
+    if (isJoined) {
+      socket.emit('turnToOffline');
+    } else if (!isJoined) {
+      if (!myProfile) return;
+      socket.emit('registAuthor', myProfile);
+    }
+    setIsJoined((isJoined) => !isJoined);
+  };
+
+  const updateAuthorList = (authorList: Friend[], onlineList: number[]) => {
+    setAuthorList(authorList);
+    setOnlineList(onlineList);
+  };
+
   useEffect(() => {
     if (!canvasRef.current) canvasRef.current = initCanvas();
     setCanvasBackground();
+    setIsJoined(false);
     canvasRef.current.on('path:created', dispatchCreatedLine);
     canvasRef.current.on('object:modified', dispatchModifiedObject);
     socket.on('offerCurrentObjects', presentPresetObjects);
     socket.on('updateModifiedObject', updateModifiedObject);
     socket.on('applyObjectRemoving', removeObject);
     socket.on('initReady', requestInitObjects);
+    socket.on('updateAuthorList', updateAuthorList);
     window.addEventListener('keydown', handleKeydown);
 
     return () => {
@@ -314,13 +335,13 @@ const Canvas = () => {
       socket.off('updateModifiedObject', updateModifiedObject);
       socket.off('applyObjectRemoving', removeObject);
       socket.off('initReady', requestInitObjects);
+      socket.off('updateAuthorList', updateAuthorList);
       window.removeEventListener('keydown', handleKeydown);
-      socket.emit('leaveCurrentRoom', currentVisit.userId, dateToString());
+      socket.emit('leaveCurrentRoom');
       canvasRef.current.clear();
     };
-  });
+  }, [currentDate, currentVisit]);
 
-  const [isJoined, setIsJoined] = useState(false);
   return (
     <>
       <ForeignerScreen isActive={isJoined}></ForeignerScreen>
@@ -336,7 +357,7 @@ const Canvas = () => {
           <img src="/textIcon.svg" onClick={() => createNewText()} alt="" />
           <input type="color" ref={colorRef} onChange={changeBrushColor} />
         </Palette>
-        <JoinButton onClick={() => setIsJoined((isJoined) => !isJoined)}>{isJoined ? 'DRAW' : 'JOIN'}</JoinButton>
+        <JoinButton onClick={() => registAuthor()}>{isJoined ? 'DRAW' : 'JOIN'}</JoinButton>
       </ControlBar>
     </>
   );
@@ -355,7 +376,7 @@ const ForeignerScreen = styled.div<{
   isActive: boolean;
 }>`
   width: 100%;
-  height: 25rem;
+  height: 26rem;
   position: absolute;
   top: 3.5rem;
   left: 0;
