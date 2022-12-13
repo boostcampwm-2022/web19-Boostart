@@ -82,7 +82,7 @@ const setDiary = async (roomName: string, data: DiaryData): Promise<void> => {
   await redisCli.set(roomName, JSON.stringify(data));
 };
 const getDiary = async (roomName: string): Promise<DiaryData> => {
-  let diaryData = await redisCli.get(roomName);
+  let diaryData = JSON.parse(await redisCli.get(roomName));
   if (diaryData === undefined || diaryData.author === undefined || !isNaN(diaryData.author[0])) diaryData = { author: [], objects: {} };
   diaryData.online = [];
   return diaryData;
