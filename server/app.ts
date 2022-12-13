@@ -88,6 +88,10 @@ const getDiary = async (roomName: string): Promise<DiaryData> => {
   return diaryData;
 };
 
+const isEmptyRoom = (roomName: string) => {
+  return io.sockets.adapter.rooms.get(roomName) === undefined;
+};
+
 app.use(express.json());
 app.use(cookieParser());
 app.use(cors(corsOptions));
@@ -162,12 +166,15 @@ io.on('connection', (socket: AuthorizedSocket) => {
 
   socket.on('joinToNewRoom', async (destId, date) => {
     const roomName = destId + date;
-    visitingRoom.set(socket.id, roomName);
-    socket.join(roomName);
-    if (io.sockets.adapter.rooms.get(roomName).size === 1) {
+
+    if (isEmptyRoom(roomName)) {
       const diaryData = await getDiary(roomName);
       diaryObjects[roomName] = diaryData;
     }
+
+    visitingRoom.set(socket.id, roomName);
+    socket.join(roomName);
+    console.log(`유저 ${socket.uid} ${roomName} 접속`);
     io.to(socket.id).emit('initReady');
   });
 
@@ -245,12 +252,14 @@ io.on('connection', (socket: AuthorizedSocket) => {
       updateAuthorList(roomName);
     }
     socket.leave(roomName);
-    if (!io.sockets.adapter.rooms.get(roomName)) {
+    visitingRoom.delete(socket.id);
+
+    if (isEmptyRoom(roomName)) {
       const diaryData = diaryObjects[roomName];
       await setDiary(roomName, diaryData);
       delete diaryObjects[roomName];
     }
-    visitingRoom.delete(socket.id);
+
     delete connectionIdToUserIdx[(socket.conn as any).id];
     delete userIdxToSocketId[socket.uid];
   });
