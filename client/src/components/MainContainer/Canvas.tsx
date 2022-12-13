@@ -195,19 +195,23 @@ const Canvas = ({ setAuthorList }: CanvasProps) => {
   };
 
   useEffect(() => {
-    if (!canvasRef.current) canvasRef.current = initCanvas();
-    setCanvasBackground();
-    joinSocketRoom();
-    setIsJoined(false);
-    window.addEventListener('keydown', handleKeydown);
+    if (!currentVisit || !currentDate) return;
+    if (!canvasRef.current) {
+      canvasRef.current = initCanvas();
+      setCanvasBackground();
+    } else {
+      joinSocketRoom();
+      setIsJoined(false);
 
-    socket.on('serverStatusChange', updateDiary);
-    canvasRef.current.on('path:created', handlePathCreated);
-    canvasRef.current.on('object:modified', handleObjectModified);
-    socket.on('offerCurrentObjects', handleObjectsOffer);
-    socket.on('objectDeleted', handleObjectDeleted);
-    socket.on('newEditor', handleNewEditorEvent);
-    socket.on('editorLeft', handleEditorLeft);
+      window.addEventListener('keydown', handleKeydown);
+      socket.on('serverStatusChange', updateDiary);
+      canvasRef.current.on('path:created', handlePathCreated);
+      canvasRef.current.on('object:modified', handleObjectModified);
+      socket.on('offerCurrentObjects', handleObjectsOffer);
+      socket.on('objectDeleted', handleObjectDeleted);
+      socket.on('newEditor', handleNewEditorEvent);
+      socket.on('editorLeft', handleEditorLeft);
+    }
 
     return () => {
       if (!canvasRef.current) return;
