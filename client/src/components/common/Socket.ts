@@ -1,4 +1,4 @@
-import { FabricText, Shape, FabricLine, ObjectData, Friend } from 'GlobalType';
+import { FabricText, Shape, FabricLine, ObjectData } from 'GlobalType';
 import { io, Socket } from 'socket.io-client';
 import { HOST } from '../../constants/index';
 

@@ -1,15 +1,13 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { useRecoilState } from 'recoil';
-import { Friend } from 'GlobalType';
+import React, { useState } from 'react';
+import { useRecoilState, useRecoilValue } from 'recoil';
 import { sendUnfriendRequest } from './FriendsBarAPI';
 import * as S from './FriendsBar.style';
-import { visitState, friendState } from '../common/atoms';
+import { visitState, friendState, myInfo } from '../common/atoms';
 import Modal from '../common/Modal';
 import { MODAL_CENTER_TOP, MODAL_CENTER_LEFT, MODAL_CENTER_TRANSFORM, HOST } from '../../constants/index';
 import { ProfileImage } from '../Drawer/Drawer.style';
 
 interface FriendsBarProps {
-  myProfile: Friend | null;
   handlePlusButtonClick: React.MouseEventHandler;
 }
 
@@ -29,12 +27,13 @@ interface FriendProfileModalProps {
   profileImg: string;
 }
 
-const FriendsBar = ({ myProfile, handlePlusButtonClick }: FriendsBarProps) => {
+const FriendsBar = ({ handlePlusButtonClick }: FriendsBarProps) => {
   const plusIcon = '/plus.svg';
   const [currentFriendOnMenu, setCurrentFriendOnMenu] = useState<Friend | null>(null);
   const [isDoubleCheckModalOpen, setIsDoubleCheckMdoalOpen] = useState(false);
   const [isFriendProfileOpen, setIsFriendProfileOpen] = useState(false);
   const [friendsList, setFriendsList] = useRecoilState(friendState);
+  const myProfile = useRecoilValue(myInfo);
 
   const closeDoubleCheckModal = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -78,7 +77,7 @@ const FriendsBar = ({ myProfile, handlePlusButtonClick }: FriendsBarProps) => {
             onContextMenu={(e) => handleRightClick(e)}
             nowVisiting={currentVisit.userId === userId}
           ></S.ProfileBox>
-          {currentFriendOnMenu?.userId === userId && userId !== myProfile?.userId && <FriendMenuModal setIsDoubleCheckMdoalOpen={setIsDoubleCheckMdoalOpen} setIsFriendProfileOpen={setIsFriendProfileOpen}></FriendMenuModal>}
+          {currentFriendOnMenu?.userId === userId && userId !== myProfile!.userId && <FriendMenuModal setIsDoubleCheckMdoalOpen={setIsDoubleCheckMdoalOpen} setIsFriendProfileOpen={setIsFriendProfileOpen}></FriendMenuModal>}
         </div>
       </>
     );

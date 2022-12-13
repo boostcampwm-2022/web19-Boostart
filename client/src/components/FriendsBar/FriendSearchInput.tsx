@@ -1,10 +1,8 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React from 'react';
 import axios from 'axios';
 import { HOST } from '../../constants';
 import styled from 'styled-components';
 import useInput from '../../hooks/useInput';
-import { RiCloseLine } from 'react-icons/ri';
-import { Friend } from 'GlobalType';
 
 axios.defaults.withCredentials = true; // withCredentials 전역 설정
 

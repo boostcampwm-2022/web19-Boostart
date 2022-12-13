@@ -1,11 +1,4 @@
 declare module 'GlobalType' {
-  interface Friend {
-    idx: number;
-    userId: string;
-    username: string;
-    profileImg: string;
-  }
-
   interface LabelData {
     labelIdx: number;
     title: string;
@@ -136,4 +129,10 @@ interface ModalProps {
 
 interface Window {
   kakao: any;
+}
+interface Friend {
+  idx: number;
+  userId: string;
+  username: string;
+  profileImg: string;
 }

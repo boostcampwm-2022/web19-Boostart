@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import axios, { AxiosStatic } from 'axios';
+import { AxiosStatic } from 'axios';
 import { useRecoilState } from 'recoil';
 import { visitState, friendState, myInfo } from '../components/common/atoms';
-import { Friend } from 'GlobalType';
+import { getMyProfile, getFriendsList, postFriendRequest, getFriendRequests, sendLogoutRequest } from '../components/FriendsBar/FriendsBarAPI';
 import FriendsBar from '../components/FriendsBar/FriendsBar';
 import MainContents from '../components/MainContainer/MainContainer';
 import Drawer from '../components/Drawer/Drawer';
@@ -21,46 +21,17 @@ const MainPage = () => {
   const [myProfile, setMyProfile] = useRecoilState<Friend | null>(myInfo);
   const [friendsList, setFriendsList] = useRecoilState(friendState);
   const [currentVisit, setCurrentVisit] = useRecoilState(visitState);
-
   const [friendRequests, setFriendRequests] = useState<Friend[] | null>(null);
 
-  //API Requests
-  const getFriendsList = async () => {
-    try {
-      const response = await axios.get(`${HOST}/api/v1/friend`);
-      setFriendsList(response.data);
-    } catch (error) {
-      console.log(error);
-    }
-  };
-
-  const getMyProfile = async () => {
-    try {
-      const response = await axios.get(`${HOST}/api/v1/user/me`);
-      setMyProfile(response.data);
-      return response.data;
-    } catch (error) {
-      console.log(error);
-    }
-  };
-
   const sendFriendRequest = async () => {
-    try {
-      const response = await axios.put(`${HOST}/api/v1/friend/request/${selectedFriend}`);
-      if (response.status === 201) alert('친구요청을 완료했습니다');
-    } catch (error: any) {
-      alert(error.response.data.msg);
-    }
-    resetFriendSearchForm();
+    if (!selectedFriend) return;
+    postFriendRequest(selectedFriend).then(() => {
+      resetFriendSearchForm();
+    });
   };
 
-  const getFriendRequests = async () => {
-    try {
-      const response = await axios.get(`${HOST}/api/v1/friend/request`);
-      setFriendRequests(response.data);
-    } catch (error) {
-      console.log(error);
-    }
+  const updateFriendRequestsList = async () => {
+    getFriendRequests().then((requests) => setFriendRequests(requests));
   };
 
   const handleFriendRequests = (action: AxiosStatic) => {
@@ -71,33 +42,23 @@ const MainPage = () => {
       } catch (error) {
         console.log(error);
       }
-      getFriendsList();
-      getFriendRequests();
+      getFriendsList().then((friendsData) => setFriendsList(friendsData));
+      updateFriendRequestsList();
     };
   };
 
-  const requestLogout = async () => {
-    try {
-      await axios.get(`${HOST}/api/v1/auth/logout`);
-      alert('로그아웃되었습니다');
-      window.location.href = '/';
-    } catch (error) {
-      console.log(error);
-    }
-  };
-
-  //Event Handler
   const resetFriendSearchForm = () => {
     setIsFriendSearchFormOpen(false);
     setSelectedFriend(null);
   };
 
   useEffect(() => {
-    getFriendsList();
-    getFriendRequests();
+    getFriendsList().then((friendsData) => setFriendsList(friendsData));
     getMyProfile().then((userData: Friend) => {
+      setMyProfile(userData);
       setCurrentVisit((prev) => ({ isMe: true, userId: userData.userId }));
     });
+    updateFriendRequestsList();
   }, []);
 
   useEffect(() => {
@@ -109,10 +70,10 @@ const MainPage = () => {
     <>
       <Container>
         <TopBar handleMenuClick={() => setIsDrawerOpen(true)} />
-        <FriendsBar myProfile={myProfile} handlePlusButtonClick={() => setIsFriendSearchFormOpen(true)} />
+        <FriendsBar handlePlusButtonClick={() => setIsFriendSearchFormOpen(true)} />
         <MainContents />
         {isDrawerOpen && <Dimmed zIndex={DRAWER_Z_INDEX - 1} onClick={() => setIsDrawerOpen(false)} />}
-        <Drawer isOpen={isDrawerOpen} friendRequests={friendRequests} handleFriendRequests={handleFriendRequests} handleLogoutButtonClick={() => requestLogout()} />
+        <Drawer isOpen={isDrawerOpen} friendRequests={friendRequests} handleFriendRequests={handleFriendRequests} />
         {isFriendSearchFormOpen && (
           <Modal
             component={<FriendSearchForm selectedFriend={selectedFriend} setSelectedFriend={setSelectedFriend} handleRequestButtonClick={() => sendFriendRequest()} />}
