@@ -435,8 +435,8 @@ const Canvas = ({ setAuthorList, setOnlineList }: CanvasProps) => {
     socket.emit('clientStatusChange', fabricData);
   };
 
-  const generateDefaultFabricData = (type: FabricType, fill: string) => {
-    return { ...DEFAULT_OBJECT_VALUE, type, fill };
+  const generateDefaultFabricData = (type: FabricType) => {
+    return { ...DEFAULT_OBJECT_VALUE, type, fill: colorRef.current?.value ?? '#000000' };
   };
 
   const handleObjectModified = (e: any) => {
@@ -472,14 +472,14 @@ const Canvas = ({ setAuthorList, setOnlineList }: CanvasProps) => {
       <canvas id="canvas" />
       <ControlBar>
         <Palette isActive={isJoined}>
-          <button onClick={() => putObject(generateDefaultFabricData('Ellipse', '#000000'))}>foo</button>
+          <button onClick={() => putObject(generateDefaultFabricData('Ellipse'))}>foo</button>
           <span onClick={() => enterDrawingMode(3)}>연필</span>
           <span onClick={() => enterDrawingMode(10)}>형광펜</span>
           <span onClick={() => enterDrawingMode(20)}>브러쉬</span>
-          <img src="/rect.svg" onClick={() => putObject(generateDefaultFabricData('Rect', '#000000'))} alt="" />
-          <img src="/triangle.svg" onClick={() => putObject(generateDefaultFabricData('Triangle', '#000000'))} alt="" />
-          <img src="/circle.svg" onClick={() => putObject(generateDefaultFabricData('Ellipse', '#000000'))} alt="" />
-          <img src="/textIcon.svg" onClick={() => putObject(generateDefaultFabricData('IText', '#000000'))} alt="" />
+          <img src="/rect.svg" onClick={() => putObject(generateDefaultFabricData('Rect'))} alt="" />
+          <img src="/triangle.svg" onClick={() => putObject(generateDefaultFabricData('Triangle'))} alt="" />
+          <img src="/circle.svg" onClick={() => putObject(generateDefaultFabricData('Ellipse'))} alt="" />
+          <img src="/textIcon.svg" onClick={() => putObject(generateDefaultFabricData('IText'))} alt="" />
           <input type="color" ref={colorRef} onChange={changeBrushColor} />
         </Palette>
         <JoinButton onClick={() => registAuthor()}>{isJoined ? 'DRAW' : 'JOIN'}</JoinButton>
