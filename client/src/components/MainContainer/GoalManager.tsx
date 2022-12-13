@@ -27,6 +27,11 @@ const httpPostGoal = async (body: FieldValues) => {
   return response;
 };
 
+const httpDeleteGoal = async (idx: number) => {
+  const response = await axios.delete(`${HOST}/api/v1/goal/${idx}`);
+  return response;
+};
+
 const httpGetLabelList = async (userId: string = '') => {
   // TODO: 전역 상태로 분리 고려
   const response = await axios.get(`${HOST}/api/v1/label/${userId}`);
@@ -111,6 +116,7 @@ const GoalManager = () => {
   };
 
   const handleGoalClick = (goal: Goal) => () => {
+    if (!currentVisit.isMe) return;
     setSelectedGoal(goal);
     setIsGoalModalOpen(true);
   };
@@ -210,7 +216,7 @@ const GoalModal = ({ isLabelModalOpen, setIsLabelModalOpen, handleCloseButtonCli
     setOver(!over);
   };
 
-  const handleDeleteButtonClick = async (e: React.MouseEvent, label: Label) => {
+  const handleLabelDeleteButtonClick = async (e: React.MouseEvent, label: Label) => {
     e.stopPropagation();
     if (!window.confirm('라벨을 삭제하시겠습니까?')) return;
     try {
@@ -219,6 +225,11 @@ const GoalModal = ({ isLabelModalOpen, setIsLabelModalOpen, handleCloseButtonCli
     } catch (error) {
       console.log(error);
     }
+  };
+
+  const handleGoalDeleteButtonClick = (idx: number) => async () => {
+    await httpDeleteGoal(idx);
+    handleCloseButtonClick();
   };
 
   const goalSubmit = async (goalData: FieldValues) => {
@@ -267,9 +278,12 @@ const GoalModal = ({ isLabelModalOpen, setIsLabelModalOpen, handleCloseButtonCli
           <S.GoalModalOverInput onClick={handleOverInputClick}>{over ? '▲' : '▼'}</S.GoalModalOverInput>
         </S.GoalModalLabel>
         <S.LabelListContainer>
-          <LabelList labelList={labelList} handlePlusButtonClick={handleLabelAddButtonClick} handleItemClick={handleLabelClick} handleDeleteButtonClick={handleDeleteButtonClick} />
+          <LabelList labelList={labelList} handlePlusButtonClick={handleLabelAddButtonClick} handleItemClick={handleLabelClick} handleDeleteButtonClick={handleLabelDeleteButtonClick} />
         </S.LabelListContainer>
-        <S.GoalModalSubmitButton onClick={setValues}>{selectedGoal ? 'APPLY' : 'NEW GOAL'}!</S.GoalModalSubmitButton>
+        <S.ButtonSection>
+          <S.GoalModalSubmitButton onClick={setValues}>{selectedGoal ? 'APPLY' : 'NEW GOAL'}!</S.GoalModalSubmitButton>
+          {selectedGoal && <S.GoalDeleteButton onClick={handleGoalDeleteButtonClick(selectedGoal.idx)}>DELETE</S.GoalDeleteButton>}
+        </S.ButtonSection>
       </S.GoalModal>
       {isLabelModalOpen && (
         <Modal

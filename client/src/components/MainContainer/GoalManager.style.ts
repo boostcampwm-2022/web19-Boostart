@@ -206,17 +206,23 @@ export const GoalModalAmountInput = styled.input`
   outline: none;
 `;
 
-export const GoalModalSubmitButton = styled.button`
+const Button = styled.button`
   border-radius: 2rem;
-  margin-top: 4rem;
-
-  width: 18rem;
   padding: 0.8rem;
+  outline: none;
+  font-family: var(--font-title);
+`;
+
+export const GoalModalSubmitButton = styled(Button)`
   background-color: var(--color-main);
   color: white;
-  outline: none;
   border: none;
-  font-family: var(--font-title);
+`;
+
+export const GoalDeleteButton = styled(Button)`
+  background-color: white;
+  border: 1px solid var(--color-main);
+  color: var(--color-main);
 `;
 
 export const LabelListContainer = styled.div`
@@ -310,4 +316,15 @@ export const GoalModalOverInput = styled.div`
 export const GoalList = styled.div`
   overflow-y: scroll;
   height: 28rem;
+`;
+
+export const ButtonSection = styled.div`
+  display: flex;
+  width: 20rem;
+  margin-top: 4rem;
+  justify-content: space-between;
+  * {
+    margin: 0.3rem;
+    flex: 1;
+  }
 `;
