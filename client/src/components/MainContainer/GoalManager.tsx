@@ -80,7 +80,7 @@ const GoalManager = () => {
 
   const fetchLabelMap = async () => {
     try {
-      const labelList = await httpGetLabelList(currentVisit.userId);
+      const labelList = await authorizedHttpRequest(() => httpGetLabelList(currentVisit.userId));
       labelList.forEach((label: Label) => {
         labelMap.set(label.idx, label);
       });
@@ -98,11 +98,11 @@ const GoalManager = () => {
   };
 
   useEffect(() => {
-    authorizedHttpRequest(fetchLabelMap).then(fetchGoalList);
+    fetchLabelMap().then(fetchGoalList);
   }, [currentVisit]);
 
   useEffect(() => {
-    authorizedHttpRequest(fetchGoalList);
+    fetchGoalList();
   }, [currentDate]);
 
   const handleNewGoalButtonClick = () => {
@@ -111,7 +111,7 @@ const GoalManager = () => {
   };
 
   const handleCloseButtonClick = () => {
-    authorizedHttpRequest(fetchLabelMap).then(fetchGoalList);
+    fetchLabelMap().then(fetchGoalList);
     setIsGoalModalOpen(false);
   };
 
@@ -228,7 +228,7 @@ const GoalModal = ({ isLabelModalOpen, setIsLabelModalOpen, handleCloseButtonCli
   };
 
   const handleGoalDeleteButtonClick = (idx: number) => async () => {
-    await httpDeleteGoal(idx);
+    await authorizedHttpRequest(() => httpDeleteGoal(idx));
     handleCloseButtonClick();
   };
 
@@ -236,7 +236,7 @@ const GoalModal = ({ isLabelModalOpen, setIsLabelModalOpen, handleCloseButtonCli
     try {
       await authorizedHttpRequest(() => (selectedGoal ? httpPutGoal(selectedGoal.idx, goalData) : httpPostGoal(goalData)));
       handleCloseButtonClick();
-      await httpGetCalendar(currentDate).then((res) => setCurrentCalendar(res));
+      await authorizedHttpRequest(() => httpGetCalendar(currentDate)).then((res) => setCurrentCalendar(res));
     } catch (error) {
       console.log(error);
     }
@@ -291,7 +291,7 @@ const GoalModal = ({ isLabelModalOpen, setIsLabelModalOpen, handleCloseButtonCli
             <LabelModal
               handleCloseButtonClick={() => {
                 try {
-                  httpGetLabelList().then(setLabelList);
+                  authorizedHttpRequest(httpGetLabelList).then(setLabelList);
                   setIsLabelModalOpen(false);
                 } catch (error) {
                   console.log(error);
@@ -319,6 +319,11 @@ interface LabelModalProps {
   handleCloseButtonClick: () => void;
 }
 
+const httpPostLabel = async (body: FieldValues) => {
+  const response = await axios.post(`${HOST}/api/v1/label`, body);
+  return response;
+};
+
 const LabelModal = ({ handleCloseButtonClick }: LabelModalProps) => {
   const schema = yup.object().shape({
     title: yup.string().required(),
@@ -344,7 +349,7 @@ const LabelModal = ({ handleCloseButtonClick }: LabelModalProps) => {
 
   const labelSubmit = async (labelData: FieldValues) => {
     try {
-      await authorizedHttpRequest(() => axios.post(`${HOST}/api/v1/label`, labelData));
+      await authorizedHttpRequest(() => httpPostLabel(labelData));
       handleCloseButtonClick();
     } catch (error) {
       console.log(error);
