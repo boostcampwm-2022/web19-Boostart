@@ -296,7 +296,7 @@ const Canvas = ({ setAuthorList, setOnlineList }: CanvasProps) => {
   };
 
   const requestInitObjects = () => {
-    socket.emit('requestCurrentObjects');
+    // socket.emit('requestCurrentObjects');
   };
 
   const registAuthor = () => {

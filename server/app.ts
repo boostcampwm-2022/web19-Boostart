@@ -137,10 +137,11 @@ io.on('connection', (socket: AuthorizedSocket) => {
       if (diaryData.author === undefined || !isNaN(diaryData.author[0])) diaryData = { author: [], objects: {} };
       diaryData['online'] = [];
       diaryObjects[roomName] = diaryData;
-      io.to(socket.id).emit('initReady');
-    } else {
-      io.to(socket.id).emit('initReady');
     }
+
+    const targetObjects = diaryObjects[roomName].objects;
+    socket.emit('offerCurrentObjects', targetObjects);
+    updateAuthorList(roomName);
   });
 
   socket.on('leaveCurrentRoom', async () => {
@@ -180,14 +181,6 @@ io.on('connection', (socket: AuthorizedSocket) => {
     const userIdx = socket.uid;
     const onlineList = diaryObjects[roomName].online;
     diaryObjects[roomName].online = [...onlineList].filter((idx) => idx !== parseInt(userIdx));
-    updateAuthorList(roomName);
-  });
-
-  socket.on('requestCurrentObjects', () => {
-    const roomName = visitingRoom.get(socket.id);
-    if (!roomName || !diaryObjects[roomName]) return;
-    const targetObjects = diaryObjects[roomName].objects;
-    io.to(socket.id).emit('offerCurrentObjects', targetObjects);
     updateAuthorList(roomName);
   });
 
