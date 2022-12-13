@@ -158,6 +158,8 @@ io.on('connection', (socket: AuthorizedSocket) => {
 
     diaryObjects[roomName][id] = fabricData;
     console.log(diaryObjects[roomName]);
+
+    io.to(roomName).emit('serverStatusChange', fabricData);
   });
 
   socket.on('leaveCurrentRoom', async () => {

@@ -346,6 +346,13 @@ const Canvas = ({ setAuthorList, setOnlineList }: CanvasProps) => {
     socket.emit('clientStatusChange', DEFAULT_OBJECT_VALUE);
   };
 
+  useEffect(() => {
+    socket.on('serverStatusChange', (fabricData: any) => {
+      console.log('서버에 상태가 변했어요.');
+      console.log(fabricData);
+    });
+  }, []);
+
   return (
     <>
       <ForeignerScreen isActive={isJoined}></ForeignerScreen>
