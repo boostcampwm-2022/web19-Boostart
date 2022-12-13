@@ -114,6 +114,7 @@ const GoalManager = () => {
   };
 
   const handleGoalClick = (goal: Goal) => () => {
+    if (!currentVisit.isMe) return;
     setSelectedGoal(goal);
     setIsGoalModalOpen(true);
   };
