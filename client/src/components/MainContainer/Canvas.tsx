@@ -86,12 +86,16 @@ const Canvas = ({ setAuthorList, setOnlineList }: CanvasProps) => {
     });
   };
 
+  const handleNewEditorEvent = (userIdx: number) => {
+    console.log(`${userIdx}번 유저가 입장했어요.`);
+  };
+
   const registAuthor = () => {
     if (isJoined) {
-      socket.emit('turnToOffline');
     } else if (!isJoined) {
-      if (!myProfile) return;
-      socket.emit('registAuthor', myProfile);
+      // if (!myProfile) return;
+      socket.emit('joinEditing');
+      // socket.emit('registAuthor', myProfile);
     }
     setIsJoined((isJoined) => !isJoined);
   };
@@ -107,6 +111,7 @@ const Canvas = ({ setAuthorList, setOnlineList }: CanvasProps) => {
     canvasRef.current.on('object:modified', handleObjectModified);
     socket.on('offerCurrentObjects', handleObjectsOffer);
     socket.on('objectDeleted', handleObjectDeleted);
+    socket.on('newEditor', handleNewEditorEvent);
 
     return () => {
       if (!canvasRef.current) return;
@@ -116,6 +121,7 @@ const Canvas = ({ setAuthorList, setOnlineList }: CanvasProps) => {
       canvasRef.current.off('object:modified', handleObjectModified);
       socket.off('offerCurrentObjects', handleObjectsOffer);
       socket.off('objectDeleted', handleObjectDeleted);
+      socket.on('newEditor', handleNewEditorEvent);
     };
   }, [currentDate, currentVisit]);
 
@@ -212,8 +218,11 @@ const Canvas = ({ setAuthorList, setOnlineList }: CanvasProps) => {
     putObject(modifiedObject);
   };
 
-  const handleObjectsOffer = (fabricObjects: any) => {
-    Object.values(fabricObjects).forEach((fabricData: any) => {
+  const handleObjectsOffer = ({ objects, participants }: any) => {
+    console.log('-- 현재 참여자 목록 --');
+    console.log(participants);
+
+    Object.values(objects).forEach((fabricData: any) => {
       updateDiary(fabricData);
     });
   };

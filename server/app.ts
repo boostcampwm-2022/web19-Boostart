@@ -15,6 +15,7 @@ import { globalSocket } from './src/core/socket';
 import { randomUUID } from 'crypto';
 
 const fooStore = {};
+const currentParticipantStore = {};
 
 const options = {
   cert: fs.readFileSync('../rootca.pem'),
@@ -135,8 +136,16 @@ io.on('connection', (socket: AuthorizedSocket) => {
     const userIdx = socket.uid;
     const roomName = destId + date;
     visitingRoom.set(userIdx, roomName);
-    fooStore[roomName] ??= {};
+
+    if (fooStore[roomName] === undefined) {
+      fooStore[roomName] = {};
+      console.log(1);
+      currentParticipantStore[roomName] = [];
+      console.log(currentParticipantStore);
+    }
+
     socket.join(roomName);
+
     // if (io.sockets.adapter.rooms.get(roomName).size === 1) {
     //   let diaryData = JSON.parse(await getDiary(roomName)) || { author: [], objects: {} };
     //   if (diaryData.author === undefined || !isNaN(diaryData.author[0])) diaryData = { author: [], objects: {} };
@@ -145,8 +154,26 @@ io.on('connection', (socket: AuthorizedSocket) => {
     // console.log(diaryObjects[roomName]);
 
     // const targetObjects = diaryObjects[roomName].objects;
-    socket.emit('offerCurrentObjects', fooStore[roomName]);
+    socket.emit('offerCurrentObjects', {
+      objects: fooStore[roomName],
+      participants: currentParticipantStore[roomName],
+    });
     // updateAuthorList(roomName);
+  });
+
+  socket.on('joinEditing', () => {
+    const userIdx = socket.uid;
+    const roomName = visitingRoom.get(userIdx);
+
+    console.log(`user ${userIdx} join editing`);
+
+    console.log(currentParticipantStore);
+    console.log(roomName);
+    console.log(currentParticipantStore[roomName]);
+
+    currentParticipantStore[roomName].push(userIdx);
+
+    io.to(roomName).emit('newEditor', userIdx);
   });
 
   socket.on('clientStatusChange', (fabricData) => {
