@@ -328,6 +328,7 @@ const Canvas = ({ setAuthorList, setOnlineList }: CanvasProps) => {
     // window.addEventListener('keydown', handleKeydown);
 
     socket.on('serverStatusChange', updateDiary);
+    canvasRef.current.on('path:created', handlePathCreated);
     canvasRef.current.on('object:modified', handleObjectModified);
     socket.on('offerCurrentObjects', handleObjectsOffer);
 
@@ -345,6 +346,7 @@ const Canvas = ({ setAuthorList, setOnlineList }: CanvasProps) => {
       // canvasRef.current.clear();
 
       socket.off('serverStatusChange', updateDiary);
+      canvasRef.current.off('path:created', handlePathCreated);
       canvasRef.current.off('object:modified', handleObjectModified);
       socket.off('offerCurrentObjects', handleObjectsOffer);
     };
@@ -354,8 +356,8 @@ const Canvas = ({ setAuthorList, setOnlineList }: CanvasProps) => {
   interface FabricData {
     id?: string;
     type: FabricType;
-    width: number;
-    height: number;
+    width?: number;
+    height?: number;
     top: number;
     left: number;
     fill: string;
@@ -456,6 +458,12 @@ const Canvas = ({ setAuthorList, setOnlineList }: CanvasProps) => {
     });
 
     console.log(diaryObjects);
+  };
+
+  const handlePathCreated = (e: any) => {
+    const fabricObject = e.path;
+    fabricObject.type = 'Path';
+    putObject(fabricObject);
   };
 
   return (
