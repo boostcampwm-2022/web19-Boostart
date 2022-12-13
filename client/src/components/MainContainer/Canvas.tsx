@@ -101,35 +101,6 @@ const Canvas = ({ setAuthorList }: CanvasProps) => {
     setIsJoined((isJoined) => !isJoined);
   };
 
-  useEffect(() => {
-    if (!canvasRef.current) canvasRef.current = initCanvas();
-    setCanvasBackground();
-    joinSocketRoom();
-    setIsJoined(false);
-    window.addEventListener('keydown', handleKeydown);
-
-    socket.on('serverStatusChange', updateDiary);
-    canvasRef.current.on('path:created', handlePathCreated);
-    canvasRef.current.on('object:modified', handleObjectModified);
-    socket.on('offerCurrentObjects', handleObjectsOffer);
-    socket.on('objectDeleted', handleObjectDeleted);
-    socket.on('newEditor', handleNewEditorEvent);
-    socket.on('editorLeft', handleEditorLeft);
-
-    return () => {
-      if (!canvasRef.current) return;
-      window.removeEventListener('keydown', handleKeydown);
-      socket.off('serverStatusChange', updateDiary);
-      canvasRef.current.off('path:created', handlePathCreated);
-      canvasRef.current.off('object:modified', handleObjectModified);
-      socket.off('offerCurrentObjects', handleObjectsOffer);
-      socket.off('objectDeleted', handleObjectDeleted);
-      socket.on('newEditor', handleNewEditorEvent);
-      socket.on('editorLeft', handleEditorLeft);
-      socket.emit('leaveCurrentRoom');
-    };
-  }, [currentDate, currentVisit]);
-
   const createFabricObject = (fabricData: FabricData) => {
     const { type } = fabricData;
     let object;
@@ -222,6 +193,35 @@ const Canvas = ({ setAuthorList }: CanvasProps) => {
     const oldObject = diaryObjects.get(id);
     canvasRef.current?.remove(oldObject);
   };
+
+  useEffect(() => {
+    if (!canvasRef.current) canvasRef.current = initCanvas();
+    setCanvasBackground();
+    joinSocketRoom();
+    setIsJoined(false);
+    window.addEventListener('keydown', handleKeydown);
+
+    socket.on('serverStatusChange', updateDiary);
+    canvasRef.current.on('path:created', handlePathCreated);
+    canvasRef.current.on('object:modified', handleObjectModified);
+    socket.on('offerCurrentObjects', handleObjectsOffer);
+    socket.on('objectDeleted', handleObjectDeleted);
+    socket.on('newEditor', handleNewEditorEvent);
+    socket.on('editorLeft', handleEditorLeft);
+
+    return () => {
+      if (!canvasRef.current) return;
+      window.removeEventListener('keydown', handleKeydown);
+      socket.off('serverStatusChange', updateDiary);
+      canvasRef.current.off('path:created', handlePathCreated);
+      canvasRef.current.off('object:modified', handleObjectModified);
+      socket.off('offerCurrentObjects', handleObjectsOffer);
+      socket.off('objectDeleted', handleObjectDeleted);
+      socket.on('newEditor', handleNewEditorEvent);
+      socket.on('editorLeft', handleEditorLeft);
+      socket.emit('leaveCurrentRoom');
+    };
+  }, [currentDate, currentVisit]);
 
   return (
     <>
