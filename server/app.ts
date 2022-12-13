@@ -181,6 +181,15 @@ io.on('connection', (socket: AuthorizedSocket) => {
     }
   });
 
+  socket.on('deleteObject', (id) => {
+    const userIdx = socket.uid;
+    const roomName = visitingRoom.get(userIdx);
+    console.log(`delete ${id}`);
+    delete fooStore[roomName].id;
+
+    io.to(roomName).emit('objectDeleted', id);
+  });
+
   socket.on('registAuthor', (author) => {
     const userIdx = socket.uid;
     const roomName = visitingRoom.get(userIdx);

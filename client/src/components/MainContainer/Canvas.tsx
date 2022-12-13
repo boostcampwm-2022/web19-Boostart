@@ -57,7 +57,8 @@ const Canvas = ({ setAuthorList, setOnlineList }: CanvasProps) => {
     switch (pressedKey) {
       case 'Delete':
       case 'Backspace':
-        eraseSelectedObject();
+        const selectedObject = canvasRef.current?.getActiveObject();
+        eraseSelectedObject(selectedObject);
         break;
       case 'Escape':
         leaveDrawingMode();
@@ -65,14 +66,11 @@ const Canvas = ({ setAuthorList, setOnlineList }: CanvasProps) => {
     }
   };
 
-  const eraseSelectedObject = () => {
-    if (!canvasRef.current) return;
-    const currentTarget = canvasRef.current.getActiveObject() as FabricObject;
-    if (!currentTarget) return;
-    if (currentTarget instanceof fabric.IText && currentTarget.isEditing) return;
-    canvasRef.current.remove(currentTarget);
-    const objectId = currentTarget.id;
-    socket.emit('sendRemovedObjectId', objectId);
+  const eraseSelectedObject = (fabricObject: any) => {
+    if (!fabricObject) return;
+    if (fabricObject instanceof fabric.IText && fabricObject.isEditing) return;
+    const { id } = fabricObject;
+    socket.emit('deleteObject', id);
   };
 
   // Create Objects
@@ -325,12 +323,13 @@ const Canvas = ({ setAuthorList, setOnlineList }: CanvasProps) => {
     // socket.on('applyObjectRemoving', removeObject);
     // socket.on('initReady', requestInitObjects);
     // socket.on('updateAuthorList', updateAuthorList);
-    // window.addEventListener('keydown', handleKeydown);
+    window.addEventListener('keydown', handleKeydown);
 
     socket.on('serverStatusChange', updateDiary);
     canvasRef.current.on('path:created', handlePathCreated);
     canvasRef.current.on('object:modified', handleObjectModified);
     socket.on('offerCurrentObjects', handleObjectsOffer);
+    socket.on('objectDeleted', handleObjectDeleted);
 
     return () => {
       if (!canvasRef.current) return;
@@ -341,7 +340,7 @@ const Canvas = ({ setAuthorList, setOnlineList }: CanvasProps) => {
       // socket.off('applyObjectRemoving', removeObject);
       // socket.off('initReady', requestInitObjects);
       // socket.off('updateAuthorList', updateAuthorList);
-      // window.removeEventListener('keydown', handleKeydown);
+      window.removeEventListener('keydown', handleKeydown);
       // socket.emit('leaveCurrentRoom');
       // canvasRef.current.clear();
 
@@ -349,6 +348,7 @@ const Canvas = ({ setAuthorList, setOnlineList }: CanvasProps) => {
       canvasRef.current.off('path:created', handlePathCreated);
       canvasRef.current.off('object:modified', handleObjectModified);
       socket.off('offerCurrentObjects', handleObjectsOffer);
+      socket.off('objectDeleted', handleObjectDeleted);
     };
   }, [currentDate, currentVisit]);
 
@@ -464,6 +464,11 @@ const Canvas = ({ setAuthorList, setOnlineList }: CanvasProps) => {
     const fabricObject = e.path;
     fabricObject.type = 'Path';
     putObject(fabricObject);
+  };
+
+  const handleObjectDeleted = (id: string) => {
+    const oldObject = diaryObjects.get(id);
+    canvasRef.current?.remove(oldObject);
   };
 
   return (
