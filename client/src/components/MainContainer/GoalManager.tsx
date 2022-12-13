@@ -71,6 +71,8 @@ const GoalManager = () => {
 
   const [currentMenu, setCurrentMenu] = useRecoilState(menuState);
 
+  const isPast = dateToString() < dateToString(new Date());
+
   const fetchLabelMap = async () => {
     try {
       const labelList = await httpGetLabelList(currentVisit.userId);
@@ -125,7 +127,7 @@ const GoalManager = () => {
       <S.GoalList>
         {goalList.map((goal) => (
           <div key={goal.idx} onClick={handleGoalClick(goal)}>
-            <Goal goal={goal} />
+            <Goal goal={goal} isPast={isPast} />
           </div>
         ))}
       </S.GoalList>
@@ -356,7 +358,7 @@ interface WaveProps {
 
 const PRIMARY_COLOR = '#9BB1D7';
 const WaveContainer = ({ textContent, percentage }: WaveProps) => {
-  const BOUNDARY = 0.3;
+  const BOUNDARY = PROGRESS_RATE;
   return (
     <S.WaveContainer>
       <S.Wrap color={percentage <= BOUNDARY ? PRIMARY_COLOR : 'white'}>
@@ -379,16 +381,18 @@ interface Goal {
 
 interface GoalProps {
   goal: Goal;
+  isPast: boolean;
 }
 
-const Goal = ({ goal }: GoalProps) => {
+const PROGRESS_RATE = 0.4;
+
+const Goal = ({ goal, isPast }: GoalProps) => {
   const { idx, title, labelIdx, currentAmount, goalAmount, over } = goal;
   const label = labelMap.get(labelIdx);
   if (!label) return <></>;
   const { title: labelTitle, color: labelColor, unit: labelUnit } = label;
 
-  const isPast = true;
-  const rate = over ? Math.min(currentAmount / goalAmount, 1) : currentAmount <= goalAmount ? 1 : isPast ? 0 : 0.5;
+  const rate = over ? Math.min(currentAmount / goalAmount, 1) : isPast ? (currentAmount <= goalAmount ? 1 : 0) : PROGRESS_RATE;
   const rateString = rate >= 1 ? 'success' : over ? (100 * rate).toFixed(0).toString() + '%' : isPast ? 'failed' : 'progress';
 
   return (
