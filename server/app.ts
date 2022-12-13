@@ -149,6 +149,8 @@ io.on('connection', (socket: AuthorizedSocket) => {
     const userIdx = socket.uid;
     const roomName = visitingRoom.get(userIdx);
 
+    if (!roomName) return;
+
     console.log(`user ${userIdx} join editing`);
 
     fooStore[roomName]['participants'][userIdx] = {
@@ -209,18 +211,27 @@ io.on('connection', (socket: AuthorizedSocket) => {
 
   socket.on('disconnect', async () => {
     const userIdx = socket.uid;
+    if (!userIdx) return;
     const roomName = visitingRoom.get(userIdx);
-    if (!roomName || !diaryObjects[roomName]) return;
+    console.log(`${userIdx} disconnected`);
 
-    socket.leave(roomName);
+    delete connectionIdToUserIdx[(socket.conn as any).id];
+    delete userIdxToSocketId[userIdx];
+
+    if (!roomName) return;
+    visitingRoom.delete(userIdx);
+
+    if (!fooStore[roomName]) return;
+
+    if (fooStore[roomName]['participants'][userIdx] !== undefined) {
+      fooStore[roomName]['participants'][userIdx].isOnline = false;
+    }
+
     if (!io.sockets.adapter.rooms.get(roomName)) {
       const diaryData = diaryObjects[roomName];
       // await setDiary(roomName, JSON.stringify(diaryData));
       delete diaryObjects[roomName];
     }
-    visitingRoom.delete(userIdx);
-    delete connectionIdToUserIdx[(socket.conn as any).id];
-    delete userIdxToSocketId[userIdx];
   });
 });
 
