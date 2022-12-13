@@ -1,4 +1,5 @@
-import { atom } from 'recoil';
+import { atom, selector } from 'recoil';
+import { Friend } from 'GlobalType';
 
 export const dateState = atom({
   key: 'currentDate',
@@ -11,4 +12,16 @@ export const visitState = atom({
 export const menuState = atom({
   key: 'currentMenu',
   default: '',
+});
+export const friendState = atom<Friend[]>({
+  key: 'friendsList',
+  default: [],
+});
+export const myInfo = atom<Friend | null>({
+  key: 'myProfile',
+  default: null,
+});
+export const calendarState = atom({
+  key: 'currentCalendar',
+  default: [],
 });

@@ -10,7 +10,7 @@ import { FieldValues, useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
 import useCurrentDate from '../../hooks/useCurrentDate';
-import { visitState, menuState } from '../common/atoms';
+import { visitState, menuState, calendarState } from '../common/atoms';
 import { useRecoilValue, useRecoilState } from 'recoil';
 import { authorizedHttpRequest } from '../common/utils';
 
@@ -24,6 +24,11 @@ const httpGetGoalList = async (userId: string, dateString: string) => {
 
 const httpPostGoal = async (body: FieldValues) => {
   const response = await axios.post(`${HOST}/api/v1/goal`, body);
+  return response;
+};
+
+const httpDeleteGoal = async (idx: number) => {
+  const response = await axios.delete(`${HOST}/api/v1/goal/${idx}`);
   return response;
 };
 
@@ -49,6 +54,11 @@ const httpPutGoal = async (idx: number, body: FieldValues) => {
   return response;
 };
 
+const httpGetCalendar = async (currentDate: Date) => {
+  const response = await axios.get(`${HOST}/api/v1/calendar/goal?year=${currentDate.getFullYear()}&month=${currentDate.getMonth() + 1}`);
+  return response.data;
+};
+
 const generateRandomHexColor = () => {
   const R = Math.floor(Math.random() * 127 + 128).toString(16);
   const G = Math.floor(Math.random() * 127 + 128).toString(16);
@@ -65,6 +75,8 @@ const GoalManager = () => {
   const [selectedGoal, setSelectedGoal] = useState<Goal>();
 
   const [currentMenu, setCurrentMenu] = useRecoilState(menuState);
+
+  const isPast = dateToString() < dateToString(new Date());
 
   const fetchLabelMap = async () => {
     try {
@@ -104,6 +116,7 @@ const GoalManager = () => {
   };
 
   const handleGoalClick = (goal: Goal) => () => {
+    if (!currentVisit.isMe) return;
     setSelectedGoal(goal);
     setIsGoalModalOpen(true);
   };
@@ -113,14 +126,14 @@ const GoalManager = () => {
   }, []);
 
   return (
-    <>
+    <S.Container>
       <S.GoalHead>
         <span>목표</span> <span>제목</span> <span>현황</span> <span>달성률</span>
       </S.GoalHead>
       <S.GoalList>
         {goalList.map((goal) => (
           <div key={goal.idx} onClick={handleGoalClick(goal)}>
-            <Goal goal={goal} />
+            <Goal goal={goal} isPast={isPast} />
           </div>
         ))}
       </S.GoalList>
@@ -137,7 +150,7 @@ const GoalManager = () => {
           }}
         />
       )}
-    </>
+    </S.Container>
   );
 };
 
@@ -154,7 +167,8 @@ const GoalModal = ({ isLabelModalOpen, setIsLabelModalOpen, handleCloseButtonCli
   const [selectedLabelIndex, setSelectedLabelIndex] = useState<number | null>(selectedGoal ? selectedGoal.labelIdx : null);
   const [labelList, setLabelList] = useState<Label[]>([]);
   const [over, setOver] = useState(selectedGoal ? selectedGoal.over : true);
-  const { dateToString } = useCurrentDate();
+  const { currentDate, dateToString } = useCurrentDate();
+  const [currentCalendar, setCurrentCalendar] = useRecoilState(calendarState);
 
   const schema = yup.object().shape({
     title: yup.string().required(),
@@ -202,7 +216,7 @@ const GoalModal = ({ isLabelModalOpen, setIsLabelModalOpen, handleCloseButtonCli
     setOver(!over);
   };
 
-  const handleDeleteButtonClick = async (e: React.MouseEvent, label: Label) => {
+  const handleLabelDeleteButtonClick = async (e: React.MouseEvent, label: Label) => {
     e.stopPropagation();
     if (!window.confirm('라벨을 삭제하시겠습니까?')) return;
     try {
@@ -213,10 +227,16 @@ const GoalModal = ({ isLabelModalOpen, setIsLabelModalOpen, handleCloseButtonCli
     }
   };
 
+  const handleGoalDeleteButtonClick = (idx: number) => async () => {
+    await httpDeleteGoal(idx);
+    handleCloseButtonClick();
+  };
+
   const goalSubmit = async (goalData: FieldValues) => {
     try {
       await authorizedHttpRequest(() => (selectedGoal ? httpPutGoal(selectedGoal.idx, goalData) : httpPostGoal(goalData)));
       handleCloseButtonClick();
+      await httpGetCalendar(currentDate).then((res) => setCurrentCalendar(res));
     } catch (error) {
       console.log(error);
     }
@@ -258,9 +278,12 @@ const GoalModal = ({ isLabelModalOpen, setIsLabelModalOpen, handleCloseButtonCli
           <S.GoalModalOverInput onClick={handleOverInputClick}>{over ? '▲' : '▼'}</S.GoalModalOverInput>
         </S.GoalModalLabel>
         <S.LabelListContainer>
-          <LabelList labelList={labelList} handlePlusButtonClick={handleLabelAddButtonClick} handleItemClick={handleLabelClick} handleDeleteButtonClick={handleDeleteButtonClick} />
+          <LabelList labelList={labelList} handlePlusButtonClick={handleLabelAddButtonClick} handleItemClick={handleLabelClick} handleDeleteButtonClick={handleLabelDeleteButtonClick} />
         </S.LabelListContainer>
-        <S.GoalModalSubmitButton onClick={setValues}>{selectedGoal ? 'APPLY' : 'NEW GOAL'}!</S.GoalModalSubmitButton>
+        <S.ButtonSection>
+          <S.GoalModalSubmitButton onClick={setValues}>{selectedGoal ? 'APPLY' : 'NEW GOAL'}!</S.GoalModalSubmitButton>
+          {selectedGoal && <S.GoalDeleteButton onClick={handleGoalDeleteButtonClick(selectedGoal.idx)}>DELETE</S.GoalDeleteButton>}
+        </S.ButtonSection>
       </S.GoalModal>
       {isLabelModalOpen && (
         <Modal
@@ -349,7 +372,7 @@ interface WaveProps {
 
 const PRIMARY_COLOR = '#9BB1D7';
 const WaveContainer = ({ textContent, percentage }: WaveProps) => {
-  const BOUNDARY = 0.3;
+  const BOUNDARY = PROGRESS_RATE;
   return (
     <S.WaveContainer>
       <S.Wrap color={percentage <= BOUNDARY ? PRIMARY_COLOR : 'white'}>
@@ -372,16 +395,18 @@ interface Goal {
 
 interface GoalProps {
   goal: Goal;
+  isPast: boolean;
 }
 
-const Goal = ({ goal }: GoalProps) => {
+const PROGRESS_RATE = 0.4;
+
+const Goal = ({ goal, isPast }: GoalProps) => {
   const { idx, title, labelIdx, currentAmount, goalAmount, over } = goal;
   const label = labelMap.get(labelIdx);
   if (!label) return <></>;
   const { title: labelTitle, color: labelColor, unit: labelUnit } = label;
 
-  const isPast = true;
-  const rate = over ? Math.min(currentAmount / goalAmount, 1) : currentAmount <= goalAmount ? 1 : isPast ? 0 : 0.5;
+  const rate = over ? Math.min(currentAmount / goalAmount, 1) : isPast ? (currentAmount <= goalAmount ? 1 : 0) : PROGRESS_RATE;
   const rateString = rate >= 1 ? 'success' : over ? (100 * rate).toFixed(0).toString() + '%' : isPast ? 'failed' : 'progress';
 
   return (

@@ -305,9 +305,18 @@ export const TaskMainInfos = styled.div`
   pointer-events: none;
 `;
 
+export const LogNavBarSectionItem = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 200px;
+`;
+
 export const CheckBoxContainer = styled.div`
   display: flex;
   align-items: center;
+  justify-content: right;
+  width: 200px;
 `;
 
 export const CheckBoxLabel = styled.label`
@@ -423,8 +432,12 @@ export const EmoticonInput = styled.div`
   align-items: center;
   position: relative;
   span {
-    padding-top: 3px;
-    margin: 5.5px;
+    padding-top: 5px;
+    margin: 5px;
     cursor: pointer;
+  }
+  img {
+    width: 17px;
+    height: 17px;
   }
 `;

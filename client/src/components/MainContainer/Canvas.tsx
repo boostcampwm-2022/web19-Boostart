@@ -1,19 +1,31 @@
-import { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useRecoilValue } from 'recoil';
-import { visitState } from '../common/atoms';
+import { myInfo, visitState } from '../common/atoms';
 import useCurrentDate from '../../hooks/useCurrentDate';
 import globalSocket from '../common/Socket';
 import { DEFAULT_OBJECT_VALUE } from '../../constants';
-import { Shape, FabricText, FabricLine, ShapeType, FabricObject, ObjectData } from 'GlobalType';
+import { Shape, FabricText, FabricLine, ShapeType, FabricObject, ObjectData, Friend } from 'GlobalType';
 import { fabric } from 'fabric';
 import { v4 } from 'uuid';
 import styled from 'styled-components';
+import { RiMarkPenFill } from 'react-icons/ri';
+import { AiFillFormatPainter } from 'react-icons/ai';
+import { BsPenFill } from 'react-icons/bs';
+import { BiRectangle, BiCircle, BiText } from 'react-icons/bi';
+import { FiTriangle } from 'react-icons/fi';
 
-const Canvas = () => {
+interface CanvasProps {
+  setAuthorList: React.Dispatch<Friend[]>;
+  setOnlineList: React.Dispatch<number[]>;
+}
+
+const Canvas = ({ setAuthorList, setOnlineList }: CanvasProps) => {
   const canvasRef = useRef<fabric.Canvas | null>(null);
   const colorRef = useRef<HTMLInputElement | null>(null);
+  const myProfile = useRecoilValue(myInfo);
   const currentVisit = useRecoilValue(visitState);
   const { currentDate, dateToString } = useCurrentDate();
+  const [isJoined, setIsJoined] = useState(false);
   const canvasBackground = '/canvasBackground.png';
   const diaryObjects = new Map();
   const socket = globalSocket.instance;
@@ -86,7 +98,6 @@ const Canvas = () => {
       id: v4(),
     };
     dispatchCanvasChange(shapeData);
-    drawShapeOnCanvas(shapeData);
   };
 
   const createNewText = () => {
@@ -105,10 +116,6 @@ const Canvas = () => {
       id: v4(),
     };
     dispatchCanvasChange(textData);
-    const fabricText = drawTextOnCanvas(textData);
-    if (!fabricText || !canvasRef.current) return;
-    canvasRef.current.setActiveObject(fabricText);
-    fabricText.enterEditing();
   };
 
   //Draw Objects
@@ -267,6 +274,7 @@ const Canvas = () => {
 
   const joinSocketRoom = () => {
     const currentDateString = dateToString();
+    if (!currentDateString || !currentVisit.userId) return;
     socket.emit('joinToNewRoom', currentVisit.userId, currentDateString);
   };
 
@@ -276,6 +284,7 @@ const Canvas = () => {
       updateModifiedObject(objectData);
     });
   };
+
   const setCanvasBackground = () => {
     fabric.Image.fromURL(canvasBackground, function (img) {
       img.set({
@@ -295,15 +304,32 @@ const Canvas = () => {
     socket.emit('requestCurrentObjects');
   };
 
+  const registAuthor = () => {
+    if (isJoined) {
+      socket.emit('turnToOffline');
+    } else if (!isJoined) {
+      if (!myProfile) return;
+      socket.emit('registAuthor', myProfile);
+    }
+    setIsJoined((isJoined) => !isJoined);
+  };
+
+  const updateAuthorList = (authorList: Friend[], onlineList: number[]) => {
+    setAuthorList(authorList);
+    setOnlineList(onlineList);
+  };
+
   useEffect(() => {
     if (!canvasRef.current) canvasRef.current = initCanvas();
     setCanvasBackground();
+    setIsJoined(false);
     canvasRef.current.on('path:created', dispatchCreatedLine);
     canvasRef.current.on('object:modified', dispatchModifiedObject);
     socket.on('offerCurrentObjects', presentPresetObjects);
     socket.on('updateModifiedObject', updateModifiedObject);
     socket.on('applyObjectRemoving', removeObject);
     socket.on('initReady', requestInitObjects);
+    socket.on('updateAuthorList', updateAuthorList);
     window.addEventListener('keydown', handleKeydown);
 
     return () => {
@@ -314,29 +340,29 @@ const Canvas = () => {
       socket.off('updateModifiedObject', updateModifiedObject);
       socket.off('applyObjectRemoving', removeObject);
       socket.off('initReady', requestInitObjects);
+      socket.off('updateAuthorList', updateAuthorList);
       window.removeEventListener('keydown', handleKeydown);
-      socket.emit('leaveCurrentRoom', currentVisit.userId, dateToString());
+      socket.emit('leaveCurrentRoom');
       canvasRef.current.clear();
     };
-  });
+  }, [currentDate, currentVisit]);
 
-  const [isJoined, setIsJoined] = useState(false);
   return (
     <>
       <ForeignerScreen isActive={isJoined}></ForeignerScreen>
       <canvas id="canvas" />
       <ControlBar>
         <Palette isActive={isJoined}>
-          <span onClick={() => enterDrawingMode(3)}>연필</span>
-          <span onClick={() => enterDrawingMode(10)}>형광펜</span>
-          <span onClick={() => enterDrawingMode(20)}>브러쉬</span>
-          <img src="/rect.svg" onClick={() => createNewShape('rect')} alt="" />
-          <img src="/triangle.svg" onClick={() => createNewShape('triangle')} alt="" />
-          <img src="/circle.svg" onClick={() => createNewShape('circle')} alt="" />
-          <img src="/textIcon.svg" onClick={() => createNewText()} alt="" />
-          <input type="color" ref={colorRef} onChange={changeBrushColor} />
+          <PenIcon onClick={() => enterDrawingMode(3)} />
+          <MarkerIcon onClick={() => enterDrawingMode(10)} />
+          <PaintIcon onClick={() => enterDrawingMode(18)} />
+          <RectIcon onClick={() => createNewShape('rect')} />
+          <CircleIcon onClick={() => createNewShape('triangle')} />
+          <TriangleIcon onClick={() => createNewShape('circle')} />
+          <TextIcon onClick={() => createNewText()} />
+          <ColorPicker type="color" ref={colorRef} onChange={changeBrushColor} />
         </Palette>
-        <JoinButton onClick={() => setIsJoined((isJoined) => !isJoined)}>{isJoined ? 'DRAW' : 'JOIN'}</JoinButton>
+        <JoinButton onClick={() => registAuthor()}>{isJoined ? 'DRAW' : 'JOIN'}</JoinButton>
       </ControlBar>
     </>
   );
@@ -355,7 +381,7 @@ const ForeignerScreen = styled.div<{
   isActive: boolean;
 }>`
   width: 100%;
-  height: 25rem;
+  height: 26rem;
   position: absolute;
   top: 3.5rem;
   left: 0;
@@ -367,11 +393,12 @@ const ForeignerScreen = styled.div<{
 const Palette = styled.div<{
   isActive: boolean;
 }>`
-  width: ${(props) => (props.isActive ? '28rem' : '1px')};
+  width: ${(props) => (props.isActive ? '31rem' : '1px')};
   height: 3rem;
   padding: ${(props) => (props.isActive ? '0 1rem 0 4rem' : '0')};
   border-radius: 2rem;
-  background: var(--color-gray1);
+  background: var(--color-gray8);
+
   position: absolute;
   display: flex;
   flex-wrap: nowrap;
@@ -382,6 +409,8 @@ const Palette = styled.div<{
   overflow: hidden;
   box-sizing: border-box;
   transition: all 0.5s;
+  ${(props) => props.isActive && 'box-shadow: 0px 0px 3px 2px rgba(200, 200, 200, 0.3);'};
+
   & img {
     height: 1.5rem;
   }
@@ -390,6 +419,8 @@ const Palette = styled.div<{
   }
 `;
 const JoinButton = styled.div`
+  box-shadow: 0px 0px 3px 2px rgba(200, 200, 200, 0.4);
+
   width: 6.5rem;
   height: 3rem;
   position: absolute;
@@ -400,4 +431,69 @@ const JoinButton = styled.div`
   font-family: 'Press Start 2P', cursive;
   text-align: center;
   line-height: 3rem;
+`;
+
+export const MarkerIcon = styled(RiMarkPenFill)`
+  width: 1.7rem;
+  height: 1.7rem;
+  color: black;
+  padding: 0.3rem;
+`;
+
+export const PaintIcon = styled(AiFillFormatPainter)`
+  width: 1.7rem;
+  height: 1.7rem;
+  color: black;
+  padding: 0.3rem;
+`;
+
+export const PenIcon = styled(BsPenFill)`
+  width: 1.7rem;
+  height: 1.7rem;
+  color: black;
+  padding: 0.3rem;
+`;
+
+export const RectIcon = styled(BiRectangle)`
+  width: 1.7rem;
+  height: 1.7rem;
+  color: black;
+  padding: 0.3rem;
+`;
+
+export const TriangleIcon = styled(FiTriangle)`
+  width: 1.7rem;
+  height: 1.7rem;
+  color: black;
+  padding: 0.3rem;
+`;
+
+export const CircleIcon = styled(BiCircle)`
+  width: 1.7rem;
+  height: 1.7rem;
+  color: black;
+  padding: 0.3rem;
+`;
+
+export const TextIcon = styled(BiText)`
+  width: 1.7rem;
+  height: 1.7rem;
+  color: black;
+  padding: 0.3rem;
+`;
+
+const ColorPicker = styled.input`
+  cursor: pointer;
+  border: 1px solid var(--color-gray4);
+  background-color: inherit;
+  width: 1.72rem;
+  height: 1.7rem;
+  padding: 0.15rem;
+
+  ::-webkit-color-swatch-wrapper {
+    padding: 0px;
+  }
+  ::-webkit-color-swatch {
+    border: none;
+  }
 `;

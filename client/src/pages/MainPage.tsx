@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios, { AxiosStatic } from 'axios';
 import { useRecoilState } from 'recoil';
-import { visitState } from '../components/common/atoms';
+import { visitState, friendState, myInfo } from '../components/common/atoms';
 import { Friend } from 'GlobalType';
 import FriendsBar from '../components/FriendsBar/FriendsBar';
 import MainContents from '../components/MainContainer/MainContainer';
@@ -18,8 +18,8 @@ const MainPage = () => {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [isFriendSearchFormOpen, setIsFriendSearchFormOpen] = useState(false);
   const [selectedFriend, setSelectedFriend] = useState<number | null>(null);
-  const [myProfile, setMyProfile] = useState<Friend | null>(null);
-  const [friendsList, setFriendsList] = useState<Friend[] | null>(null);
+  const [myProfile, setMyProfile] = useRecoilState<Friend | null>(myInfo);
+  const [friendsList, setFriendsList] = useRecoilState(friendState);
   const [currentVisit, setCurrentVisit] = useRecoilState(visitState);
 
   const [friendRequests, setFriendRequests] = useState<Friend[] | null>(null);
@@ -109,10 +109,10 @@ const MainPage = () => {
     <>
       <Container>
         <TopBar handleMenuClick={() => setIsDrawerOpen(true)} />
-        <FriendsBar myProfile={myProfile} friendsList={friendsList} setFriendsList={setFriendsList} handlePlusButtonClick={() => setIsFriendSearchFormOpen(true)} />
+        <FriendsBar myProfile={myProfile} handlePlusButtonClick={() => setIsFriendSearchFormOpen(true)} />
         <MainContents />
         {isDrawerOpen && <Dimmed zIndex={DRAWER_Z_INDEX - 1} onClick={() => setIsDrawerOpen(false)} />}
-        <Drawer isOpen={isDrawerOpen} myProfile={myProfile} friendRequests={friendRequests} handleFriendRequests={handleFriendRequests} handleLogoutButtonClick={() => requestLogout()} />
+        <Drawer isOpen={isDrawerOpen} friendRequests={friendRequests} handleFriendRequests={handleFriendRequests} handleLogoutButtonClick={() => requestLogout()} />
         {isFriendSearchFormOpen && (
           <Modal
             component={<FriendSearchForm selectedFriend={selectedFriend} setSelectedFriend={setSelectedFriend} handleRequestButtonClick={() => sendFriendRequest()} />}

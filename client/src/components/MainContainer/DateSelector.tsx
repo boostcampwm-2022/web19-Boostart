@@ -7,9 +7,9 @@ interface DateSelectArrowProps {
 }
 
 export const DateController = styled.span`
-  width: 14rem;
+  width: 200px;
   color: var(--color-main);
-  font-size: 1.5rem;
+  font-size: 1.3rem;
   font-family: 'Press Start 2P', cursive;
   display: flex;
   justify-content: space-between;

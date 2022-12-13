@@ -1,6 +1,6 @@
 import express from 'express';
 import cookieParser from 'cookie-parser';
-import { CLIENT, HTTP_PORT, HTTPS_PORT, HOST, API_VERSION, REDIS_HOST, REDIS_USERNAME, REDIS_PORT, REDIS_PASSWORD, TOKEN_SECRET } from './src/constants';
+import { CLIENT, HTTP_PORT, HTTPS_PORT, HOST, API_VERSION, REDIS_HOST, REDIS_USERNAME, REDIS_PORT, REDIS_PASSWORD, TOKEN_SECRET, MODE } from './src/constants';
 import apiRouter from './src/api/index';
 import cors from 'cors';
 import path from 'path';
@@ -22,13 +22,15 @@ const app = express();
 const httpServer = http.createServer(app);
 const httpsServer = https.createServer(options, app);
 
+const server = MODE === 'dev' ? httpServer : httpsServer;
+
 const corsOptions = {
   origin: CLIENT,
   credentials: true,
   methods: ['GET', 'POST', 'DELETE', 'PUT', 'PATCH'],
 };
 
-globalSocket.initialize(httpsServer, {
+globalSocket.initialize(server, {
   cors: corsOptions,
 });
 
@@ -47,18 +49,18 @@ redisclient.on('error', (err) => {
 redisclient.connect().then();
 const redisCli = redisclient.v4;
 
-const setDiary = async (roomName: string, data: any) => {
-  await redisCli.set(roomName, JSON.stringify(data));
+const setDiary = async (roomName: string, data: string): Promise<void> => {
+  await redisCli.set(roomName, data);
 };
-const getDiary = async (roomName: string) => {
-  return JSON.parse(await redisCli.get(roomName));
+const getDiary = async (roomName: string): Promise<string> => {
+  return await redisCli.get(roomName);
 };
 
 app.use(express.json());
 app.use(cookieParser());
 app.use(cors(corsOptions));
 app.use((req, res, next) => {
-  if (!req.secure) return res.redirect(HOST + req.url);
+  if (MODE !== 'dev' && !req.secure) return res.redirect(HOST + req.url);
   next();
 });
 app.use(`/api/${API_VERSION}`, apiRouter);
@@ -71,6 +73,12 @@ app.get('*', (req, res) => {
 
 const diaryObjects = {};
 const visitingRoom = new Map();
+
+const updateAuthorList = (roomName: string) => {
+  const authorList = diaryObjects[roomName].author;
+  const onlineList = diaryObjects[roomName].online;
+  io.to(roomName).emit('updateAuthorList', authorList, onlineList);
+};
 
 // handshake 과정에서 원시소켓이 가지고 있는 쿠키를 확인
 io.engine.on('headers', async (_, request) => {
@@ -121,49 +129,99 @@ io.on('connection', (socket: AuthorizedSocket) => {
   });
 
   socket.on('joinToNewRoom', async (destId, date) => {
-    console.log(`유저 ${socket.uid} 다이어리 ${destId}${date} 입장`);
-    console.log(`해당 유저의 소켓 ID는 ${userIdxToSocketId[socket.uid]}(${socket.id}) 입니다.`);
     const roomName = destId + date;
     visitingRoom.set(socket.id, roomName);
     socket.join(roomName);
     if (io.sockets.adapter.rooms.get(roomName).size === 1) {
-      const diaryData = (await getDiary(roomName)) || {};
-      console.log(roomName, diaryData);
+      let diaryData = JSON.parse(await getDiary(roomName)) || { author: [], objects: {} };
+      if (diaryData.author === undefined || !isNaN(diaryData.author[0])) diaryData = { author: [], objects: {} };
+      diaryData['online'] = [];
       diaryObjects[roomName] = diaryData;
       io.to(socket.id).emit('initReady');
     } else {
       io.to(socket.id).emit('initReady');
     }
   });
-  socket.on('leaveCurrentRoom', async (destId, date) => {
-    const roomName = destId + date;
+
+  socket.on('leaveCurrentRoom', async () => {
+    const roomName = visitingRoom.get(socket.id);
+    if (!roomName || !diaryObjects[roomName]) return;
+    const userIdx = socket.uid;
+    const authorList = diaryObjects[roomName].author;
+    const onlineList = diaryObjects[roomName].online;
+    if (authorList.some(({ idx }) => idx === parseInt(userIdx))) {
+      diaryObjects[roomName].online = [...onlineList].filter((idx) => idx !== parseInt(userIdx));
+      updateAuthorList(roomName);
+    }
     socket.leave(roomName);
-    console.log(io.sockets.adapter.rooms.get(roomName));
     if (!io.sockets.adapter.rooms.get(roomName)) {
-      const diaryData = diaryObjects[roomName] || {};
-      await setDiary(roomName, diaryData);
+      const diaryData = diaryObjects[roomName];
+      await setDiary(roomName, JSON.stringify(diaryData));
+      delete diaryObjects[roomName];
     }
   });
+
+  socket.on('registAuthor', (author) => {
+    const roomName = visitingRoom.get(socket.id);
+    const userIdx = socket.uid;
+    if (!roomName || !diaryObjects[roomName]) return;
+    const authorList = diaryObjects[roomName].author;
+    const onlineList = diaryObjects[roomName].online;
+    if (!authorList.some(({ idx }) => idx === parseInt(userIdx))) {
+      authorList.push(author);
+    }
+    onlineList.push(parseInt(userIdx));
+    updateAuthorList(roomName);
+  });
+
+  socket.on('turnToOffline', () => {
+    const roomName = visitingRoom.get(socket.id);
+    if (!roomName || !diaryObjects[roomName]) return;
+    const userIdx = socket.uid;
+    const onlineList = diaryObjects[roomName].online;
+    diaryObjects[roomName].online = [...onlineList].filter((idx) => idx !== parseInt(userIdx));
+    updateAuthorList(roomName);
+  });
+
   socket.on('requestCurrentObjects', () => {
     const roomName = visitingRoom.get(socket.id);
-    const targetObjects = diaryObjects[roomName];
+    if (!roomName || !diaryObjects[roomName]) return;
+    const targetObjects = diaryObjects[roomName].objects;
     io.to(socket.id).emit('offerCurrentObjects', targetObjects);
+    updateAuthorList(roomName);
   });
+
   socket.on('sendModifiedObject', (objectData) => {
     const roomName = visitingRoom.get(socket.id);
-    const targetObjects = diaryObjects[roomName];
+    if (!roomName || !diaryObjects[roomName]) return;
+    const targetObjects = diaryObjects[roomName].objects;
     const objectId = objectData.id;
     targetObjects[objectId] = objectData;
-    socket.to(roomName).emit('updateModifiedObject', objectData);
+    io.to(roomName).emit('updateModifiedObject', objectData);
   });
   socket.on('sendRemovedObjectId', (objectId) => {
     const roomName = visitingRoom.get(socket.id);
-    const targetObjects = diaryObjects[roomName];
+    const targetObjects = diaryObjects[roomName].objects;
     delete targetObjects[objectId];
     socket.to(roomName).emit('applyObjectRemoving', objectId);
   });
 
-  socket.on('disconnect', () => {
+  socket.on('disconnect', async () => {
+    const roomName = visitingRoom.get(socket.id);
+    if (!roomName || !diaryObjects[roomName]) return;
+    const userIdx = socket.uid;
+    const authorList = diaryObjects[roomName].author;
+    const onlineList = diaryObjects[roomName].online;
+    if (authorList.some(({ idx }) => idx === parseInt(userIdx))) {
+      diaryObjects[roomName].online = [...onlineList].filter((idx) => idx !== parseInt(userIdx));
+      updateAuthorList(roomName);
+    }
+    socket.leave(roomName);
+    if (!io.sockets.adapter.rooms.get(roomName)) {
+      const diaryData = diaryObjects[roomName];
+      await setDiary(roomName, JSON.stringify(diaryData));
+      delete diaryObjects[roomName];
+    }
     visitingRoom.delete(socket.id);
     delete connectionIdToUserIdx[(socket.conn as any).id];
     delete userIdxToSocketId[socket.uid];

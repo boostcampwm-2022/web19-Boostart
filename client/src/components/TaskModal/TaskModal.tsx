@@ -11,6 +11,8 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
 import axios from 'axios';
 import { HOST } from '../../constants';
+import { useRecoilState } from 'recoil';
+import { calendarState } from '../common/atoms';
 
 interface Props {
   handleCloseButtonClick: () => void;
@@ -42,6 +44,9 @@ const TaskModal = ({ handleCloseButtonClick, tagList, fetchTagList, currentTask 
   const { currentDate, getMonth, getDate } = useCurrentDate();
 
   const [importance, setImportance] = useState(currentTask ? currentTask.importance : DEFAULT_IMPORTANCE);
+  const [isPublic, setIsPublic] = useState(currentTask ? currentTask.isPublic : false);
+
+  const [currentCalendar, setCurrentCalendar] = useRecoilState(calendarState);
 
   const contents = {
     close: '닫기 ▲',
@@ -100,6 +105,7 @@ const TaskModal = ({ handleCloseButtonClick, tagList, fetchTagList, currentTask 
   const createTask = async (body: FieldValues) => {
     await httpPostTask({ ...body, date: formatDate(currentDate) });
     handleCloseButtonClick();
+    await httpGetCalendar();
   };
 
   const editTask = async (body: FieldValues) => {
@@ -111,6 +117,11 @@ const TaskModal = ({ handleCloseButtonClick, tagList, fetchTagList, currentTask 
     await axios.post(`${HOST}/api/v1/task`, body);
   };
 
+  const httpGetCalendar = async () => {
+    const result = await axios.get(`${HOST}/api/v1/calendar/task?year=${currentDate.getFullYear()}&month=${currentDate.getMonth() + 1}`);
+    setCurrentCalendar(result.data);
+  };
+
   const httpPatchTask = async (body: FieldValues) => {
     await axios.patch(`${HOST}/api/v1/task/update/${currentTask!.idx}`, body);
   };
@@ -118,6 +129,10 @@ const TaskModal = ({ handleCloseButtonClick, tagList, fetchTagList, currentTask 
   // k-th star clicked
   const handleStarClick = (k: number) => () => {
     setImportance(k);
+  };
+
+  const handlePublicInputClick = () => {
+    setIsPublic(!isPublic);
   };
 
   const setValues = () => {
@@ -168,7 +183,7 @@ const TaskModal = ({ handleCloseButtonClick, tagList, fetchTagList, currentTask 
             />
             <input type="number" {...register('importance')} hidden={true} />
             <Row title="중요도" content={<ImportanceInput importance={importance} handleStarClick={handleStarClick} />} />
-            <Row title="공개" content={<input type="checkbox" {...register('isPublic')} />} />
+            <Row title="공개" content={<input type="checkbox" checked={isPublic} {...register('isPublic')} onClick={handlePublicInputClick} />} />
           </tbody>
         </S.FormTable>
         <S.DetailButton onClick={() => setIsDetailOpen(!isDetailOpen)}>
