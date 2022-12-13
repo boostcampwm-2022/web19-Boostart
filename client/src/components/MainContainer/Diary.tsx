@@ -49,7 +49,7 @@ const Diary = () => {
           return <AuthorList username={username} profileImg={profileImg} isOnline={isOnline} />;
         })}
       </S.DiaryAuthorList>
-      <Canvas setAuthorList={setAuthorList} setOnlineList={setOnlineList} />
+      <Canvas setAuthorList={setAuthorList} />
     </S.DiaryContainer>
   );
 };

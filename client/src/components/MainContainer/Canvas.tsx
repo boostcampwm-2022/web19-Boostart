@@ -11,10 +11,9 @@ import styled from 'styled-components';
 
 interface CanvasProps {
   setAuthorList: React.Dispatch<Friend[]>;
-  setOnlineList: React.Dispatch<number[]>;
 }
 
-const Canvas = ({ setAuthorList, setOnlineList }: CanvasProps) => {
+const Canvas = ({ setAuthorList }: CanvasProps) => {
   const canvasRef = useRef<fabric.Canvas | null>(null);
   const colorRef = useRef<HTMLInputElement | null>(null);
   const myProfile = useRecoilValue(myInfo);
