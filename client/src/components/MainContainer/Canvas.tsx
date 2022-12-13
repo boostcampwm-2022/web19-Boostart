@@ -353,13 +353,59 @@ const Canvas = ({ setAuthorList, setOnlineList }: CanvasProps) => {
     });
   }, []);
 
+  interface FabricData {
+    id?: string;
+    type: string;
+    width: number;
+    height: number;
+    top: number;
+    left: number;
+    fill: string;
+    angle: number;
+    scaleX: number;
+    scaleY: number;
+    rx?: number;
+    ry?: number;
+    text?: string;
+    fontSize?: number;
+    path?: any;
+    stroke?: any;
+    strokeWidth?: number;
+  }
+
+  const putObject = ({ id, type, width, height, top, left, fill, angle, scaleX, scaleY, rx, ry, text, fontSize, path, stroke, strokeWidth }: FabricData) => {
+    const fabricData = { id, type, width, height, top, left, fill, angle, scaleX, scaleY, rx, ry, text, fontSize, path, stroke, strokeWidth };
+
+    if (type !== 'Ellipse') {
+      delete fabricData.rx;
+      delete fabricData.ry;
+    }
+
+    if (type !== 'IText') {
+      delete fabricData.text;
+      delete fabricData.fontSize;
+    }
+
+    if (type !== 'Path') {
+      delete fabricData.path;
+      delete fabricData.stroke;
+      delete fabricData.strokeWidth;
+    }
+
+    socket.emit('clientStatusChange', fabricData);
+  };
+
+  const generateDefaultFabricData = (type: string, fill: string) => {
+    return { ...DEFAULT_OBJECT_VALUE, type, fill };
+  };
+
   return (
     <>
       <ForeignerScreen isActive={isJoined}></ForeignerScreen>
       <canvas id="canvas" />
       <ControlBar>
         <Palette isActive={isJoined}>
-          <button onClick={foo}>foo</button>
+          <button onClick={() => putObject(generateDefaultFabricData('Rect', '#000000'))}>foo</button>
           <span onClick={() => enterDrawingMode(3)}>연필</span>
           <span onClick={() => enterDrawingMode(10)}>형광펜</span>
           <span onClick={() => enterDrawingMode(20)}>브러쉬</span>
