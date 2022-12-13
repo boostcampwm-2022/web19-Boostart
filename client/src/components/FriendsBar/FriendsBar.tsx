@@ -3,15 +3,13 @@ import { useRecoilState } from 'recoil';
 import { Friend } from 'GlobalType';
 import { sendUnfriendRequest } from './FriendsBarAPI';
 import * as S from './FriendsBar.style';
-import { visitState } from '../common/atoms';
+import { visitState, friendState } from '../common/atoms';
 import Modal from '../common/Modal';
 import { MODAL_CENTER_TOP, MODAL_CENTER_LEFT, MODAL_CENTER_TRANSFORM, HOST } from '../../constants/index';
 import { ProfileImage } from '../Drawer/Drawer.style';
 
 interface FriendsBarProps {
   myProfile: Friend | null;
-  friendsList: Friend[] | null;
-  setFriendsList: React.Dispatch<Friend[] | null>;
   handlePlusButtonClick: React.MouseEventHandler;
 }
 
@@ -31,14 +29,32 @@ interface FriendProfileModalProps {
   profileImg: string;
 }
 
-const FriendsBar = ({ myProfile, friendsList, setFriendsList, handlePlusButtonClick }: FriendsBarProps) => {
+const FriendsBar = ({ myProfile, handlePlusButtonClick }: FriendsBarProps) => {
   const plusIcon = '/plus.svg';
   const [currentFriendOnMenu, setCurrentFriendOnMenu] = useState<Friend | null>(null);
   const [isDoubleCheckModalOpen, setIsDoubleCheckMdoalOpen] = useState(false);
   const [isFriendProfileOpen, setIsFriendProfileOpen] = useState(false);
+  const [friendsList, setFriendsList] = useRecoilState(friendState);
+
+  const closeDoubleCheckModal = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setIsDoubleCheckMdoalOpen(false);
+  };
+  const unfollowFriend = async (e: React.MouseEvent, unfollowingIdx: number) => {
+    e.stopPropagation();
+    const response = await sendUnfriendRequest(unfollowingIdx);
+    if (!friendsList || !response) return;
+    setFriendsList([...friendsList.filter(({ idx }) => idx !== unfollowingIdx)]);
+    setIsDoubleCheckMdoalOpen(false);
+  };
+
+  const closeFriendProfileModal = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setIsFriendProfileOpen(false);
+  };
 
   const ProfileBox = ({ profileData }: { profileData: Friend }) => {
-    const { idx, userId, profileImg } = profileData;
+    const { userId, profileImg } = profileData;
     const [currentVisit, setCurrentVisit] = useRecoilState(visitState);
 
     const closeFriendMenuModal = () => {
@@ -66,22 +82,6 @@ const FriendsBar = ({ myProfile, friendsList, setFriendsList, handlePlusButtonCl
         </div>
       </>
     );
-  };
-  const closeDoubleCheckModal = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    setIsDoubleCheckMdoalOpen(false);
-  };
-  const unfollowFriend = async (e: React.MouseEvent, unfollowingIdx: number) => {
-    e.stopPropagation();
-    const response = await sendUnfriendRequest(unfollowingIdx);
-    if (!friendsList || !response) return;
-    setFriendsList([...friendsList.filter(({ idx }) => idx !== unfollowingIdx)]);
-    setIsDoubleCheckMdoalOpen(false);
-  };
-
-  const closeFriendProfileModal = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    setIsFriendProfileOpen(false);
   };
 
   return (

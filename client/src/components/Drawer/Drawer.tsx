@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useRecoilValue } from 'recoil';
 import { dummyNotifications } from '../common/dummy';
 import { PROFILE_EDIT_FORM_Z_INDEX, PROFILE_EDIT_FORM_TOP, PROFILE_EDIT_FORM_LEFT, PROFILE_EDIT_FORM_TRANFORM } from './Drawer.style';
 import { FRIEND_REQUEST_ACTION, HOST } from '../../constants';
@@ -6,10 +7,10 @@ import Modal from '../common/Modal';
 import { Friend } from 'GlobalType';
 import * as S from './Drawer.style';
 import useInput from '../../hooks/useInput';
+import { myInfo } from '../common/atoms';
 
 interface DrawerProps {
   isOpen: boolean;
-  myProfile: Friend | null;
   friendRequests: Friend[] | null;
   handleFriendRequests: Function;
   handleLogoutButtonClick: React.MouseEventHandler;
@@ -27,10 +28,9 @@ interface ReceivedFriendRequestProps {
 }
 interface ProfileSectionProps {
   handleProfileEditButtonClick: React.MouseEventHandler;
-  myProfile: Friend | null;
 }
 
-const Drawer = ({ isOpen, myProfile, friendRequests, handleFriendRequests, handleLogoutButtonClick }: DrawerProps) => {
+const Drawer = ({ isOpen, friendRequests, handleFriendRequests, handleLogoutButtonClick }: DrawerProps) => {
   const [isProfileEditModalOpen, setIsProfileEditModalOpen] = useState(false);
 
   const handleProfileEditButtonClick = () => {
@@ -40,7 +40,7 @@ const Drawer = ({ isOpen, myProfile, friendRequests, handleFriendRequests, handl
   return (
     <>
       <S.Drawer isOpen={isOpen}>
-        <ProfileSection handleProfileEditButtonClick={handleProfileEditButtonClick} myProfile={myProfile} />
+        <ProfileSection handleProfileEditButtonClick={handleProfileEditButtonClick} />
         <S.HorizontalRule />
         <ReceivedFriendRequestSection friendRequests={friendRequests} handleFriendRequests={handleFriendRequests} />
         <S.HorizontalRule />
@@ -51,7 +51,7 @@ const Drawer = ({ isOpen, myProfile, friendRequests, handleFriendRequests, handl
       </S.Drawer>
       {isProfileEditModalOpen && (
         <Modal
-          component={<ProfileEditForm myProfile={myProfile!} setIsProfileEditModalOpen={setIsProfileEditModalOpen} />}
+          component={<ProfileEditForm setIsProfileEditModalOpen={setIsProfileEditModalOpen} />}
           top={PROFILE_EDIT_FORM_TOP}
           left={PROFILE_EDIT_FORM_LEFT}
           transform={PROFILE_EDIT_FORM_TRANFORM}
@@ -63,10 +63,11 @@ const Drawer = ({ isOpen, myProfile, friendRequests, handleFriendRequests, handl
   );
 };
 
-const ProfileEditForm = ({ myProfile, setIsProfileEditModalOpen }: { myProfile: Friend; setIsProfileEditModalOpen: React.Dispatch<React.SetStateAction<boolean>> }) => {
+const ProfileEditForm = ({ setIsProfileEditModalOpen }: { setIsProfileEditModalOpen: React.Dispatch<React.SetStateAction<boolean>> }) => {
   //api 연결
   const [profileImg, setProfileImg] = useState<File | null>(null);
-  const [username, onUsernameChange, setUsername] = useInput(myProfile.username);
+  const myProfile = useRecoilValue(myInfo);
+  const [username, onUsernameChange, setUsername] = useInput(myProfile!.username);
 
   const handleProfileImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
@@ -96,7 +97,7 @@ const ProfileEditForm = ({ myProfile, setIsProfileEditModalOpen }: { myProfile: 
     <S.ProfileEditForm onSubmit={postProfileChange}>
       <S.Profile>
         <S.ProfileImageForm>
-          <img src={profileImg ? URL.createObjectURL(profileImg) : `${HOST}/${myProfile.profileImg}`} alt="profile-img" />
+          <img src={profileImg ? URL.createObjectURL(profileImg) : `${HOST}/${myProfile!.profileImg}`} alt="profile-img" />
           <S.EditRound>
             <input type="file" onChange={handleProfileImageChange} />
             <S.EditIcon />
@@ -106,7 +107,7 @@ const ProfileEditForm = ({ myProfile, setIsProfileEditModalOpen }: { myProfile: 
           <S.SizedText fontSize="14px">
             <S.InputBar placeholder="NICKNAME" value={username} onChange={onUsernameChange} /> 님
           </S.SizedText>
-          <S.UserId>@{myProfile.userId}</S.UserId>
+          <S.UserId>@{myProfile!.userId}</S.UserId>
         </S.ProfileInfo>
       </S.Profile>
       <S.ProfileEditApplyButton type="submit" isDone={username === ''}>
@@ -116,7 +117,8 @@ const ProfileEditForm = ({ myProfile, setIsProfileEditModalOpen }: { myProfile: 
   );
 };
 
-const ProfileSection = ({ handleProfileEditButtonClick, myProfile }: ProfileSectionProps) => {
+const ProfileSection = ({ handleProfileEditButtonClick }: ProfileSectionProps) => {
+  const myProfile = useRecoilValue(myInfo);
   return (
     <>
       {myProfile && (
