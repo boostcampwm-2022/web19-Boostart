@@ -8,6 +8,11 @@ import { Shape, FabricText, FabricLine, ShapeType, FabricObject, ObjectData, Fri
 import { fabric } from 'fabric';
 import { v4 } from 'uuid';
 import styled from 'styled-components';
+import { RiMarkPenFill } from 'react-icons/ri';
+import { AiFillFormatPainter } from 'react-icons/ai';
+import { BsPenFill } from 'react-icons/bs';
+import { BiRectangle, BiCircle, BiText } from 'react-icons/bi';
+import { FiTriangle } from 'react-icons/fi';
 
 interface CanvasProps {
   setAuthorList: React.Dispatch<Friend[]>;
@@ -348,14 +353,14 @@ const Canvas = ({ setAuthorList, setOnlineList }: CanvasProps) => {
       <canvas id="canvas" />
       <ControlBar>
         <Palette isActive={isJoined}>
-          <span onClick={() => enterDrawingMode(3)}>연필</span>
-          <span onClick={() => enterDrawingMode(10)}>형광펜</span>
-          <span onClick={() => enterDrawingMode(20)}>브러쉬</span>
-          <img src="/rect.svg" onClick={() => createNewShape('rect')} alt="" />
-          <img src="/triangle.svg" onClick={() => createNewShape('triangle')} alt="" />
-          <img src="/circle.svg" onClick={() => createNewShape('circle')} alt="" />
-          <img src="/textIcon.svg" onClick={() => createNewText()} alt="" />
-          <input type="color" ref={colorRef} onChange={changeBrushColor} />
+          <PenIcon onClick={() => enterDrawingMode(3)} />
+          <MarkerIcon onClick={() => enterDrawingMode(10)} />
+          <PaintIcon onClick={() => enterDrawingMode(18)} />
+          <RectIcon onClick={() => createNewShape('rect')} />
+          <CircleIcon onClick={() => createNewShape('triangle')} />
+          <TriangleIcon onClick={() => createNewShape('circle')} />
+          <TextIcon onClick={() => createNewText()} />
+          <ColorPicker type="color" ref={colorRef} onChange={changeBrushColor} />
         </Palette>
         <JoinButton onClick={() => registAuthor()}>{isJoined ? 'DRAW' : 'JOIN'}</JoinButton>
       </ControlBar>
@@ -388,11 +393,12 @@ const ForeignerScreen = styled.div<{
 const Palette = styled.div<{
   isActive: boolean;
 }>`
-  width: ${(props) => (props.isActive ? '28rem' : '1px')};
+  width: ${(props) => (props.isActive ? '31rem' : '1px')};
   height: 3rem;
   padding: ${(props) => (props.isActive ? '0 1rem 0 4rem' : '0')};
   border-radius: 2rem;
-  background: var(--color-gray1);
+  background: var(--color-gray8);
+
   position: absolute;
   display: flex;
   flex-wrap: nowrap;
@@ -403,6 +409,8 @@ const Palette = styled.div<{
   overflow: hidden;
   box-sizing: border-box;
   transition: all 0.5s;
+  ${(props) => props.isActive && 'box-shadow: 0px 0px 3px 2px rgba(200, 200, 200, 0.3);'};
+
   & img {
     height: 1.5rem;
   }
@@ -411,6 +419,8 @@ const Palette = styled.div<{
   }
 `;
 const JoinButton = styled.div`
+  box-shadow: 0px 0px 3px 2px rgba(200, 200, 200, 0.4);
+
   width: 6.5rem;
   height: 3rem;
   position: absolute;
@@ -421,4 +431,69 @@ const JoinButton = styled.div`
   font-family: 'Press Start 2P', cursive;
   text-align: center;
   line-height: 3rem;
+`;
+
+export const MarkerIcon = styled(RiMarkPenFill)`
+  width: 1.7rem;
+  height: 1.7rem;
+  color: black;
+  padding: 0.3rem;
+`;
+
+export const PaintIcon = styled(AiFillFormatPainter)`
+  width: 1.7rem;
+  height: 1.7rem;
+  color: black;
+  padding: 0.3rem;
+`;
+
+export const PenIcon = styled(BsPenFill)`
+  width: 1.7rem;
+  height: 1.7rem;
+  color: black;
+  padding: 0.3rem;
+`;
+
+export const RectIcon = styled(BiRectangle)`
+  width: 1.7rem;
+  height: 1.7rem;
+  color: black;
+  padding: 0.3rem;
+`;
+
+export const TriangleIcon = styled(FiTriangle)`
+  width: 1.7rem;
+  height: 1.7rem;
+  color: black;
+  padding: 0.3rem;
+`;
+
+export const CircleIcon = styled(BiCircle)`
+  width: 1.7rem;
+  height: 1.7rem;
+  color: black;
+  padding: 0.3rem;
+`;
+
+export const TextIcon = styled(BiText)`
+  width: 1.7rem;
+  height: 1.7rem;
+  color: black;
+  padding: 0.3rem;
+`;
+
+const ColorPicker = styled.input`
+  cursor: pointer;
+  border: 1px solid var(--color-gray4);
+  background-color: inherit;
+  width: 1.72rem;
+  height: 1.7rem;
+  padding: 0.15rem;
+
+  ::-webkit-color-swatch-wrapper {
+    padding: 0px;
+  }
+  ::-webkit-color-swatch {
+    border: none;
+  }
 `;
