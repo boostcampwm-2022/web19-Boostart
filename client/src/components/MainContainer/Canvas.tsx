@@ -38,9 +38,9 @@ const Canvas = ({ setAuthorList, setOnlineList }: CanvasProps) => {
     if (!canvasRef.current || !colorRef.current) return;
     const brush = canvasRef.current.freeDrawingBrush;
     brush.width = brushWidth;
-    brush.color = colorRef.current.value;
     canvasRef.current.isDrawingMode = true;
   };
+
   const leaveDrawingMode = () => {
     if (!canvasRef.current) return;
     canvasRef.current.isDrawingMode = false;
@@ -73,209 +73,10 @@ const Canvas = ({ setAuthorList, setOnlineList }: CanvasProps) => {
     socket.emit('deleteObject', id);
   };
 
-  // Create Objects
-
-  const createNewShape = (type: ShapeType) => {
-    if (!colorRef.current) return;
-    const { rx, ry, width, height, top, left, angle, scaleX, scaleY } = DEFAULT_OBJECT_VALUE;
-    const shapeData = {
-      type: type,
-      [type === 'circle' ? 'ry' : 'height']: type === 'circle' ? ry : height,
-      [type === 'circle' ? 'rx' : 'width']: type === 'circle' ? rx : width,
-      top,
-      left,
-      fill: colorRef.current.value,
-      angle,
-      scaleX,
-      scaleY,
-      id: v4(),
-    };
-    dispatchCanvasChange(shapeData);
-  };
-
-  const createNewText = () => {
-    if (!colorRef.current) return;
-    const { text, left, top, fontSize, angle, scaleX, scaleY } = DEFAULT_OBJECT_VALUE;
-    const textData = {
-      type: 'text',
-      text,
-      left,
-      top,
-      fontSize,
-      fill: colorRef.current.value,
-      angle,
-      scaleX,
-      scaleY,
-      id: v4(),
-    };
-    dispatchCanvasChange(textData);
-  };
-
-  //Draw Objects
-
-  const drawShapeOnCanvas = (shapeData: Shape) => {
-    let shape: fabric.Object | undefined;
-    const shapeId = shapeData.id;
-    const type = shapeData.type;
-
-    if (type === 'rect') {
-      shape = new fabric.Rect(shapeData);
-    } else if (type === 'triangle') {
-      shape = new fabric.Triangle(shapeData);
-    } else if (type === 'circle') {
-      shape = new fabric.Ellipse(shapeData);
-    }
-
-    if (!shape || !canvasRef.current) return;
-    diaryObjects.set(shapeId, shape);
-    canvasRef.current.add(shape);
-    canvasRef.current.renderAll();
-  };
-
-  const drawTextOnCanvas = (textData: FabricText) => {
-    const textId = textData.id;
-    const text = new fabric.IText(textData.text, textData);
-    if (!text || !canvasRef.current) return;
-    diaryObjects.set(textId, text);
-    canvasRef.current.add(text);
-    return text;
-  };
-
-  const drawLineOnCanvas = (lineData: FabricLine) => {
-    const line = new fabric.Path(lineData.path, lineData);
-    const lineId = lineData.id;
-    if (!line || !canvasRef.current) return;
-    diaryObjects.set(lineId, line);
-    canvasRef.current.add(line);
-    canvasRef.current.renderAll();
-  };
-
-  //Dispatch Modified Object
-
-  const dispatchCreatedLine = (e: any) => {
-    const newId = v4();
-    e.path.id = newId;
-    diaryObjects.set(newId, e.path);
-    const { path, left, top, stroke, fill, strokeWidth, angle, strokeLineCap, strokeLineJoin, scaleX, scaleY } = e.path;
-    const lineData = {
-      type: 'path',
-      path,
-      left,
-      top,
-      stroke,
-      strokeWidth,
-      angle,
-      fill,
-      scaleX,
-      scaleY,
-      strokeLineCap,
-      strokeLineJoin,
-      id: newId,
-    };
-    dispatchCanvasChange(lineData);
-  };
-
-  const dispatchModifiedObject = (e: any) => {
-    const modifiedObject = e.target;
-    const objectType = modifiedObject.type;
-    if (objectType === 'path') dispatchModifiedLine(modifiedObject);
-    else if (objectType === 'text') dispatchModifiedText(modifiedObject);
-    else dispatchModifiedShape(modifiedObject);
-  };
-
-  const dispatchModifiedShape = (modifiedObject: any) => {
-    const { type, rx, ry, width, height, top, left, fill, angle, scaleX, scaleY, id } = modifiedObject;
-    const shapeData = {
-      type,
-      rx,
-      ry,
-      width,
-      height,
-      top,
-      left,
-      fill,
-      angle,
-      scaleX,
-      scaleY,
-      id,
-    };
-    dispatchCanvasChange(shapeData);
-  };
-
-  const dispatchModifiedText = (modifiedObject: any) => {
-    const { type, text, left, top, fontSize, fill, angle, scaleX, scaleY, id } = modifiedObject;
-    const textData = {
-      type,
-      text,
-      left,
-      top,
-      fontSize,
-      fill,
-      angle,
-      scaleX,
-      scaleY,
-      id,
-    };
-    dispatchCanvasChange(textData);
-  };
-
-  const dispatchModifiedLine = (modifiedObject: any) => {
-    const { type, id, path, left, top, stroke, fill, strokeWidth, angle, strokeLineCap, strokeLineJoin, scaleX, scaleY } = modifiedObject;
-    const lineData = {
-      type,
-      path,
-      left,
-      top,
-      stroke,
-      strokeWidth,
-      angle,
-      fill,
-      scaleX,
-      scaleY,
-      strokeLineCap,
-      strokeLineJoin,
-      id,
-    };
-    dispatchCanvasChange(lineData);
-  };
-
-  //Update Modified Object
-
-  const updateModifiedObject = (objectData: FabricLine | FabricText | Shape) => {
-    const objectId = objectData.id;
-    const objectType = objectData.type;
-    const targetObject = diaryObjects.get(objectId);
-    if (!canvasRef.current) return;
-    canvasRef.current.remove(targetObject);
-    if (objectType === 'path') drawLineOnCanvas(objectData as FabricLine);
-    else if (objectType === 'text') drawTextOnCanvas(objectData as FabricText);
-    else drawShapeOnCanvas(objectData as Shape);
-  };
-
-  //remove Object
-
-  const removeObject = (objectId: string) => {
-    const targetObject = diaryObjects.get(objectId);
-    if (!canvasRef.current) return;
-    canvasRef.current.remove(targetObject);
-    diaryObjects.delete(objectId);
-  };
-
-  const dispatchCanvasChange = (objectData: FabricLine | FabricText | Shape) => {
-    socket.emit('sendModifiedObject', objectData);
-  };
-
   const joinSocketRoom = () => {
     const currentDateString = dateToString();
     if (!currentDateString || !currentVisit.userId) return;
     socket.emit('joinToNewRoom', currentVisit.userId, currentDateString);
-  };
-
-  const presentPresetObjects = (objectDataMap: ObjectData) => {
-    if (!objectDataMap) return;
-    Object.values(objectDataMap).forEach((objectData) => {
-      updateModifiedObject(objectData);
-    });
   };
 
   const setCanvasBackground = () => {
@@ -293,10 +94,6 @@ const Canvas = ({ setAuthorList, setOnlineList }: CanvasProps) => {
     });
   };
 
-  const requestInitObjects = () => {
-    // socket.emit('requestCurrentObjects');
-  };
-
   const registAuthor = () => {
     if (isJoined) {
       socket.emit('turnToOffline');
@@ -307,22 +104,10 @@ const Canvas = ({ setAuthorList, setOnlineList }: CanvasProps) => {
     setIsJoined((isJoined) => !isJoined);
   };
 
-  const updateAuthorList = (authorList: Friend[], onlineList: number[]) => {
-    setAuthorList(authorList);
-    setOnlineList(onlineList);
-  };
-
   useEffect(() => {
     if (!canvasRef.current) canvasRef.current = initCanvas();
     setCanvasBackground();
     setIsJoined(false);
-    // canvasRef.current.on('path:created', dispatchCreatedLine);
-    // canvasRef.current.on('object:modified', dispatchModifiedObject);
-    // socket.on('offerCurrentObjects', presentPresetObjects);
-    // socket.on('updateModifiedObject', updateModifiedObject);
-    // socket.on('applyObjectRemoving', removeObject);
-    // socket.on('initReady', requestInitObjects);
-    // socket.on('updateAuthorList', updateAuthorList);
     window.addEventListener('keydown', handleKeydown);
 
     socket.on('serverStatusChange', updateDiary);
@@ -333,17 +118,7 @@ const Canvas = ({ setAuthorList, setOnlineList }: CanvasProps) => {
 
     return () => {
       if (!canvasRef.current) return;
-      // canvasRef.current.off('path:created', dispatchCreatedLine);
-      // canvasRef.current.off('object:modified', dispatchModifiedObject);
-      // socket.off('offerCurrentObjects', presentPresetObjects);
-      // socket.off('updateModifiedObject', updateModifiedObject);
-      // socket.off('applyObjectRemoving', removeObject);
-      // socket.off('initReady', requestInitObjects);
-      // socket.off('updateAuthorList', updateAuthorList);
       window.removeEventListener('keydown', handleKeydown);
-      // socket.emit('leaveCurrentRoom');
-      // canvasRef.current.clear();
-
       socket.off('serverStatusChange', updateDiary);
       canvasRef.current.off('path:created', handlePathCreated);
       canvasRef.current.off('object:modified', handleObjectModified);
@@ -353,6 +128,7 @@ const Canvas = ({ setAuthorList, setOnlineList }: CanvasProps) => {
   }, [currentDate, currentVisit]);
 
   type FabricType = 'Rect' | 'Triangle' | 'Ellipse' | 'IText' | 'Path';
+
   interface FabricData {
     id?: string;
     type: FabricType;
@@ -441,23 +217,13 @@ const Canvas = ({ setAuthorList, setOnlineList }: CanvasProps) => {
 
   const handleObjectModified = (e: any) => {
     const modifiedObject = e.target;
-    if (!canvasRef.current) {
-      console.log('error');
-      return;
-    }
     putObject(modifiedObject);
   };
 
   const handleObjectsOffer = (fabricObjects: any) => {
-    console.log(fabricObjects);
-    Object.entries(fabricObjects).forEach(([id, fabricData]: any) => {
-      const fabricObject: any = createFabricObject(fabricData);
-      // console.log('1', fabricObject);
-      // console.log('2', diaryObjects.get(fabricObject.id));
+    Object.values(fabricObjects).forEach((fabricData: any) => {
       updateDiary(fabricData);
     });
-
-    console.log(diaryObjects);
   };
 
   const handlePathCreated = (e: any) => {

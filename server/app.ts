@@ -212,23 +212,6 @@ io.on('connection', (socket: AuthorizedSocket) => {
     updateAuthorList(roomName);
   });
 
-  socket.on('sendModifiedObject', (objectData) => {
-    const userIdx = socket.uid;
-    const roomName = visitingRoom.get(userIdx);
-    if (!roomName || !diaryObjects[roomName]) return;
-    const targetObjects = diaryObjects[roomName].objects;
-    const objectId = objectData.id;
-    targetObjects[objectId] = objectData;
-    io.to(roomName).emit('updateModifiedObject', objectData);
-  });
-  socket.on('sendRemovedObjectId', (objectId) => {
-    const userIdx = socket.uid;
-    const roomName = visitingRoom.get(userIdx);
-    const targetObjects = diaryObjects[roomName].objects;
-    delete targetObjects[objectId];
-    socket.to(roomName).emit('applyObjectRemoving', objectId);
-  });
-
   socket.on('disconnect', async () => {
     const userIdx = socket.uid;
     const roomName = visitingRoom.get(userIdx);
