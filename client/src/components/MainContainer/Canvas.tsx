@@ -329,6 +329,7 @@ const Canvas = ({ setAuthorList, setOnlineList }: CanvasProps) => {
 
     socket.on('serverStatusChange', handleServerStatusChange);
     canvasRef.current.on('object:modified', handleObjectModified);
+    socket.on('offerCurrentObjects', handleObjectsOffer);
 
     return () => {
       if (!canvasRef.current) return;
@@ -345,6 +346,7 @@ const Canvas = ({ setAuthorList, setOnlineList }: CanvasProps) => {
 
       socket.off('serverStatusChange', handleServerStatusChange);
       canvasRef.current.off('object:modified', handleObjectModified);
+      socket.off('offerCurrentObjects', handleObjectsOffer);
     };
   }, [currentDate, currentVisit]);
 
@@ -373,15 +375,9 @@ const Canvas = ({ setAuthorList, setOnlineList }: CanvasProps) => {
     strokeWidth?: number;
   }
 
-  const renderObject = (fabricData: FabricData) => {
-    if (!canvasRef.current) {
-      console.log('error');
-      return;
-    }
-
+  const createFabricObject = (fabricData: FabricData) => {
     const { type } = fabricData;
     let object;
-
     switch (type) {
       case 'Rect':
       case 'Triangle':
@@ -398,6 +394,17 @@ const Canvas = ({ setAuthorList, setOnlineList }: CanvasProps) => {
         break;
       }
     }
+
+    return object;
+  };
+
+  const renderObject = (fabricData: FabricData) => {
+    if (!canvasRef.current) {
+      console.log('error');
+      return;
+    }
+
+    const object = createFabricObject(fabricData);
 
     canvasRef.current.add(object);
   };
@@ -442,6 +449,17 @@ const Canvas = ({ setAuthorList, setOnlineList }: CanvasProps) => {
     }
     // canvasRef.current.remove(modifiedObject);
     putObject(modifiedObject);
+  };
+
+  const handleObjectsOffer = (fabricObjects: any) => {
+    console.log(fabricObjects);
+    Object.entries(fabricObjects).forEach(([id, fabricData]: any) => {
+      const fabricObject = createFabricObject(fabricData);
+      diaryObjects.set(id, fabricObject);
+      handleServerStatusChange(fabricData);
+    });
+
+    console.log(diaryObjects);
   };
 
   return (

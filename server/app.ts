@@ -14,6 +14,8 @@ import { connectionIdToUserIdx, userIdxToSocketId } from './src/core/store';
 import { globalSocket } from './src/core/socket';
 import { randomUUID } from 'crypto';
 
+const fooStore = {};
+
 const options = {
   cert: fs.readFileSync('../rootca.pem'),
   key: fs.readFileSync('../rootca-key.pem'),
@@ -133,18 +135,18 @@ io.on('connection', (socket: AuthorizedSocket) => {
     const userIdx = socket.uid;
     const roomName = destId + date;
     visitingRoom.set(userIdx, roomName);
+    fooStore[roomName] ??= {};
     socket.join(roomName);
-    if (io.sockets.adapter.rooms.get(roomName).size === 1) {
-      let diaryData = JSON.parse(await getDiary(roomName)) || { author: [], objects: {} };
-      if (diaryData.author === undefined || !isNaN(diaryData.author[0])) diaryData = { author: [], objects: {} };
-      diaryData['online'] = [];
-      diaryObjects[roomName] = diaryData;
-    }
-    console.log(diaryObjects[roomName]);
+    // if (io.sockets.adapter.rooms.get(roomName).size === 1) {
+    //   let diaryData = JSON.parse(await getDiary(roomName)) || { author: [], objects: {} };
+    //   if (diaryData.author === undefined || !isNaN(diaryData.author[0])) diaryData = { author: [], objects: {} };
+    //   diaryData['online'] = [];
+    // }
+    // console.log(diaryObjects[roomName]);
 
-    const targetObjects = diaryObjects[roomName].objects;
-    socket.emit('offerCurrentObjects', targetObjects);
-    updateAuthorList(roomName);
+    // const targetObjects = diaryObjects[roomName].objects;
+    socket.emit('offerCurrentObjects', fooStore[roomName]);
+    // updateAuthorList(roomName);
   });
 
   socket.on('clientStatusChange', (fabricData) => {
@@ -154,10 +156,9 @@ io.on('connection', (socket: AuthorizedSocket) => {
     fabricData.id ??= randomUUID();
 
     const { id } = fabricData;
-    console.log(diaryObjects[roomName]);
 
-    diaryObjects[roomName][id] = fabricData;
-    console.log(Object.values(diaryObjects[roomName]).map(({ top, left }: any) => `${left} ${top}`));
+    fooStore[roomName][id] = fabricData;
+    console.log(Object.values(fooStore[roomName]).map(({ top, left }: any) => `${left} ${top}`));
 
     io.to(roomName).emit('serverStatusChange', fabricData);
   });
