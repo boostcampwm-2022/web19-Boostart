@@ -77,12 +77,6 @@ app.get('*', (req, res) => {
 const diaryObjects = {};
 const visitingRoom = new Map();
 
-const updateAuthorList = (roomName: string) => {
-  const authorList = diaryObjects[roomName].author;
-  const onlineList = diaryObjects[roomName].online;
-  io.to(roomName).emit('updateAuthorList', authorList, onlineList);
-};
-
 // handshake 과정에서 원시소켓이 가지고 있는 쿠키를 확인
 io.engine.on('headers', async (_, request) => {
   const { rawHeaders } = request;
@@ -136,18 +130,12 @@ io.on('connection', (socket: AuthorizedSocket) => {
     const roomName = destId + date;
     visitingRoom.set(userIdx, roomName);
 
+    // initialize diary
     if (fooStore[roomName] === undefined) {
       fooStore[roomName] = { objects: {}, participants: {} };
     }
 
     socket.join(roomName);
-
-    // if (io.sockets.adapter.rooms.get(roomName).size === 1) {
-    //   let diaryData = JSON.parse(await getDiary(roomName)) || { author: [], objects: {} };
-    //   if (diaryData.author === undefined || !isNaN(diaryData.author[0])) diaryData = { author: [], objects: {} };
-    //   diaryData['online'] = [];
-    // }
-    // console.log(diaryObjects[roomName]);
 
     // const targetObjects = diaryObjects[roomName].objects;
     socket.emit('offerCurrentObjects', {
@@ -201,12 +189,7 @@ io.on('connection', (socket: AuthorizedSocket) => {
     const userIdx = socket.uid;
     const roomName = visitingRoom.get(userIdx);
     if (!roomName || !diaryObjects[roomName]) return;
-    const authorList = diaryObjects[roomName].author;
-    const onlineList = diaryObjects[roomName].online;
-    if (authorList.some(({ idx }) => idx === parseInt(userIdx))) {
-      diaryObjects[roomName].online = [...onlineList].filter((idx) => idx !== parseInt(userIdx));
-      updateAuthorList(roomName);
-    }
+
     socket.leave(roomName);
     if (!io.sockets.adapter.rooms.get(roomName)) {
       const diaryData = diaryObjects[roomName];
@@ -224,38 +207,11 @@ io.on('connection', (socket: AuthorizedSocket) => {
     io.to(roomName).emit('objectDeleted', id);
   });
 
-  socket.on('registAuthor', (author) => {
-    const userIdx = socket.uid;
-    const roomName = visitingRoom.get(userIdx);
-    if (!roomName || !diaryObjects[roomName]) return;
-    const authorList = diaryObjects[roomName].author;
-    const onlineList = diaryObjects[roomName].online;
-    if (!authorList.some(({ idx }) => idx === parseInt(userIdx))) {
-      authorList.push(author);
-    }
-    onlineList.push(parseInt(userIdx));
-    updateAuthorList(roomName);
-  });
-
-  socket.on('turnToOffline', () => {
-    const userIdx = socket.uid;
-    const roomName = visitingRoom.get(userIdx);
-    if (!roomName || !diaryObjects[roomName]) return;
-    const onlineList = diaryObjects[roomName].online;
-    diaryObjects[roomName].online = [...onlineList].filter((idx) => idx !== parseInt(userIdx));
-    updateAuthorList(roomName);
-  });
-
   socket.on('disconnect', async () => {
     const userIdx = socket.uid;
     const roomName = visitingRoom.get(userIdx);
     if (!roomName || !diaryObjects[roomName]) return;
-    const authorList = diaryObjects[roomName].author;
-    const onlineList = diaryObjects[roomName].online;
-    if (authorList.some(({ idx }) => idx === parseInt(userIdx))) {
-      diaryObjects[roomName].online = [...onlineList].filter((idx) => idx !== parseInt(userIdx));
-      updateAuthorList(roomName);
-    }
+
     socket.leave(roomName);
     if (!io.sockets.adapter.rooms.get(roomName)) {
       const diaryData = diaryObjects[roomName];
