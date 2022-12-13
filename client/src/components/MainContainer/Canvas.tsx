@@ -10,7 +10,7 @@ import { v4 } from 'uuid';
 import styled from 'styled-components';
 
 interface CanvasProps {
-  setAuthorList: React.Dispatch<Friend[]>;
+  setAuthorList: React.Dispatch<any>;
 }
 
 const Canvas = ({ setAuthorList }: CanvasProps) => {
@@ -84,12 +84,25 @@ const Canvas = ({ setAuthorList }: CanvasProps) => {
     });
   };
 
-  const handleNewEditorEvent = (userIdx: number) => {
-    console.log(`${userIdx}번 유저가 입장했어요.`);
+  const handleNewEditorEvent = (user: any) => {
+    setAuthorList((authorList: any) => {
+      const newEditor = authorList.find((_user: any) => _user.userIdx === user.userIdx);
+      if (newEditor === undefined) {
+        user.isOnline = true;
+        authorList.push(user);
+      } else {
+        newEditor.isOnline = true;
+      }
+      return [...authorList];
+    });
   };
 
   const handleEditorLeft = (userIdx: number) => {
-    console.log(`${userIdx}번 유저가 퇴장했어요.`);
+    setAuthorList((authorList: any) => {
+      const leftUser = authorList.find((user: any) => user.userIdx === userIdx);
+      leftUser.isOnline = false;
+      return [...authorList];
+    });
   };
 
   const registAuthor = () => {
@@ -173,9 +186,6 @@ const Canvas = ({ setAuthorList }: CanvasProps) => {
   };
 
   const handleObjectsOffer = ({ objects, participants }: any) => {
-    console.log('-- 현재 참여자 목록 --');
-    console.log(participants);
-
     setAuthorList(participants);
 
     Object.values(objects).forEach((fabricData: any) => {
@@ -221,8 +231,8 @@ const Canvas = ({ setAuthorList }: CanvasProps) => {
       canvasRef.current.off('object:modified', handleObjectModified);
       socket.off('offerCurrentObjects', handleObjectsOffer);
       socket.off('objectDeleted', handleObjectDeleted);
-      socket.on('newEditor', handleNewEditorEvent);
-      socket.on('editorLeft', handleEditorLeft);
+      socket.off('newEditor', handleNewEditorEvent);
+      socket.off('editorLeft', handleEditorLeft);
       socket.emit('leaveCurrentRoom');
     };
   }, [currentDate, currentVisit]);

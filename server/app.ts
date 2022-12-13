@@ -149,30 +149,32 @@ io.on('connection', (socket: AuthorizedSocket) => {
     const { user } = socket;
     if (!user) return;
 
-    const { userId, userIdx, profileImg } = user;
+    const { userId, userIdx, username, profileImg } = user;
     const roomName = visitingRoom.get(userIdx);
     if (!roomName) return;
 
     console.log(`user ${user.userIdx} join editing`);
 
     fooStore[roomName]['participants'][userIdx] = {
+      userIdx: userIdx,
       userId: userId,
-      username: `${userIdx}`,
+      username: username,
       profileImg: profileImg,
       isOnline: true,
     };
     console.log(`${roomName}:`, fooStore[roomName]['participants']);
 
-    io.to(roomName).emit('newEditor', userIdx);
+    io.to(roomName).emit('newEditor', user);
   });
 
   socket.on('leaveEditing', () => {
     const userIdx = socket.user?.userIdx;
-    if (userIdx) return;
+    if (!userIdx) return;
     const roomName = visitingRoom.get(userIdx);
 
+    if (!roomName) return;
+
     fooStore[roomName]['participants'][userIdx].isOnline = false;
-    console.log(`${roomName}:`, fooStore[roomName]['participants']);
     io.to(roomName).emit('editorLeft', userIdx);
   });
 
@@ -210,6 +212,7 @@ io.on('connection', (socket: AuthorizedSocket) => {
     if (fooStore[roomName]['participants'][userIdx]) {
       fooStore[roomName]['participants'][userIdx].isOnline = false;
     }
+    io.to(roomName).emit('editorLeft', userIdx);
 
     // 레디스 접근을 자주해도 괜찮나?
     if (!io.sockets.adapter.rooms.get(roomName)) {
