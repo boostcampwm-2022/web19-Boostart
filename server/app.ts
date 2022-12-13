@@ -15,7 +15,6 @@ import { globalSocket } from './src/core/socket';
 import { randomUUID } from 'crypto';
 
 const fooStore = {};
-const participantStore = {};
 
 const options = {
   cert: fs.readFileSync('../rootca.pem'),
@@ -138,10 +137,7 @@ io.on('connection', (socket: AuthorizedSocket) => {
     visitingRoom.set(userIdx, roomName);
 
     if (fooStore[roomName] === undefined) {
-      fooStore[roomName] = {};
-      console.log(1);
-      participantStore[roomName] = {};
-      console.log(participantStore);
+      fooStore[roomName] = { objects: {}, participants: {} };
     }
 
     socket.join(roomName);
@@ -155,8 +151,8 @@ io.on('connection', (socket: AuthorizedSocket) => {
 
     // const targetObjects = diaryObjects[roomName].objects;
     socket.emit('offerCurrentObjects', {
-      objects: fooStore[roomName],
-      participants: Object.values(participantStore[roomName]),
+      objects: fooStore[roomName].objects,
+      participants: Object.values(fooStore[roomName].participants),
     });
     // updateAuthorList(roomName);
   });
@@ -167,13 +163,13 @@ io.on('connection', (socket: AuthorizedSocket) => {
 
     console.log(`user ${userIdx} join editing`);
 
-    participantStore[roomName][userIdx] = {
+    fooStore[roomName]['participants'][userIdx] = {
       userId: '테스트 ID',
       username: `${userIdx}`,
       profileImg: 'default_profile.png',
       isOnline: true,
     };
-    console.log(`${roomName}:`, participantStore[roomName]);
+    console.log(`${roomName}:`, fooStore[roomName]['participants']);
 
     io.to(roomName).emit('newEditor', userIdx);
   });
@@ -182,8 +178,8 @@ io.on('connection', (socket: AuthorizedSocket) => {
     const userIdx = socket.uid;
     const roomName = visitingRoom.get(userIdx);
 
-    participantStore[roomName][userIdx].isOnline = false;
-    console.log(`${roomName}:`, participantStore[roomName]);
+    fooStore[roomName]['participants'][userIdx].isOnline = false;
+    console.log(`${roomName}:`, fooStore[roomName]['participants']);
     io.to(roomName).emit('editorLeft', userIdx);
   });
 
