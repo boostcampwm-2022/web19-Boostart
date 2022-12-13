@@ -137,3 +137,25 @@ interface ModalProps {
 interface Window {
   kakao: any;
 }
+
+type FabricType = 'Rect' | 'Triangle' | 'Ellipse' | 'IText' | 'Path';
+
+interface FabricData {
+  id?: string;
+  type: FabricType;
+  width?: number;
+  height?: number;
+  top: number;
+  left: number;
+  fill: string;
+  angle: number;
+  scaleX: number;
+  scaleY: number;
+  rx?: number;
+  ry?: number;
+  text?: string;
+  fontSize?: number;
+  path?: any;
+  stroke?: any;
+  strokeWidth?: number;
+}
