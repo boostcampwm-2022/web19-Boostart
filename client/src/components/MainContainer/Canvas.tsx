@@ -97,10 +97,8 @@ const Canvas = ({ setAuthorList, setOnlineList }: CanvasProps) => {
   const registAuthor = () => {
     if (isJoined) {
       socket.emit('leaveEditing');
-    } else if (!isJoined) {
-      // if (!myProfile) return;
+    } else {
       socket.emit('joinEditing');
-      // socket.emit('registAuthor', myProfile);
     }
     setIsJoined((isJoined) => !isJoined);
   };
