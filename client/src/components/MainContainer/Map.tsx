@@ -169,6 +169,7 @@ const TaskListOnMap = styled.div<{
   background: rgba(255, 255, 255, 0.8);
   gap: 0.25rem;
   overflow: scroll;
+  word-break: keep-all;
   z-index: 600;
   cursor: pointer;
 `;
