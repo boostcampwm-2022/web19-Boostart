@@ -1,4 +1,4 @@
-import axios from 'axios';
+import axios, { Axios, AxiosResponse } from 'axios';
 import { HOST, API_VERSION } from '../../constants';
 import { authorizedHttpRequest } from '../common/utils';
 
@@ -22,6 +22,10 @@ const fetchLogoutRequest = async () => {
   await axios.get(`${HOST}/api/v1/auth/logout`);
   alert('로그아웃되었습니다');
   window.location.href = '/';
+};
+
+const sendFriendRequest = async (selectedFriend: number) => {
+  await axios.put(`${HOST}/api/v1/friend/request/${selectedFriend}`);
 };
 
 //API
@@ -55,7 +59,7 @@ export const getMyProfile = async () => {
 
 export const postFriendRequest = async (selectedFriend: number) => {
   try {
-    const response = await axios.put(`${HOST}/api/v1/friend/request/${selectedFriend}`);
+    const response = await authorizedHttpRequest(() => sendFriendRequest(selectedFriend));
     if (response.status === 201) alert('친구요청을 완료했습니다');
   } catch (error: any) {
     alert(error.response.data.msg);
