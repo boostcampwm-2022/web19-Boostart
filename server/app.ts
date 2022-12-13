@@ -187,8 +187,8 @@ io.on('connection', (socket: AuthorizedSocket) => {
 
     const { id } = fabricData;
 
-    fooStore[roomName][id] = fabricData;
-    console.log(Object.values(fooStore[roomName]).map(({ top, left }: any) => `${left} ${top}`));
+    fooStore[roomName]['objects'][id] = fabricData;
+    console.log(Object.values(fooStore[roomName].objects).map(({ top, left }: any) => `${left} ${top}`));
 
     io.to(roomName).emit('serverStatusChange', fabricData);
   });
