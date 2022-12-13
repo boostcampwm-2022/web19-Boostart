@@ -26,11 +26,7 @@ const Canvas = ({ setAuthorList, setOnlineList }: CanvasProps) => {
   const socket = globalSocket.instance;
 
   const initCanvas = (): fabric.Canvas => {
-    const canvas = new fabric.Canvas('canvas', {
-      height: 400,
-      width: 674,
-      selection: false,
-    });
+    const canvas = new fabric.Canvas('canvas', { height: 400, width: 674, selection: false });
     return canvas;
   };
 
@@ -81,11 +77,7 @@ const Canvas = ({ setAuthorList, setOnlineList }: CanvasProps) => {
 
   const setCanvasBackground = () => {
     fabric.Image.fromURL(canvasBackground, function (img) {
-      img.set({
-        top: 0,
-        left: 0,
-        evented: false,
-      });
+      img.set({ top: 0, left: 0, evented: false });
       img.scaleToWidth(674);
       img.setCoords();
       if (!canvasRef.current) return;
@@ -268,9 +260,7 @@ const ControlBar = styled.div`
   display: flex;
   position: relative;
 `;
-const ForeignerScreen = styled.div<{
-  isActive: boolean;
-}>`
+const ForeignerScreen = styled.div<{ isActive: boolean }>`
   width: 100%;
   height: 26rem;
   position: absolute;
@@ -281,9 +271,7 @@ const ForeignerScreen = styled.div<{
   display: ${(props) => (props.isActive ? 'none' : 'block')};
 `;
 
-const Palette = styled.div<{
-  isActive: boolean;
-}>`
+const Palette = styled.div<{ isActive: boolean }>`
   width: ${(props) => (props.isActive ? '28rem' : '1px')};
   height: 3rem;
   padding: ${(props) => (props.isActive ? '0 1rem 0 4rem' : '0')};
