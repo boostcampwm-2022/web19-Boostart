@@ -49,13 +49,42 @@ redisclient.on('error', (err) => {
 redisclient.connect().then();
 const redisCli = redisclient.v4;
 
-const setDiary = async (roomName: string, data): Promise<void> => {
+interface User {
+  idx: number;
+  userId: string;
+  profileImg: string;
+}
+
+interface DiaryObjects {
+  [id: string]: {
+    type: string;
+    rx: string;
+    ry: string;
+    width: string;
+    height: string;
+    top: string;
+    left: string;
+    fill: string;
+    angle: number;
+    scaleX: number;
+    scaleY: number;
+    id: string;
+  };
+}
+
+interface DiaryData {
+  author: User[];
+  objects: DiaryObjects;
+  online: User[];
+}
+
+const setDiary = async (roomName: string, data: DiaryData): Promise<void> => {
   await redisCli.set(roomName, JSON.stringify(data));
 };
-const getDiary = async (roomName: string): Promise<string> => {
+const getDiary = async (roomName: string): Promise<DiaryData> => {
   let diaryData = await redisCli.get(roomName);
   if (diaryData === undefined || diaryData.author === undefined || !isNaN(diaryData.author[0])) diaryData = { author: [], objects: {} };
-  diaryData['online'] = [];
+  diaryData.online = [];
   return diaryData;
 };
 
