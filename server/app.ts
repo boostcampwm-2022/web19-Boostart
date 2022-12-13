@@ -49,11 +49,14 @@ redisclient.on('error', (err) => {
 redisclient.connect().then();
 const redisCli = redisclient.v4;
 
-const setDiary = async (roomName: string, data: string): Promise<void> => {
-  await redisCli.set(roomName, data);
+const setDiary = async (roomName: string, data): Promise<void> => {
+  await redisCli.set(roomName, JSON.stringify(data));
 };
 const getDiary = async (roomName: string): Promise<string> => {
-  return await redisCli.get(roomName);
+  let diaryData = await redisCli.get(roomName);
+  if (diaryData === undefined || diaryData.author === undefined || !isNaN(diaryData.author[0])) diaryData = { author: [], objects: {} };
+  diaryData['online'] = [];
+  return diaryData;
 };
 
 app.use(express.json());
@@ -133,9 +136,7 @@ io.on('connection', (socket: AuthorizedSocket) => {
     visitingRoom.set(socket.id, roomName);
     socket.join(roomName);
     if (io.sockets.adapter.rooms.get(roomName).size === 1) {
-      let diaryData = JSON.parse(await getDiary(roomName)) || { author: [], objects: {} };
-      if (diaryData.author === undefined || !isNaN(diaryData.author[0])) diaryData = { author: [], objects: {} };
-      diaryData['online'] = [];
+      const diaryData = await getDiary(roomName);
       diaryObjects[roomName] = diaryData;
       io.to(socket.id).emit('initReady');
     } else {
@@ -156,7 +157,7 @@ io.on('connection', (socket: AuthorizedSocket) => {
     socket.leave(roomName);
     if (!io.sockets.adapter.rooms.get(roomName)) {
       const diaryData = diaryObjects[roomName];
-      await setDiary(roomName, JSON.stringify(diaryData));
+      await setDiary(roomName, diaryData);
       delete diaryObjects[roomName];
     }
   });
@@ -219,7 +220,7 @@ io.on('connection', (socket: AuthorizedSocket) => {
     socket.leave(roomName);
     if (!io.sockets.adapter.rooms.get(roomName)) {
       const diaryData = diaryObjects[roomName];
-      await setDiary(roomName, JSON.stringify(diaryData));
+      await setDiary(roomName, diaryData);
       delete diaryObjects[roomName];
     }
     visitingRoom.delete(socket.id);
