@@ -167,10 +167,8 @@ io.on('connection', (socket: AuthorizedSocket) => {
     if (io.sockets.adapter.rooms.get(roomName).size === 1) {
       const diaryData = await getDiary(roomName);
       diaryObjects[roomName] = diaryData;
-      io.to(socket.id).emit('initReady');
-    } else {
-      io.to(socket.id).emit('initReady');
     }
+    io.to(socket.id).emit('initReady');
   });
 
   socket.on('leaveCurrentRoom', async () => {
