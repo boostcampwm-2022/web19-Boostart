@@ -164,7 +164,7 @@ io.on('connection', (socket: AuthorizedSocket) => {
   socket.on('registAuthor', (author) => {
     const roomName = visitingRoom.get(socket.id);
     const userIdx = socket.uid;
-    if (!roomName) return;
+    if (!roomName || !diaryObjects[roomName]) return;
     const authorList = diaryObjects[roomName].author;
     const onlineList = diaryObjects[roomName].online;
     if (!authorList.some(({ idx }) => idx === parseInt(userIdx))) {
@@ -176,6 +176,7 @@ io.on('connection', (socket: AuthorizedSocket) => {
 
   socket.on('turnToOffline', () => {
     const roomName = visitingRoom.get(socket.id);
+    if (!roomName || !diaryObjects[roomName]) return;
     const userIdx = socket.uid;
     const onlineList = diaryObjects[roomName].online;
     diaryObjects[roomName].online = [...onlineList].filter((idx) => idx !== parseInt(userIdx));
