@@ -1,12 +1,13 @@
 import styled from 'styled-components';
 import { HOST } from '../../constants';
+import { RiMarkPenFill } from 'react-icons/ri';
 
 export const DiaryContainer = styled.div`
   position: relative;
   user-select: none;
   width: 100%;
   height: 100%;
-  padding: 0.5rem;
+  padding: 0rem 0.5rem;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -33,8 +34,8 @@ export const DateController = styled.span`
 `;
 
 export const AuthorHeaderIcon = styled.img`
-  width: 2rem;
-  margin: 0.5rem 0 0 0.5rem;
+  width: 1.7rem;
+  margin: 0.5rem 0.5rem 0 1.3rem;
 `;
 export const AuthorHeaderSpan = styled.span`
   color: var(--color-gray5);
@@ -44,21 +45,20 @@ export const AuthorHeaderSpan = styled.span`
 `;
 
 export const DiaryAuthorList = styled.div`
-  width: 100%;
-  height: 3rem;
+  width: 42rem;
+  height: 3.6rem;
   background: white;
   border-radius: 0.8rem;
-  margin: 0.5rem auto;
-  padding: 0.5rem;
+  margin: 0rem 0rem 0.4rem 0rem;
   display: flex;
   align-items: center;
   box-sizing: border-box;
 `;
 
 export const AuthorBox = styled.div`
-  width: 2.8rem;
-  height: 2.8rem;
-  margin: 0 0.4rem;
+  width: 2.75rem;
+  height: 2.75rem;
+  margin: 0 0.35rem;
   position: relative;
   display: flex;
   flex-direction: column;
@@ -70,8 +70,8 @@ export const AuthorBox = styled.div`
 export const ProfileBox = styled.div<{
   imgURL: string;
 }>`
-  width: 2.8rem;
-  height: 2.8rem;
+  width: 2.75rem;
+  height: 2.75rem;
   border-radius: 3.4rem;
   border: 1px solid #d4d4d4;
   margin: 0 0.4rem;
@@ -86,7 +86,7 @@ export const OnlineMarker = styled.div<{
   height: 2.8rem;
   line-height: 2.05rem;
   text-align: center;
-  border: 0.35rem solid #9391ff;
+  border: 0.3rem solid #9391ff;
   border-radius: 3.4rem;
   position: absolute;
   top: 0;
