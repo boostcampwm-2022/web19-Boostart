@@ -147,13 +147,10 @@ io.on('connection', (socket: AuthorizedSocket) => {
 
   socket.on('joinEditing', () => {
     const { user } = socket;
-
     if (!user) return;
 
     const { userId, userIdx, profileImg } = user;
-
     const roomName = visitingRoom.get(userIdx);
-
     if (!roomName) return;
 
     console.log(`user ${user.userIdx} join editing`);
@@ -181,6 +178,7 @@ io.on('connection', (socket: AuthorizedSocket) => {
 
   socket.on('clientStatusChange', (fabricData) => {
     const userIdx = socket.user?.userIdx;
+    if (!userIdx) return;
     const roomName = visitingRoom.get(userIdx);
 
     fabricData.id ??= randomUUID();
@@ -188,7 +186,7 @@ io.on('connection', (socket: AuthorizedSocket) => {
     const { id } = fabricData;
 
     fooStore[roomName]['objects'][id] = fabricData;
-    console.log(Object.values(fooStore[roomName].objects).map(({ top, left }: any) => `${left} ${top}`));
+    console.log(`${fabricData.id} => (${fabricData.left}, ${fabricData.top})`);
 
     io.to(roomName).emit('serverStatusChange', fabricData);
   });
