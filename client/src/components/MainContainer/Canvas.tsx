@@ -327,7 +327,7 @@ const Canvas = ({ setAuthorList, setOnlineList }: CanvasProps) => {
     // socket.on('updateAuthorList', updateAuthorList);
     // window.addEventListener('keydown', handleKeydown);
 
-    socket.on('serverStatusChange', handleServerStatusChange);
+    socket.on('serverStatusChange', updateDiary);
     canvasRef.current.on('object:modified', handleObjectModified);
     socket.on('offerCurrentObjects', handleObjectsOffer);
 
@@ -344,15 +344,11 @@ const Canvas = ({ setAuthorList, setOnlineList }: CanvasProps) => {
       // socket.emit('leaveCurrentRoom');
       // canvasRef.current.clear();
 
-      socket.off('serverStatusChange', handleServerStatusChange);
+      socket.off('serverStatusChange', updateDiary);
       canvasRef.current.off('object:modified', handleObjectModified);
       socket.off('offerCurrentObjects', handleObjectsOffer);
     };
   }, [currentDate, currentVisit]);
-
-  const foo = () => {
-    socket.emit('clientStatusChange', DEFAULT_OBJECT_VALUE);
-  };
 
   type FabricType = 'Rect' | 'Triangle' | 'Ellipse' | 'IText' | 'Path';
   interface FabricData {
@@ -398,21 +394,21 @@ const Canvas = ({ setAuthorList, setOnlineList }: CanvasProps) => {
     return object;
   };
 
-  const renderObject = (fabricData: FabricData) => {
+  const updateDiary = (fabricData: FabricData) => {
     if (!canvasRef.current) {
       console.log('error');
       return;
     }
 
+    const { id } = fabricData;
+
     const object = createFabricObject(fabricData);
 
-    canvasRef.current.add(object);
-  };
+    const oldObject = diaryObjects.get(id);
+    diaryObjects.set(id, object);
 
-  const handleServerStatusChange = (fabricData: FabricData) => {
-    console.log('서버의 상태가 변했어요.');
-    if (!canvasRef.current) return;
-    renderObject(fabricData);
+    canvasRef.current.add(object);
+    canvasRef.current.remove(oldObject);
   };
 
   const putObject = ({ id, type, width, height, top, left, fill, angle, scaleX, scaleY, rx, ry, text, fontSize, path, stroke, strokeWidth }: FabricData) => {
@@ -447,16 +443,16 @@ const Canvas = ({ setAuthorList, setOnlineList }: CanvasProps) => {
       console.log('error');
       return;
     }
-    // canvasRef.current.remove(modifiedObject);
     putObject(modifiedObject);
   };
 
   const handleObjectsOffer = (fabricObjects: any) => {
     console.log(fabricObjects);
     Object.entries(fabricObjects).forEach(([id, fabricData]: any) => {
-      const fabricObject = createFabricObject(fabricData);
-      diaryObjects.set(id, fabricObject);
-      handleServerStatusChange(fabricData);
+      const fabricObject: any = createFabricObject(fabricData);
+      // console.log('1', fabricObject);
+      // console.log('2', diaryObjects.get(fabricObject.id));
+      updateDiary(fabricData);
     });
 
     console.log(diaryObjects);
