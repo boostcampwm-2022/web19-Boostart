@@ -327,6 +327,8 @@ const Canvas = ({ setAuthorList, setOnlineList }: CanvasProps) => {
     socket.on('updateAuthorList', updateAuthorList);
     window.addEventListener('keydown', handleKeydown);
 
+    socket.on('serverStatusChange', handleServerStatusChange);
+
     return () => {
       if (!canvasRef.current) return;
       canvasRef.current.off('path:created', dispatchCreatedLine);
@@ -339,6 +341,8 @@ const Canvas = ({ setAuthorList, setOnlineList }: CanvasProps) => {
       window.removeEventListener('keydown', handleKeydown);
       socket.emit('leaveCurrentRoom');
       canvasRef.current.clear();
+
+      socket.off('serverStatusChange', handleServerStatusChange);
     };
   }, [currentDate, currentVisit]);
 
@@ -346,16 +350,10 @@ const Canvas = ({ setAuthorList, setOnlineList }: CanvasProps) => {
     socket.emit('clientStatusChange', DEFAULT_OBJECT_VALUE);
   };
 
-  useEffect(() => {
-    socket.on('serverStatusChange', (fabricData: any) => {
-      console.log('서버에 상태가 변했어요.');
-      console.log(fabricData);
-    });
-  }, []);
-
+  type FabricType = 'Rect' | 'Triangle' | 'Ellipse' | 'IText' | 'Path';
   interface FabricData {
     id?: string;
-    type: string;
+    type: FabricType;
     width: number;
     height: number;
     top: number;
@@ -372,6 +370,41 @@ const Canvas = ({ setAuthorList, setOnlineList }: CanvasProps) => {
     stroke?: any;
     strokeWidth?: number;
   }
+
+  const renderObject = (fabricData: FabricData) => {
+    if (!canvasRef.current) {
+      console.log('error');
+      return;
+    }
+
+    const { type } = fabricData;
+    let object;
+
+    switch (type) {
+      case 'Rect':
+      case 'Triangle':
+      case 'Ellipse': {
+        object = new fabric[type](fabricData);
+        break;
+      }
+      case 'IText': {
+        object = new fabric[type](fabricData.text!, fabricData);
+        break;
+      }
+      case 'Path': {
+        object = new fabric[type](fabricData.path, fabricData);
+        break;
+      }
+    }
+
+    canvasRef.current.add(object);
+  };
+
+  const handleServerStatusChange = (fabricData: FabricData) => {
+    console.log('서버의 상태가 변했어요.');
+    if (!canvasRef.current) return;
+    renderObject(fabricData);
+  };
 
   const putObject = ({ id, type, width, height, top, left, fill, angle, scaleX, scaleY, rx, ry, text, fontSize, path, stroke, strokeWidth }: FabricData) => {
     const fabricData = { id, type, width, height, top, left, fill, angle, scaleX, scaleY, rx, ry, text, fontSize, path, stroke, strokeWidth };
@@ -395,7 +428,7 @@ const Canvas = ({ setAuthorList, setOnlineList }: CanvasProps) => {
     socket.emit('clientStatusChange', fabricData);
   };
 
-  const generateDefaultFabricData = (type: string, fill: string) => {
+  const generateDefaultFabricData = (type: FabricType, fill: string) => {
     return { ...DEFAULT_OBJECT_VALUE, type, fill };
   };
 
@@ -405,7 +438,7 @@ const Canvas = ({ setAuthorList, setOnlineList }: CanvasProps) => {
       <canvas id="canvas" />
       <ControlBar>
         <Palette isActive={isJoined}>
-          <button onClick={() => putObject(generateDefaultFabricData('Rect', '#000000'))}>foo</button>
+          <button onClick={() => putObject(generateDefaultFabricData('Ellipse', '#000000'))}>foo</button>
           <span onClick={() => enterDrawingMode(3)}>연필</span>
           <span onClick={() => enterDrawingMode(10)}>형광펜</span>
           <span onClick={() => enterDrawingMode(20)}>브러쉬</span>
