@@ -195,16 +195,31 @@ io.on('connection', (socket: AuthorizedSocket) => {
 
   socket.on('leaveCurrentRoom', async () => {
     const userIdx = socket.user?.userIdx;
-    const roomName = visitingRoom.get(userIdx);
-    if (!roomName || !diaryObjects[roomName]) return;
+    if (!userIdx) return;
 
+    try {
+      handleUserLeaveDiary(userIdx);
+    } catch (error) {
+      console.log(error);
+    }
+  });
+
+  const handleUserLeaveDiary = (userIdx: number) => {
+    const roomName = visitingRoom.get(userIdx);
+    visitingRoom.delete(userIdx);
     socket.leave(roomName);
+
+    if (fooStore[roomName]['participants'][userIdx]) {
+      fooStore[roomName]['participants'][userIdx].isOnline = false;
+    }
+
+    // 레디스 접근을 자주해도 괜찮나?
     if (!io.sockets.adapter.rooms.get(roomName)) {
       const diaryData = diaryObjects[roomName];
       // await setDiary(roomName, JSON.stringify(diaryData));
       delete diaryObjects[roomName];
     }
-  });
+  };
 
   socket.on('deleteObject', (id) => {
     const userIdx = socket.user?.userIdx;
@@ -218,25 +233,15 @@ io.on('connection', (socket: AuthorizedSocket) => {
   socket.on('disconnect', async () => {
     const userIdx = socket.user?.userIdx;
     if (!userIdx) return;
-    const roomName = visitingRoom.get(userIdx);
     console.log(`${userIdx} disconnected`);
 
     delete connectionIdToUserInfo[(socket.conn as any).id];
     delete userIdxToSocketId[userIdx];
 
-    if (!roomName) return;
-    visitingRoom.delete(userIdx);
-
-    if (!fooStore[roomName]) return;
-
-    if (fooStore[roomName]['participants'][userIdx] !== undefined) {
-      fooStore[roomName]['participants'][userIdx].isOnline = false;
-    }
-
-    if (!io.sockets.adapter.rooms.get(roomName)) {
-      const diaryData = diaryObjects[roomName];
-      // await setDiary(roomName, JSON.stringify(diaryData));
-      delete diaryObjects[roomName];
+    try {
+      handleUserLeaveDiary(userIdx);
+    } catch (error) {
+      console.log(error);
     }
   });
 });

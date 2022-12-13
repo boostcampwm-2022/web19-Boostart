@@ -129,6 +129,7 @@ const Canvas = ({ setAuthorList, setOnlineList }: CanvasProps) => {
       socket.off('objectDeleted', handleObjectDeleted);
       socket.on('newEditor', handleNewEditorEvent);
       socket.on('editorLeft', handleEditorLeft);
+      socket.emit('leaveCurrentRoom');
     };
   }, [currentDate, currentVisit]);
 
