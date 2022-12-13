@@ -129,8 +129,9 @@ io.on('connection', (socket: AuthorizedSocket) => {
   });
 
   socket.on('joinToNewRoom', async (destId, date) => {
+    const userIdx = socket.uid;
     const roomName = destId + date;
-    visitingRoom.set(socket.id, roomName);
+    visitingRoom.set(userIdx, roomName);
     socket.join(roomName);
     if (io.sockets.adapter.rooms.get(roomName).size === 1) {
       let diaryData = JSON.parse(await getDiary(roomName)) || { author: [], objects: {} };
@@ -145,9 +146,9 @@ io.on('connection', (socket: AuthorizedSocket) => {
   });
 
   socket.on('leaveCurrentRoom', async () => {
-    const roomName = visitingRoom.get(socket.id);
-    if (!roomName || !diaryObjects[roomName]) return;
     const userIdx = socket.uid;
+    const roomName = visitingRoom.get(userIdx);
+    if (!roomName || !diaryObjects[roomName]) return;
     const authorList = diaryObjects[roomName].author;
     const onlineList = diaryObjects[roomName].online;
     if (authorList.some(({ idx }) => idx === parseInt(userIdx))) {
@@ -163,8 +164,8 @@ io.on('connection', (socket: AuthorizedSocket) => {
   });
 
   socket.on('registAuthor', (author) => {
-    const roomName = visitingRoom.get(socket.id);
     const userIdx = socket.uid;
+    const roomName = visitingRoom.get(userIdx);
     if (!roomName || !diaryObjects[roomName]) return;
     const authorList = diaryObjects[roomName].author;
     const onlineList = diaryObjects[roomName].online;
@@ -176,16 +177,17 @@ io.on('connection', (socket: AuthorizedSocket) => {
   });
 
   socket.on('turnToOffline', () => {
-    const roomName = visitingRoom.get(socket.id);
-    if (!roomName || !diaryObjects[roomName]) return;
     const userIdx = socket.uid;
+    const roomName = visitingRoom.get(userIdx);
+    if (!roomName || !diaryObjects[roomName]) return;
     const onlineList = diaryObjects[roomName].online;
     diaryObjects[roomName].online = [...onlineList].filter((idx) => idx !== parseInt(userIdx));
     updateAuthorList(roomName);
   });
 
   socket.on('sendModifiedObject', (objectData) => {
-    const roomName = visitingRoom.get(socket.id);
+    const userIdx = socket.uid;
+    const roomName = visitingRoom.get(userIdx);
     if (!roomName || !diaryObjects[roomName]) return;
     const targetObjects = diaryObjects[roomName].objects;
     const objectId = objectData.id;
@@ -193,16 +195,17 @@ io.on('connection', (socket: AuthorizedSocket) => {
     io.to(roomName).emit('updateModifiedObject', objectData);
   });
   socket.on('sendRemovedObjectId', (objectId) => {
-    const roomName = visitingRoom.get(socket.id);
+    const userIdx = socket.uid;
+    const roomName = visitingRoom.get(userIdx);
     const targetObjects = diaryObjects[roomName].objects;
     delete targetObjects[objectId];
     socket.to(roomName).emit('applyObjectRemoving', objectId);
   });
 
   socket.on('disconnect', async () => {
-    const roomName = visitingRoom.get(socket.id);
-    if (!roomName || !diaryObjects[roomName]) return;
     const userIdx = socket.uid;
+    const roomName = visitingRoom.get(userIdx);
+    if (!roomName || !diaryObjects[roomName]) return;
     const authorList = diaryObjects[roomName].author;
     const onlineList = diaryObjects[roomName].online;
     if (authorList.some(({ idx }) => idx === parseInt(userIdx))) {
@@ -215,9 +218,9 @@ io.on('connection', (socket: AuthorizedSocket) => {
       await setDiary(roomName, JSON.stringify(diaryData));
       delete diaryObjects[roomName];
     }
-    visitingRoom.delete(socket.id);
+    visitingRoom.delete(userIdx);
     delete connectionIdToUserIdx[(socket.conn as any).id];
-    delete userIdxToSocketId[socket.uid];
+    delete userIdxToSocketId[userIdx];
   });
 });
 
