@@ -157,7 +157,7 @@ io.on('connection', (socket: AuthorizedSocket) => {
     console.log(diaryObjects[roomName]);
 
     diaryObjects[roomName][id] = fabricData;
-    console.log(diaryObjects[roomName]);
+    console.log(Object.values(diaryObjects[roomName]).map(({ top, left }: any) => `${left} ${top}`));
 
     io.to(roomName).emit('serverStatusChange', fabricData);
   });

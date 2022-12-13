@@ -318,31 +318,33 @@ const Canvas = ({ setAuthorList, setOnlineList }: CanvasProps) => {
     if (!canvasRef.current) canvasRef.current = initCanvas();
     setCanvasBackground();
     setIsJoined(false);
-    canvasRef.current.on('path:created', dispatchCreatedLine);
-    canvasRef.current.on('object:modified', dispatchModifiedObject);
-    socket.on('offerCurrentObjects', presentPresetObjects);
-    socket.on('updateModifiedObject', updateModifiedObject);
-    socket.on('applyObjectRemoving', removeObject);
-    socket.on('initReady', requestInitObjects);
-    socket.on('updateAuthorList', updateAuthorList);
-    window.addEventListener('keydown', handleKeydown);
+    // canvasRef.current.on('path:created', dispatchCreatedLine);
+    // canvasRef.current.on('object:modified', dispatchModifiedObject);
+    // socket.on('offerCurrentObjects', presentPresetObjects);
+    // socket.on('updateModifiedObject', updateModifiedObject);
+    // socket.on('applyObjectRemoving', removeObject);
+    // socket.on('initReady', requestInitObjects);
+    // socket.on('updateAuthorList', updateAuthorList);
+    // window.addEventListener('keydown', handleKeydown);
 
     socket.on('serverStatusChange', handleServerStatusChange);
+    canvasRef.current.on('object:modified', handleObjectModified);
 
     return () => {
       if (!canvasRef.current) return;
-      canvasRef.current.off('path:created', dispatchCreatedLine);
-      canvasRef.current.off('object:modified', dispatchModifiedObject);
-      socket.off('offerCurrentObjects', presentPresetObjects);
-      socket.off('updateModifiedObject', updateModifiedObject);
-      socket.off('applyObjectRemoving', removeObject);
-      socket.off('initReady', requestInitObjects);
-      socket.off('updateAuthorList', updateAuthorList);
-      window.removeEventListener('keydown', handleKeydown);
-      socket.emit('leaveCurrentRoom');
-      canvasRef.current.clear();
+      // canvasRef.current.off('path:created', dispatchCreatedLine);
+      // canvasRef.current.off('object:modified', dispatchModifiedObject);
+      // socket.off('offerCurrentObjects', presentPresetObjects);
+      // socket.off('updateModifiedObject', updateModifiedObject);
+      // socket.off('applyObjectRemoving', removeObject);
+      // socket.off('initReady', requestInitObjects);
+      // socket.off('updateAuthorList', updateAuthorList);
+      // window.removeEventListener('keydown', handleKeydown);
+      // socket.emit('leaveCurrentRoom');
+      // canvasRef.current.clear();
 
       socket.off('serverStatusChange', handleServerStatusChange);
+      canvasRef.current.off('object:modified', handleObjectModified);
     };
   }, [currentDate, currentVisit]);
 
@@ -430,6 +432,16 @@ const Canvas = ({ setAuthorList, setOnlineList }: CanvasProps) => {
 
   const generateDefaultFabricData = (type: FabricType, fill: string) => {
     return { ...DEFAULT_OBJECT_VALUE, type, fill };
+  };
+
+  const handleObjectModified = (e: any) => {
+    const modifiedObject = e.target;
+    if (!canvasRef.current) {
+      console.log('error');
+      return;
+    }
+    // canvasRef.current.remove(modifiedObject);
+    putObject(modifiedObject);
   };
 
   return (
