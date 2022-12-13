@@ -22,7 +22,7 @@ interface ClientToServerEvents {
 }
 
 class GlobalSocket {
-  private _instance: Socket<ServerToClientEvents, ClientToServerEvents>;
+  private _instance: Socket<any>;
 
   constructor() {
     this._instance = io(HOST!);

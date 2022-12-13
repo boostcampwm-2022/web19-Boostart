@@ -12,6 +12,7 @@ import * as redis from 'redis';
 import jwt from 'jsonwebtoken';
 import { connectionIdToUserIdx, userIdxToSocketId } from './src/core/store';
 import { globalSocket } from './src/core/socket';
+import { randomUUID } from 'crypto';
 
 const options = {
   cert: fs.readFileSync('../rootca.pem'),
@@ -139,10 +140,24 @@ io.on('connection', (socket: AuthorizedSocket) => {
       diaryData['online'] = [];
       diaryObjects[roomName] = diaryData;
     }
+    console.log(diaryObjects[roomName]);
 
     const targetObjects = diaryObjects[roomName].objects;
     socket.emit('offerCurrentObjects', targetObjects);
     updateAuthorList(roomName);
+  });
+
+  socket.on('clientStatusChange', (fabricData) => {
+    const userIdx = socket.uid;
+    const roomName = visitingRoom.get(userIdx);
+
+    fabricData.id ??= randomUUID();
+
+    const { id } = fabricData;
+    console.log(diaryObjects[roomName]);
+
+    diaryObjects[roomName][id] = fabricData;
+    console.log(diaryObjects[roomName]);
   });
 
   socket.on('leaveCurrentRoom', async () => {
@@ -158,7 +173,7 @@ io.on('connection', (socket: AuthorizedSocket) => {
     socket.leave(roomName);
     if (!io.sockets.adapter.rooms.get(roomName)) {
       const diaryData = diaryObjects[roomName];
-      await setDiary(roomName, JSON.stringify(diaryData));
+      // await setDiary(roomName, JSON.stringify(diaryData));
       delete diaryObjects[roomName];
     }
   });
@@ -215,7 +230,7 @@ io.on('connection', (socket: AuthorizedSocket) => {
     socket.leave(roomName);
     if (!io.sockets.adapter.rooms.get(roomName)) {
       const diaryData = diaryObjects[roomName];
-      await setDiary(roomName, JSON.stringify(diaryData));
+      // await setDiary(roomName, JSON.stringify(diaryData));
       delete diaryObjects[roomName];
     }
     visitingRoom.delete(userIdx);

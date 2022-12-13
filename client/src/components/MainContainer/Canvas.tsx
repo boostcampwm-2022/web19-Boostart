@@ -342,12 +342,17 @@ const Canvas = ({ setAuthorList, setOnlineList }: CanvasProps) => {
     };
   }, [currentDate, currentVisit]);
 
+  const foo = () => {
+    socket.emit('clientStatusChange', DEFAULT_OBJECT_VALUE);
+  };
+
   return (
     <>
       <ForeignerScreen isActive={isJoined}></ForeignerScreen>
       <canvas id="canvas" />
       <ControlBar>
         <Palette isActive={isJoined}>
+          <button onClick={foo}>foo</button>
           <span onClick={() => enterDrawingMode(3)}>연필</span>
           <span onClick={() => enterDrawingMode(10)}>형광펜</span>
           <span onClick={() => enterDrawingMode(20)}>브러쉬</span>
