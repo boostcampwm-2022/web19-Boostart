@@ -432,8 +432,12 @@ export const EmoticonInput = styled.div`
   align-items: center;
   position: relative;
   span {
-    padding-top: 3px;
-    margin: 5.5px;
+    padding-top: 5px;
+    margin: 5px;
     cursor: pointer;
+  }
+  img {
+    width: 17px;
+    height: 17px;
   }
 `;

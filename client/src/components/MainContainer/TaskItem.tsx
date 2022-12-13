@@ -57,7 +57,6 @@ const TaskList = ({ taskList, activeTask, completionFilter, fetchTaskList, setIs
 
   const taskChange = (task: Task) => {
     setIsEditModalOpen(true);
-    //modal...
   };
   const DetailInfo = ({ task }: { task: Task }) => {
     return (
@@ -130,7 +129,6 @@ const TaskList = ({ taskList, activeTask, completionFilter, fetchTaskList, setIs
   };
 
   return (
-    // tagIdx, idx, title, startedAt, endedAt, importance, location, content, done, isPublic, tagName, labels
     <>
       {taskList.map((task: Task) => {
         return (
@@ -175,7 +173,8 @@ const EmoticonList = ({ task, isMe }: { task: Task; isMe: boolean }) => {
     }
   };
 
-  const emoticonSample = ['🙂', '❤️', '😭', '👍', '👎', '🔥', '🎉'];
+  // const emoticonSample = ['🙂', '❤️', '😭', '👍', '👎', '🔥', '🎉'];
+  // <img src={`/emoticon${emoticonSample.findIndex((d) => d === i.emoticon) + 1}.svg`} />
 
   const postEmoticon = async (index: number) => {
     try {
@@ -190,9 +189,9 @@ const EmoticonList = ({ task, isMe }: { task: Task; isMe: boolean }) => {
     <>
       {!isMe && (
         <S.EmoticonInput>
-          {emoticonSample.map((el, index) => (
+          {[0, 1, 2, 3, 4, 5, 6].map((el, index) => (
             <span key={index} onClick={(e) => postEmoticon(index)}>
-              {el}
+              <img src={`/emoticon${index + 1}.svg`} />
             </span>
           ))}
         </S.EmoticonInput>
