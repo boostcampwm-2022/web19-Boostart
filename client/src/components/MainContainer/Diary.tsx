@@ -45,8 +45,8 @@ const Diary = () => {
           <S.AuthorHeaderIcon src="/author.svg" alt="" />
           <S.AuthorHeaderSpan>참여자</S.AuthorHeaderSpan>
         </S.AuthorBox>
-        {authorList.map(({ username, profileImg, isOnline }: any) => {
-          return <AuthorList username={username} profileImg={profileImg} isOnline={isOnline} />;
+        {authorList.map(({ userId, username, profileImg, isOnline }: any) => {
+          return <AuthorList key={userId} username={username} profileImg={profileImg} isOnline={isOnline} />;
         })}
       </S.DiaryAuthorList>
       <Canvas setAuthorList={setAuthorList} />
