@@ -2,7 +2,6 @@ import React, { useEffect, useRef, useState } from 'react';
 import { useRecoilValue, useRecoilState } from 'recoil';
 import styled from 'styled-components';
 import axios from 'axios';
-import DateSelector from './DateSelector';
 import { HOST, TaskTargetType } from '../../constants';
 import useCurrentDate from '../../hooks/useCurrentDate';
 import { visitState, menuState } from '../common/atoms';
@@ -135,23 +134,25 @@ export const Map = () => {
   };
 
   return (
-    <>
-      <MapTitle>MAP{!currentVisit.isMe && <span> width {currentVisit.userId}</span>}</MapTitle>
-      <MapContainer>
-        <DateSelector />
-        <KakaoContainer>
-          <div ref={mapRef} style={{ width: '41rem', height: '31rem' }}></div>
-          {myTaskList.length > 0 && <TaskList isMyList={true} />}
-          {friendTaskList.length > 0 && <TaskList isMyList={false} />}
-          {myTaskList.length === 0 && friendTaskList.length === 0 && <TaskAlertBox>위치정보가 있는 Task를 추가해주세요</TaskAlertBox>}
-          {friendTaskList.length > 0 && myTaskList.length > 0 && <BothFocusButton onClick={() => setMapBoundary(TaskTargetType.both)}>전체보기</BothFocusButton>}
-        </KakaoContainer>
-      </MapContainer>
-    </>
+    <KakaoContainer>
+      <MapRef ref={mapRef}></MapRef>
+      {myTaskList.length > 0 && <TaskList isMyList={true} />}
+      {friendTaskList.length > 0 && <TaskList isMyList={false} />}
+      {myTaskList.length === 0 && friendTaskList.length === 0 && <TaskAlertBox>위치정보가 있는 Task를 추가해주세요</TaskAlertBox>}
+      {friendTaskList.length > 0 && myTaskList.length > 0 && <BothFocusButton onClick={() => setMapBoundary(TaskTargetType.both)}>전체보기</BothFocusButton>}
+    </KakaoContainer>
   );
 };
 
 export default Map;
+
+const MapRef = styled.div`
+  width: 42.5rem;
+  height: 31rem;
+  border-radius: 10px;
+  border: 1px solid var(--color-gray3);
+  padding: 0.5rem;
+`;
 
 const TaskListOnMap = styled.div<{
   isMyList: boolean;
@@ -190,31 +191,6 @@ const TaskItemOnMap = styled.div`
   flex-direction: column;
   justify-content: center;
   box-sizing: border-box;
-`;
-
-const MapTitle = styled.span`
-  display: inline-block;
-  color: white;
-  font-size: 1.7rem;
-  font-family: 'Press Start 2P', cursive;
-  transform: translate(1.75rem, 0.43rem);
-  z-index: 1;
-  span {
-    font-size: 1.2rem;
-  }
-`;
-const MapContainer = styled.div`
-  width: 100%;
-  height: 37rem;
-  position: relative;
-  background: white;
-  border-radius: 1rem;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-around;
-  align-items: center;
-  box-shadow: 0px 0px 10px 5px rgba(175, 175, 175, 0.25);
-  user-select: none;
 `;
 
 const KakaoContainer = styled.div`

@@ -18,7 +18,7 @@ export const MainTitle = styled.div`
   color: white;
   font-size: 5.5rem;
   font-family: 'Baumans', cursive;
-  z-index: -1;
+  z-index: 501;
 `;
 
 export const MenuIcon = styled.img`

@@ -305,9 +305,18 @@ export const TaskMainInfos = styled.div`
   pointer-events: none;
 `;
 
+export const LogNavBarSectionItem = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 200px;
+`;
+
 export const CheckBoxContainer = styled.div`
   display: flex;
   align-items: center;
+  justify-content: right;
+  width: 200px;
 `;
 
 export const CheckBoxLabel = styled.label`

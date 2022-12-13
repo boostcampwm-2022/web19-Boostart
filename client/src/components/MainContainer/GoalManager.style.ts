@@ -265,6 +265,11 @@ export const LabelModalLabelColorInput = styled.input`
   outline: none;
 `;
 
+export const Container = styled.div`
+  height: 32.5rem;
+  position: relative;
+`;
+
 export const LabelModalLabelCreateButton = styled.button`
   outline: none;
   border: none;
