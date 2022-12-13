@@ -82,7 +82,6 @@ const Canvas = ({ setAuthorList, setOnlineList }: CanvasProps) => {
       img.setCoords();
       if (!canvasRef.current) return;
       canvasRef.current.add(img);
-      joinSocketRoom();
     });
   };
 
@@ -106,6 +105,7 @@ const Canvas = ({ setAuthorList, setOnlineList }: CanvasProps) => {
   useEffect(() => {
     if (!canvasRef.current) canvasRef.current = initCanvas();
     setCanvasBackground();
+    joinSocketRoom();
     setIsJoined(false);
     window.addEventListener('keydown', handleKeydown);
 
