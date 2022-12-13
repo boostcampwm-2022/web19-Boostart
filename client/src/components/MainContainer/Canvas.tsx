@@ -468,10 +468,10 @@ const Canvas = ({ setAuthorList, setOnlineList }: CanvasProps) => {
           <span onClick={() => enterDrawingMode(3)}>연필</span>
           <span onClick={() => enterDrawingMode(10)}>형광펜</span>
           <span onClick={() => enterDrawingMode(20)}>브러쉬</span>
-          <img src="/rect.svg" onClick={() => createNewShape('rect')} alt="" />
-          <img src="/triangle.svg" onClick={() => createNewShape('triangle')} alt="" />
-          <img src="/circle.svg" onClick={() => createNewShape('circle')} alt="" />
-          <img src="/textIcon.svg" onClick={() => createNewText()} alt="" />
+          <img src="/rect.svg" onClick={() => putObject(generateDefaultFabricData('Rect', '#000000'))} alt="" />
+          <img src="/triangle.svg" onClick={() => putObject(generateDefaultFabricData('Triangle', '#000000'))} alt="" />
+          <img src="/circle.svg" onClick={() => putObject(generateDefaultFabricData('Ellipse', '#000000'))} alt="" />
+          <img src="/textIcon.svg" onClick={() => putObject(generateDefaultFabricData('IText', '#000000'))} alt="" />
           <input type="color" ref={colorRef} onChange={changeBrushColor} />
         </Palette>
         <JoinButton onClick={() => registAuthor()}>{isJoined ? 'DRAW' : 'JOIN'}</JoinButton>
