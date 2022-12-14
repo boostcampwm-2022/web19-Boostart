@@ -41,9 +41,10 @@ class ValidationError extends Error {}
 router.get('/', authenticateToken, async (req: AuthorizedRequest, res) => {
   const { userIdx } = req.user;
   try {
-    const labels = await executeSql('select label.idx, label.title, label.color, label.unit, count(task_label.label_idx) as count from label left join task_label on label.idx = task_label.label_idx where label.user_idx = ? group by label.idx', [
-      userIdx,
-    ]);
+    const labels = await executeSql(
+      'select label.idx, label.title, label.color, label.unit, count(task_label.label_idx) + count(goal.idx) as count from label left join task_label on label.idx = task_label.label_idx left join goal on label.idx = goal.label_idx where label.user_idx = ? group by label.idx',
+      [userIdx]
+    );
     res.json(labels);
   } catch {
     res.sendStatus(500);
