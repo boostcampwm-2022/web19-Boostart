@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { Friend } from 'GlobalType';
 import styled from 'styled-components';
 import { HOST } from '../../constants';
 import FriendSearchInput from './FriendSearchInput';

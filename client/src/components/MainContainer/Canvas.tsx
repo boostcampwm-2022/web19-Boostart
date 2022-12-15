@@ -4,7 +4,7 @@ import { myInfo, visitState } from '../common/atoms';
 import useCurrentDate from '../../hooks/useCurrentDate';
 import globalSocket from '../common/Socket';
 import { DEFAULT_OBJECT_VALUE } from '../../constants';
-import { Shape, FabricText, FabricLine, ShapeType, FabricObject, ObjectData, Friend } from 'GlobalType';
+import { Shape, FabricText, FabricLine, ShapeType, FabricObject, ObjectData } from 'GlobalType';
 import { fabric } from 'fabric';
 import { v4 } from 'uuid';
 import styled from 'styled-components';

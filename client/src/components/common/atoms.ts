@@ -1,5 +1,4 @@
 import { atom, selector } from 'recoil';
-import { Friend } from 'GlobalType';
 
 export const dateState = atom({
   key: 'currentDate',

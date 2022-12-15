@@ -2,8 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { useRecoilValue } from 'recoil';
 import { PROFILE_EDIT_FORM_Z_INDEX, PROFILE_EDIT_FORM_TOP, PROFILE_EDIT_FORM_LEFT, PROFILE_EDIT_FORM_TRANFORM } from './Drawer.style';
 import { FRIEND_REQUEST_ACTION, HOST } from '../../constants';
+import { sendLogoutRequest } from '../FriendsBar/FriendsBarAPI';
 import Modal from '../common/Modal';
-import { Friend } from 'GlobalType';
 import * as S from './Drawer.style';
 import useInput from '../../hooks/useInput';
 import { myInfo } from '../common/atoms';
@@ -13,7 +13,6 @@ interface DrawerProps {
   isOpen: boolean;
   friendRequests: Friend[] | null;
   handleFriendRequests: Function;
-  handleLogoutButtonClick: React.MouseEventHandler;
 }
 interface ReceivedFriendRequestSectionProps {
   friendRequests: Friend[] | null;
@@ -30,7 +29,7 @@ interface ProfileSectionProps {
   handleProfileEditButtonClick: React.MouseEventHandler;
 }
 
-const Drawer = ({ isOpen, friendRequests, handleFriendRequests, handleLogoutButtonClick }: DrawerProps) => {
+const Drawer = ({ isOpen, friendRequests, handleFriendRequests }: DrawerProps) => {
   const [isProfileEditModalOpen, setIsProfileEditModalOpen] = useState(false);
 
   const handleProfileEditButtonClick = () => {
@@ -45,7 +44,7 @@ const Drawer = ({ isOpen, friendRequests, handleFriendRequests, handleLogoutButt
         <ReceivedFriendRequestSection friendRequests={friendRequests} handleFriendRequests={handleFriendRequests} />
         <S.HorizontalRule />
         <NotificationSection />
-        <S.LogoutButton onClick={handleLogoutButtonClick} href="#">
+        <S.LogoutButton onClick={() => sendLogoutRequest()} href="#">
           로그아웃
         </S.LogoutButton>
       </S.Drawer>

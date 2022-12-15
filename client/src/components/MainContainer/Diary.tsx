@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useRecoilValue, useRecoilState } from 'recoil';
 import { visitState, menuState, dateState } from '../common/atoms';
-import { Friend } from 'GlobalType';
 import Canvas from './Canvas';
 import * as S from './Diary.style';
 
