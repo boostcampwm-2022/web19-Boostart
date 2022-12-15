@@ -9,12 +9,12 @@ const pool = mysql.createPool({
   waitForConnections: true,
 });
 
-const executeSql = async (sql: string, values?: string[]) => {
+const executeSql = async (sql: string, values?: any[]) => {
   try {
     const [rows] = await pool.execute(sql, values);
     return rows;
   } catch (err) {
-    return err;
+    throw err;
   }
 };
 
