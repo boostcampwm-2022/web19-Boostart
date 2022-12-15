@@ -11,6 +11,7 @@
 ### 네이버 부스트캠프 웹모바일7기 Web19 팀 프로젝트
 - **Boostart - 친구와 함께 쓰는 데일리 플래너**
 - 개발 기간 : 2022.11.07 - 2022.12.16
+- 🗄 [ 프로젝트 일정 관리 백로그 ](https://docs.google.com/spreadsheets/d/114nd2S7HW2TsFTyKjC7WOrTkYY_o8vQmg40ADuNvmsM/edit?usp=sharing)
 - 🛠 [ 기술 발표 영상](https://www.youtube.com/watch?v=A--cReu9rgE)
 - 🎥 [ 데모 영상](https://www.youtube.com/watch?v=V3bffOV1W6KI)
 - 👩‍💻 [ 소개 노션 페이지](https://boostcamp-wm.notion.site/Web19-Boostart-c7680eee1664416fa967663e18d8dcb8)
@@ -35,7 +36,7 @@
 | LOG - 데일리 플랜 관리 |
 | - |
 |  ![LOG__](https://user-images.githubusercontent.com/73420533/207790009-69f3781d-2841-4d61-91b4-da8d1369f0d6.gif) |
-| - **언제 어디서 무엇을 했는지** 태그 / 라벨 / 장소 와 함께 기록해요! <br> - 상세 정보를 확인하고 각 일정을 완료 / 수정 / 삭제할 수 있어요 <br> - **`드래그 앤 드롭`** 으로 간편하게 태그를 변경할 수 있어요 <br> - 좌측의 시간 바를 통해 일정별 시간을 확인할 수 있어요 <br> - 친구가 남긴 이모티콘을 확인할 수 있어요 |
+| - **언제 어디서 무엇을 했는지** 태그 / 라벨 / 장소 와 함께 기록해요! <br> - 상세 정보를 확인하고 각 일정을 완료 / 수정 / 삭제할 수 있어요 <br> - **`드래그 앤 드롭`** 으로 간편하게 태그를 변경할 수 있어요 <br> - 좌측의 **시간 바**를 통해 일정별 시간을 확인할 수 있어요 <br> - 친구가 남긴 **이모티콘**을 확인할 수 있어요 |
 
 | LOG - 친구와의 상호작용 |
 | - |
@@ -75,7 +76,7 @@
 
 <br>
 
-## 기술적 고민 - [노션 링크](https://boostcamp-wm.notion.site/b654d048b380482dbc72eda7ab063b5a?v=7cf8cf80bd0846dab06741e4a9676883)
+## 기술적 고민 - [노션](https://boostcamp-wm.notion.site/b654d048b380482dbc72eda7ab063b5a?v=7cf8cf80bd0846dab06741e4a9676883) / [기술 발표](https://www.youtube.com/watch?v=A--cReu9rgE)
 - 🕐 [**`렌더링 효율성`** 까지 개선한 **`드래그 앤 드롭`**](https://boostcamp-wm.notion.site/4083501688754cf8b72f2a79ff9393be)
 - 🎨 [**`Redis`**, **`socket.io`** 를 이용한 **`실시간 공유 그림판`**](https://boostcamp-wm.notion.site/Redis-socket-io-66f8e3076f144182a38c09921ac906e9)
 - 🔏 [로그인, 회원가입, 일정생성 시의 **`유효성 검증`**](https://boostcamp-wm.notion.site/b974076ceb7e457cb6991b256291a811)
