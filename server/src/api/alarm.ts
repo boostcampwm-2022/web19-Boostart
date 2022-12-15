@@ -12,6 +12,6 @@ alarmRouter.get('/', authenticateToken, async (req: AuthorizedRequest, res) => {
     res.status(200).json(alarms);
   } catch (error) {
     console.log(error);
-    res.sendStatus(500);
+    res.status(500).json({ msg: '서버 에러가 발생했어요.' });
   }
 });

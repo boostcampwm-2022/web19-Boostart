@@ -15,7 +15,7 @@ router.get('/', authenticateToken, async (req: AuthorizedRequest, res) => {
     );
     res.json(users);
   } catch {
-    res.sendStatus(500);
+    res.status(500).json({ msg: '서버 에러가 발생했어요.' });
   }
 });
 
@@ -25,7 +25,7 @@ router.get('/request', authenticateToken, async (req: AuthorizedRequest, res) =>
     const users = await executeSql('select idx, user_id as userId, username, profile_img as profileImg from user inner join friendship on idx = sender_idx where receiver_idx = ? and accepted = false', [userIdx]);
     res.json(users);
   } catch {
-    res.sendStatus(500);
+    res.status(500).json({ msg: '서버 에러가 발생했어요.' });
   }
 });
 
@@ -36,9 +36,9 @@ router.delete('/:user_idx', authenticateToken, async (req: AuthorizedRequest, re
     const { affectedRows } = (await executeSql('delete from friendship where ((sender_idx = ? and receiver_idx = ?) or (sender_idx = ? and receiver_idx = ?)) and accepted = true', [userIdx, friendIdx, friendIdx, userIdx])) as RowDataPacket;
 
     if (affectedRows === 0) return res.status(404).json({ msg: '존재하지 않는 친구예요.' });
-    res.sendStatus(200);
+    res.status(200).json({ msg: '친구가 삭제되었어요.' });
   } catch {
-    res.sendStatus(500);
+    res.status(500).json({ msg: '서버 에러가 발생했어요.' });
   }
 });
 
@@ -56,7 +56,7 @@ router.put('/request/:user_idx', authenticateToken, async (req: AuthorizedReques
 
     if (friendRequest.length === 0) {
       await executeSql('insert into friendship (sender_idx, receiver_idx, accepted) values (?, ?, false)', [userIdx, friendIdx]);
-      return res.sendStatus(201);
+      return res.status(201).json({ msg: '친구 요청을 보냈어요.' });
     }
 
     const { sender_idx: senderIdx, accepted } = friendRequest[0];
@@ -67,7 +67,7 @@ router.put('/request/:user_idx', authenticateToken, async (req: AuthorizedReques
     await executeSql('update friendship set accepted = true where sender_idx = ? and receiver_idx = ?', [friendIdx, userIdx]);
     return res.status(200).json({ msg: '이미 나에게 친구 요청을 보낸 사용자예요. 자동으로 친구가 되었어요.' });
   } catch {
-    res.sendStatus(500);
+    res.status(500).json({ msg: '서버 에러가 발생했어요.' });
   }
 });
 
@@ -77,9 +77,9 @@ router.patch('/accept/:user_idx', authenticateToken, async (req: AuthorizedReque
   try {
     const { affectedRows } = (await executeSql('update friendship set accepted = true where receiver_idx = ? and sender_idx = ? and accepted = false', [userIdx, friendIdx])) as RowDataPacket;
     if (affectedRows === 0) return res.status(404).json({ msg: '존재하지 않는 친구 요청이에요.' });
-    res.sendStatus(200);
+    res.status(200).json({ msg: '친구가 되었어요.' });
   } catch {
-    res.sendStatus(500);
+    res.status(500).json({ msg: '서버 에러가 발생했어요.' });
   }
 });
 
@@ -89,9 +89,9 @@ router.delete('/accept/:user_idx', authenticateToken, async (req: AuthorizedRequ
   try {
     const { affectedRows } = (await executeSql('delete from friendship where receiver_idx = ? and sender_idx = ? and accepted = false', [userIdx, friendIdx])) as RowDataPacket;
     if (affectedRows === 0) return res.status(404).json({ msg: '존재하지 않는 친구 요청이에요.' });
-    res.sendStatus(200);
+    res.status(200).json({ msg: '친구 요청을 거절했어요.' });
   } catch {
-    res.sendStatus(500);
+    res.status(500).json({ msg: '서버 에러가 발생했어요.' });
   }
 });
 
