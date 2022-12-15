@@ -20,12 +20,13 @@ interface Tag {
 
 const Log = () => {
   const [selectedTask, setSelectedTask] = useState<{ idx: number; tagIdx: number } | null>(null);
-  const [mousePosition, setMousePosition] = useState<number[]>([0, 0]);
+  const selectedTaskRef = useRef<HTMLDivElement | null>(null);
   const [taskList, setTaskList] = useState<Task[]>([]);
   const [activeTask, setActiveTask] = useState<number | null>(null);
   const [timeMarkerData, setTimeMarkerData] = useState<number[]>([0, 0]);
   const [completionCheckBoxStatus, setCompletionCheckBoxStatus] = useState<CompletionCheckBoxStatus>({ complete: true, incomplete: true });
-  const selectedTaskRef = useRef<HTMLDivElement | null>(null);
+  const dummyTaskRef = useRef<HTMLDivElement | null>(null);
+  const mouseStartRef = useRef<number[]>([0, 0]);
   const mouseOffsetRef = useRef<number[]>([0, 0]);
   const taskContainerRef = useRef<HTMLDivElement | null>(null);
   const { currentDate } = useCurrentDate();
@@ -77,8 +78,8 @@ const Log = () => {
     if (!(e.target instanceof HTMLDivElement)) return;
     const target = e.target;
     if (!target.dataset.idx) return;
+    mouseStartRef.current = [e.pageX, e.pageY];
     mouseOffsetRef.current = [e.nativeEvent.offsetX, e.nativeEvent.offsetY];
-    setMousePosition([e.pageX - mouseOffsetRef.current[0], e.pageY - mouseOffsetRef.current[1]]);
     const timeout = setTimeout(() => {
       if (target.dataset.idx) {
         setSelectedTask({ idx: Number(target.dataset.idx), tagIdx: Number(target.dataset.tag) });
@@ -131,7 +132,8 @@ const Log = () => {
 
     if (!(e.target instanceof HTMLDivElement)) return;
     const target = e.target;
-    setMousePosition([e.pageX - mouseOffsetRef.current[0], e.pageY - mouseOffsetRef.current[1]]);
+    if (!dummyTaskRef.current) return;
+    dummyTaskRef.current.style.transform = `translate(${e.pageX - mouseStartRef.current[0]}px,${e.pageY - mouseStartRef.current[1]}px)`;
     if (target.dataset.direction && taskContainerRef.current) {
       if (target.dataset.direction === 'left') {
         taskContainerRef.current.scrollBy(-10, 0);
@@ -187,7 +189,7 @@ const Log = () => {
   return (
     <>
       {selectedTask !== null && (
-        <S.SelectedItem x={mousePosition[0]} y={mousePosition[1]}>
+        <S.SelectedItem ref={dummyTaskRef} x={mouseStartRef.current[0] - mouseOffsetRef.current[0]} y={mouseStartRef.current[1] - mouseOffsetRef.current[1]}>
           <span>{TaskMap.get(selectedTask.idx).startedAt}</span> {TaskMap.get(selectedTask.idx).title}
         </S.SelectedItem>
       )}
