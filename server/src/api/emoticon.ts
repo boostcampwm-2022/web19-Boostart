@@ -31,7 +31,7 @@ router.get('/task/:task_idx', authenticateToken, async (req: AuthorizedRequest, 
 });
 
 router.put('/task/:task_idx', authenticateToken, async (req: PutEmoticonRequest, res) => {
-  const { userIdx } = req.user;
+  const { userIdx, userId } = req.user;
   const taskIdx = req.params.task_idx;
   const { emoticon } = req.body;
   try {
@@ -43,11 +43,27 @@ router.put('/task/:task_idx', authenticateToken, async (req: PutEmoticonRequest,
     const notExistEmoticon = ((await executeSql('select idx from emoticon where idx = ?', [emoticon])) as RowDataPacket).length === 0;
     if (notExistEmoticon) return res.status(404).json({ msg: '존재하지 않는 이모티콘이에요.' });
 
+    console.log(`유저 ${userIdx}가 ${taskIdx}번 태스크에 ${emoticon}을 남겼어요.`);
+
+    const redirectURI = '#'; // todo;
+
     await executeSql('insert into task_social_action (task_idx, emoticon_idx, author_idx) values (?, ?, ?);', [taskIdx, emoticon, userIdx]);
+
+    // todo: 한방 쿼리..?
+    const { receiverIdx, title } = (await executeSql('select user_idx as receiverIdx, title from task where idx = ?', [taskIdx]))[0];
+    const { receiverId } = (await executeSql('select user_id as receiverId from user where idx = ?', [receiverIdx]))[0];
+
+    await executeSql(`insert into alarm (publisher_idx, receiver_idx, type, content, redirect, status) values (?, ?, '${AlarmType.TASK_EMOTICON}', ?, '${redirectURI}', false)`, [userIdx, receiverIdx, title]);
     res.sendStatus(201);
-  } catch {
+  } catch (error) {
+    console.log(error);
     res.sendStatus(500);
   }
 });
+
+export const AlarmType = {
+  TASK_EMOTICON: 'task_emoticon',
+  DIARY_EDIT: 'diary_edit',
+} as const;
 
 export default router;
