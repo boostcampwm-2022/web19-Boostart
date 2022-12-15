@@ -186,12 +186,54 @@ const NotificationSection = () => {
     <S.NotificationSection>
       <S.SectionHeader>알림</S.SectionHeader>
       <div>
-        {feed.map(({ idx, content }) => (
-          <S.Notification key={idx}>{content}</S.Notification>
+        {feed.map(({ idx, ...props }: any) => (
+          <S.Notification>
+            <AlarmContent key={idx} {...props} />
+          </S.Notification>
         ))}
       </div>
     </S.NotificationSection>
   );
+};
+
+const AlarmTypes = {
+  TASK_EMOTICON: 'task_emoticon',
+  DIARY_EDIT: 'diary_edit',
+};
+
+type AlarmTypes = typeof AlarmTypes[keyof typeof AlarmTypes];
+
+interface Alarm {
+  type: AlarmTypes;
+  publisherIdx: number;
+  title: string;
+  idx: number;
+}
+
+const AlarmContent = ({ type, publisherIdx, title }: Alarm) => {
+  switch (type) {
+    case AlarmTypes.TASK_EMOTICON: {
+      return (
+        <>
+          {publisherIdx} 님이 <S.AlarmTargetTitle>{title}</S.AlarmTargetTitle> 태스크에 이모티콘을 남겼어요.
+        </>
+      );
+    }
+    case AlarmTypes.DIARY_EDIT: {
+      return (
+        <>
+          {publisherIdx} 님이 <S.AlarmTargetTitle>{title}</S.AlarmTargetTitle> 다이어리에 참여했어요.
+        </>
+      );
+    }
+    default: {
+      return (
+        <>
+          {publisherIdx} {title} {type}
+        </>
+      );
+    }
+  }
 };
 
 export default Drawer;

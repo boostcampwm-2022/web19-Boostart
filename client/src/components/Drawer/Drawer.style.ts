@@ -275,3 +275,7 @@ export const LogoutButton = styled.a`
   margin-top: auto;
   padding-bottom: 1rem;
 `;
+
+export const AlarmTargetTitle = styled.span`
+  font-weight: bold;
+`;
