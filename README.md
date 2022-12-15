@@ -14,7 +14,7 @@
 - 🗄 [ 프로젝트 일정 관리 백로그 ](https://docs.google.com/spreadsheets/d/114nd2S7HW2TsFTyKjC7WOrTkYY_o8vQmg40ADuNvmsM/edit?usp=sharing)
 - 🛠 [ 기술 발표 영상](https://www.youtube.com/watch?v=A--cReu9rgE)
 - 🎥 [ 데모 영상](https://www.youtube.com/watch?v=V3bffOV1W6KI)
-- 👩‍💻 [ 소개 노션 페이지](https://boostcamp-wm.notion.site/Web19-Boostart-c7680eee1664416fa967663e18d8dcb8)
+- 👩‍💻 [ 소개 노션 페이지](https://mikaniz.notion.site/Boostart-83aafefd33d649ec9bf38927d5d2f2df)
 
 ### 놓치기 쉬운 하루의 일상을 예쁘게 기록하고 관리할 수 있어요
 - 📆 친구와 함께 **소통**할 수 있는 **데일리 플래너**
@@ -29,8 +29,11 @@
 |[@mikaniz](https://github.com/mikaniz)|[@ParkKyungChan](https://github.com/ParkKyungChan)|[@sooyeon73](https://github.com/sooyeon73)|[@high2092](https://github.com/high2092)|
 <br/>
 
-## 사용된 기술 스택
+## 사용된 기술 스택 및 아키텍처
 ![image](https://user-images.githubusercontent.com/73420533/207784878-d25d8558-760e-4f6b-b153-f9c6b084fc43.png)
+
+![Web App Reference Architecture V2](https://user-images.githubusercontent.com/92143119/207920307-d3f64501-0934-4fa0-9259-ac46f5e11614.png)
+
 
 ## 프로젝트 기능 소개
 | LOG - 데일리 플랜 관리 |
@@ -76,19 +79,19 @@
 
 <br>
 
-## 기술적 고민 - [노션](https://boostcamp-wm.notion.site/b654d048b380482dbc72eda7ab063b5a?v=7cf8cf80bd0846dab06741e4a9676883) / [기술 발표](https://www.youtube.com/watch?v=A--cReu9rgE)
-- 🕐 [**`렌더링 효율성`** 까지 개선한 **`드래그 앤 드롭`**](https://boostcamp-wm.notion.site/4083501688754cf8b72f2a79ff9393be)
-- 🎨 [**`Redis`**, **`socket.io`** 를 이용한 **`실시간 공유 그림판`**](https://boostcamp-wm.notion.site/Redis-socket-io-66f8e3076f144182a38c09921ac906e9)
-- 🔏 [로그인, 회원가입, 일정생성 시의 **`유효성 검증`**](https://boostcamp-wm.notion.site/b974076ceb7e457cb6991b256291a811)
-- 🚶 [터벅터벅 **`Raw Query`** ](https://boostcamp-wm.notion.site/Raw-Query-756003be95b844f787c7d7d0e48859fd)
-- ⚙️ [완벽한 **`RESTful API`** ?](https://boostcamp-wm.notion.site/RESTful-API-f47e0ecc07454eb8888820f304db31dc)
-- ✍️ [사용자 편의를 고려한 LOG 생성 **`인터페이스`** ](https://boostcamp-wm.notion.site/LOG-63581c61feea4e2abaf80fd3a96f6dce)
-- 🌀 [**`애니메이션`** 을 통한 한층 더 기분 좋은, 고퀄리티의 UI/UX](https://boostcamp-wm.notion.site/UI-UX-c66660f0ebdb4df4b9ba5dbb7bbaa707)
-- 🎫 [**`PR`** 에 티켓을 달아주세요](https://boostcamp-wm.notion.site/PR-71d48e59da524f0cbff71e8b17a43007) 
+## 기술적 고민 - [노션](https://www.notion.so/mikaniz/127548b26c254f42bf85f8963f8fd2be?v=60b5863159d845cbb77a1c38fa231952) / [기술 발표](https://www.youtube.com/watch?v=A--cReu9rgE)
+- 🕐 [**`렌더링 효율성`** 까지 개선한 **`드래그 앤 드롭`**](https://www.notion.so/mikaniz/127548b26c254f42bf85f8963f8fd2be?v=60b5863159d845cbb77a1c38fa231952)
+- 🎨 [**`Redis`**, **`socket.io`** 를 이용한 **`실시간 공유 그림판`**](https://www.notion.so/mikaniz/127548b26c254f42bf85f8963f8fd2be?v=60b5863159d845cbb77a1c38fa231952)
+- 🔏 [로그인, 회원가입, 일정생성 시의 **`유효성 검증`**](https://www.notion.so/mikaniz/af770bf344f949bbaa9b3eda6cc2006c)
+- 🚶 [터벅터벅 **`Raw Query`** ](https://www.notion.so/mikaniz/af770bf344f949bbaa9b3eda6cc2006c)
+- ⚙️ [완벽한 **`RESTful API`** ?](https://www.notion.so/mikaniz/af770bf344f949bbaa9b3eda6cc2006c)
+- ✍️ [사용자 편의를 고려한 LOG 생성 **`인터페이스`** ](https://www.notion.so/mikaniz/af770bf344f949bbaa9b3eda6cc2006c)
+- 🌀 [**`애니메이션`** 을 통한 한층 더 기분 좋은, 고퀄리티의 UI/UX](https://www.notion.so/mikaniz/af770bf344f949bbaa9b3eda6cc2006c)
+- 🎫 [**`PR`** 에 티켓을 달아주세요](https://www.notion.so/mikaniz/af770bf344f949bbaa9b3eda6cc2006c) 
 
 <br>
 
-## DB 설계
+## ERD
 <img width="810" alt="image" src="https://user-images.githubusercontent.com/73420533/207799380-63d3de7a-1c3f-4757-a878-0f9d400765ea.png">
 <br>
 
@@ -98,12 +101,8 @@
 ```sh
 $ cd ./client
 $ npm ci
-$ npm run build:dev
+$ npm run build
 $ cd ../server
 $ npm ci
-$ npm run dev
+$ npm start
 ```
-
-## 의존성
-- 본인이 처음 install 할 때 `npm install` -> `dependencies` 브랜치에서 commit PR
-- 다른 팀원이 install 한 라이브러리가 있을 때 `npm ci`하고 시작
