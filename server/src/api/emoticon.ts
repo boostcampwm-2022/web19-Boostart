@@ -49,9 +49,7 @@ router.put('/task/:task_idx', authenticateToken, async (req: PutEmoticonRequest,
 
     await executeSql('insert into task_social_action (task_idx, emoticon_idx, author_idx) values (?, ?, ?);', [taskIdx, emoticon, userIdx]);
 
-    // todo: 한방 쿼리..?
     const { receiverIdx, title } = (await executeSql('select user_idx as receiverIdx, title from task where idx = ?', [taskIdx]))[0];
-    const { receiverId } = (await executeSql('select user_id as receiverId from user where idx = ?', [receiverIdx]))[0];
 
     await executeSql(`insert into alarm (publisher_idx, receiver_idx, type, content, redirect, status) values (?, ?, '${AlarmType.TASK_EMOTICON}', ?, '${redirectURI}', false)`, [userIdx, receiverIdx, title]);
     res.sendStatus(201);

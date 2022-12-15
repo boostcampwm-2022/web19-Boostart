@@ -260,6 +260,9 @@ export const NotificationSection = styled.div`
 export const Notification = styled.div`
   margin: 0.3rem 0;
   margin-left: 0.5rem;
+  font-size: 0.9rem;
+  word-break: keep-all;
+  word-wrap: break-word;
   &::before {
     content: '-';
     margin-right: 0.5rem;

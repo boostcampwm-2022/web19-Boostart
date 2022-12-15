@@ -205,31 +205,31 @@ type AlarmTypes = typeof AlarmTypes[keyof typeof AlarmTypes];
 
 interface Alarm {
   type: AlarmTypes;
-  publisherIdx: number;
+  publisherId: number;
   title: string;
   idx: number;
 }
 
-const AlarmContent = ({ type, publisherIdx, title }: Alarm) => {
+const AlarmContent = ({ type, publisherId, title }: Alarm) => {
   switch (type) {
     case AlarmTypes.TASK_EMOTICON: {
       return (
         <>
-          {publisherIdx} 님이 <S.AlarmTargetTitle>{title}</S.AlarmTargetTitle> 태스크에 이모티콘을 남겼어요.
+          {publisherId} 님이 <S.AlarmTargetTitle>{title}</S.AlarmTargetTitle> 태스크에 이모티콘을 남겼어요.
         </>
       );
     }
     case AlarmTypes.DIARY_EDIT: {
       return (
         <>
-          {publisherIdx} 님이 <S.AlarmTargetTitle>{title}</S.AlarmTargetTitle> 다이어리에 참여했어요.
+          {publisherId} 님이 <S.AlarmTargetTitle>{title}</S.AlarmTargetTitle> 다이어리에 참여했어요.
         </>
       );
     }
     default: {
       return (
         <>
-          {publisherIdx} {title} {type}
+          {publisherId} {title} {type}
         </>
       );
     }
