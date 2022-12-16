@@ -10,7 +10,7 @@ const router = Router();
 router.get('/', authenticateToken, async (req: AuthorizedRequest, res) => {
   const { userIdx } = req.user;
   const { date } = req.query;
-  if (!date) return res.status(400).send({ msg: '날짜를 지정해주세요.' });
+  if (!date) return res.status(400).json({ msg: '날짜를 지정해주세요.' });
   try {
     const tasks = (await executeSql(
       'select task.idx, task.title, task.importance, task.started_at as startedAt, task.ended_at as endedAt, task.lat, task.lng, task.location, task.public as isPublic, task.tag_idx as tagIdx, tag.title as tagName, task.content, task.done from task left join tag on task.tag_idx = tag.idx where task.user_idx = ? and task.date = ?',
@@ -27,7 +27,7 @@ router.get('/', authenticateToken, async (req: AuthorizedRequest, res) => {
     );
     res.json(result);
   } catch {
-    res.sendStatus(500);
+    res.status(500).json({ msg: '서버 에러가 발생했어요.' });
   }
 });
 
@@ -35,17 +35,17 @@ router.get('/:user_id', authenticateToken, async (req: AuthorizedRequest, res) =
   const { userIdx } = req.user;
   const { user_id: friendId } = req.params;
   const { date } = req.query;
-  if (!date) return res.status(400).send({ msg: '날짜를 지정해주세요.' });
+  if (!date) return res.status(400).json({ msg: '날짜를 지정해주세요.' });
 
   try {
     const friend = (await executeSql('select idx from user where user_id = ?', [friendId])) as RowDataPacket;
-    if (friend.length === 0) return res.status(404).send({ msg: '존재하지 않는 사용자예요.' });
+    if (friend.length === 0) return res.status(404).json({ msg: '존재하지 않는 사용자예요.' });
 
     const { idx: friendIdx } = friend[0];
     if (userIdx === friendIdx) return res.redirect(`/api/${API_VERSION}/task?date=${date}`);
 
     const isNotFriend = ((await executeSql('select * from friendship where (sender_idx = ? and receiver_idx = ?) or (sender_idx = ? and receiver_idx = ?)', [userIdx, friendIdx, friendIdx, userIdx])) as RowDataPacket).length === 0;
-    if (isNotFriend) return res.status(403).send({ msg: '친구가 아닌 사용자의 태스크를 조회할 수 없어요.' });
+    if (isNotFriend) return res.status(403).json({ msg: '친구가 아닌 사용자의 일정을 조회할 수 없어요.' });
 
     const tasks = (await executeSql(
       'select task.idx, task.title, task.importance, task.started_at as startedAt, task.ended_at as endedAt, task.lat, task.lng, task.location, task.public as isPublic, task.tag_idx as tagIdx, tag.title as tagName, task.content, task.done from task left join tag on task.tag_idx = tag.idx where task.user_idx = ? and task.date = ? and public = true',
@@ -62,7 +62,7 @@ router.get('/:user_id', authenticateToken, async (req: AuthorizedRequest, res) =
     );
     res.json(result);
   } catch {
-    res.sendStatus(500);
+    res.status(500).json({ msg: '서버 에러가 발생했어요.' });
   }
 });
 
@@ -190,12 +190,12 @@ router.post('/', authenticateToken, async (req: AuthorizedRequest, res) => {
       if (!validate(key, req.body[key])) req.body[key] = TaskBodyDefaultValues[key];
     });
   } catch (error) {
-    return res.status(400).send({ msg: error.message });
+    return res.status(400).json({ msg: error.message });
   }
 
   const { title, date, importance, startedAt, endedAt, lat, lng, location, isPublic, tagIdx, content, done, labels } = req.body;
 
-  if (startedAt > endedAt) return res.sendStatus(400);
+  if (startedAt > endedAt) return res.status(400).json({ msg: '종료 시간은 시작 시간보다 나중이어야 해요.' });
 
   try {
     if (labels.length > 0) {
@@ -238,15 +238,15 @@ router.post('/', authenticateToken, async (req: AuthorizedRequest, res) => {
         executeSql('insert into task_label (task_idx, label_idx, amount) value (?, ?, ?)', [taskIdx, labelIdx, amount]);
       })
     );
-    res.sendStatus(201);
+    res.status(201).json({ msg: '일정이 생성이 완료되었어요.' });
   } catch (error) {
-    res.sendStatus(500);
+    res.status(500).json({ msg: '서버 에러가 발생했어요.' });
   }
 });
 
 router.patch('/update/:task_idx', authenticateToken, async (req: AuthorizedRequest, res) => {
   const bodyKeysCount = Object.keys(req.body).length;
-  if (bodyKeysCount === 0) return res.status(200).send({ msg: '수정할 사항이 없어요.' });
+  if (bodyKeysCount === 0) return res.status(200).json({ msg: '수정할 사항이 없어요.' });
 
   const { userIdx } = req.user;
   const { task_idx: taskIdx } = req.params;
@@ -274,12 +274,12 @@ router.patch('/update/:task_idx', authenticateToken, async (req: AuthorizedReque
     updateSql += 'where idx = ?';
     updateValue.push(taskIdx);
   } catch (error) {
-    return res.status(400).send({ msg: error.message });
+    return res.status(400).json({ msg: error.message });
   }
 
   try {
     const notExistTask = ((await executeSql('select idx from task where user_idx = ? and idx = ?', [userIdx, taskIdx])) as RowDataPacket).length === 0;
-    if (notExistTask) return res.status(404).json({ msg: '존재하지 않는 태스크예요.' });
+    if (notExistTask) return res.status(404).json({ msg: '존재하지 않는 일정이에요.' });
 
     if (labels?.length > 0) {
       let labelCheckSql = 'select idx from label where user_idx = ? and ';
@@ -322,9 +322,9 @@ router.patch('/update/:task_idx', authenticateToken, async (req: AuthorizedReque
         );
       }
     }
-    res.sendStatus(200);
+    res.status(200).json({ msg: '일정 수정이 완료되었어요.' });
   } catch (error) {
-    res.sendStatus(500);
+    res.status(500).json({ msg: '서버 에러가 발생했어요.' });
   }
 });
 
@@ -336,8 +336,8 @@ router.patch('/status/:task_idx', authenticateToken, async (req: AuthorizedReque
   try {
     const [task] = (await executeSql('select * from task where idx = ?', [taskIdx])) as RowDataPacket[];
 
-    if (!task) return res.status(404).json({ msg: '해당 태스크를 찾을 수 있어요.' });
-    if (task.user_idx !== userIdx) return res.status(403).json({ msg: '자신의 태스크만 수정할 수 있어요.' });
+    if (!task) return res.status(404).json({ msg: '해당 일정을 찾을 수 없어요.' });
+    if (task.user_idx !== userIdx) return res.status(403).json({ msg: '자신의 일정만 수정할 수 있어요.' });
 
     let status = 409;
     if (tagIdx) {
@@ -350,12 +350,12 @@ router.patch('/status/:task_idx', authenticateToken, async (req: AuthorizedReque
     }
 
     if (done !== undefined) {
-      if (task.done === done) return res.sendStatus(status);
+      if (task.done === done) return res.status(status).json({ msg: status === 409 ? '일정을 수정할 수 없어요.' : '일정 수정이 완료되었어요.' });
       await executeSql('update task set done = ? where idx = ?', [done, taskIdx]);
     }
-    res.sendStatus(200);
+    res.status(200).json({ msg: '일정 수정이 완료되었어요.' });
   } catch (error) {
-    res.sendStatus(500);
+    res.status(500).json({ msg: '서버 에러가 발생했어요.' });
   }
 });
 
@@ -365,14 +365,14 @@ router.delete('/:task_idx', authenticateToken, async (req: AuthorizedRequest, re
 
   try {
     const notExistTask = ((await executeSql('select idx from task where user_idx = ? and idx = ?', [userIdx, taskIdx])) as RowDataPacket).length === 0;
-    if (notExistTask) return res.status(404).json({ msg: '존재하지 않는 태스크예요.' });
+    if (notExistTask) return res.status(404).json({ msg: '존재하지 않는 일정이에요.' });
 
     await executeSql('delete from task_label where task_idx = ?', [taskIdx]);
     await executeSql('delete from task_social_action where task_idx = ?', [taskIdx]);
     await executeSql('delete from task where user_idx = ? and idx = ?', [userIdx, taskIdx]);
-    res.sendStatus(200);
+    res.status(200).json({ msg: '일정 삭제가 완료되었어요.' });
   } catch (error) {
-    res.sendStatus(500);
+    res.status(500).json({ msg: '서버 에러가 발생했어요.' });
   }
 });
 
