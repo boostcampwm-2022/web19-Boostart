@@ -22,7 +22,7 @@ router.get('/', authenticateToken, async (req: AuthorizedRequest, res) => {
     const users = await executeSql('select idx, user_id as userId, username, profile_img as profileImg from user where user_id LIKE ? and idx != ?', [userId, userIdx]);
     res.json(users);
   } catch {
-    res.sendStatus(500);
+    res.status(500).json({ msg: '서버 에러가 발생했어요.' });
   }
 });
 
@@ -32,7 +32,7 @@ router.get('/me', authenticateToken, async (req: AuthorizedRequest, res) => {
     const [userInfo] = (await executeSql('select idx, user_id as userId, username, profile_img as profileImg from user where idx = ?', [userIdx])) as RowDataPacket[];
     res.json(userInfo);
   } catch {
-    res.sendStatus(500);
+    res.status(500).json({ msg: '서버 에러가 발생했어요.' });
   }
 });
 
@@ -62,9 +62,9 @@ router.patch('/me', authenticateToken, async (req: UpdateProfileRequest, res) =>
 
   try {
     await executeSql(updateSql, updateValue);
-    res.sendStatus(200);
+    res.status(200).json({ msg: '프로필 수정이 완료되었어요.' });
   } catch {
-    res.sendStatus(500);
+    res.status(500).json({ msg: '서버 에러가 발생했어요.' });
   }
 });
 

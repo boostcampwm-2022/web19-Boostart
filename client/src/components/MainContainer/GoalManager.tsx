@@ -213,6 +213,7 @@ const GoalModal = ({ isLabelModalOpen, setIsLabelModalOpen, handleCloseButtonCli
   };
 
   const handleOverInputClick = () => {
+    if (!selectedLabelIndex) return;
     setOver(!over);
   };
 
@@ -243,7 +244,7 @@ const GoalModal = ({ isLabelModalOpen, setIsLabelModalOpen, handleCloseButtonCli
   };
 
   const label = selectedGoal ? labelMap.get(selectedGoal.labelIdx) : labelList.find((label) => label.idx === selectedLabelIndex);
-  const amount = selectedGoal ? selectedGoal.goalAmount : undefined;
+  const [amount, setAmount] = useState(selectedGoal ? selectedGoal.goalAmount : undefined);
 
   const [color, setColor] = useState(label?.color);
 
@@ -266,6 +267,11 @@ const GoalModal = ({ isLabelModalOpen, setIsLabelModalOpen, handleCloseButtonCli
     }
   };
 
+  const handleAmountInputChange = (e: any) => {
+    const amount = e.target.value;
+    setAmount(amount);
+  };
+
   return (
     <>
       <S.GoalModal onSubmit={handleSubmit(goalSubmit)}>
@@ -273,9 +279,11 @@ const GoalModal = ({ isLabelModalOpen, setIsLabelModalOpen, handleCloseButtonCli
         <S.GoalModalLabel color={color}>
           <S.LabelModalLabelColorInput value={color ?? '#ffffff'} type="color" {...register('color')} onChange={handleColorInputChange} onBlur={handleColorInputBlur} />
           <S.GoalModalLabelName value={label?.title ?? ''} placeholder="라벨을 설정하세요" filled={!!label} disabled={true} />
-          <S.GoalModalAmountInput type="number" defaultValue={amount} min="0" disabled={selectedLabelIndex === undefined} placeholder="목표량" {...register('amount')} />
+          <S.GoalModalAmountInput type="number" defaultValue={amount} min="0" disabled={!selectedLabelIndex} placeholder={'목표량'} {...register('amount')} length={amount ? amount.toString().length : 0} onChange={handleAmountInputChange} />
           <div>{label ? label.unit : ''}</div>
-          <S.GoalModalOverInput onClick={handleOverInputClick}>{over ? '▲' : '▼'}</S.GoalModalOverInput>
+          <S.GoalModalOverInput onClick={handleOverInputClick} selected={!!selectedLabelIndex}>
+            {over ? '▲' : '▼'}
+          </S.GoalModalOverInput>
         </S.GoalModalLabel>
         <S.LabelListContainer>
           <LabelList labelList={labelList} handlePlusButtonClick={handleLabelAddButtonClick} handleItemClick={handleLabelClick} handleDeleteButtonClick={handleLabelDeleteButtonClick} />

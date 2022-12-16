@@ -48,7 +48,7 @@ router.get('/task', authenticateToken, async (req: AuthorizedRequest, res) => {
   try {
     Object.values(CalendarQueryKeys).forEach((key) => validate(key, req.query[key] as string));
   } catch (error) {
-    return res.status(400).send({ msg: error.message });
+    return res.status(400).json({ msg: error.message });
   }
 
   const year = parseInt(req.query.year as string);
@@ -67,7 +67,7 @@ router.get('/task', authenticateToken, async (req: AuthorizedRequest, res) => {
 
     res.json(result);
   } catch {
-    res.sendStatus(500);
+    res.status(500).json({ msg: '서버 에러가 발생했어요.' });
   }
 });
 
@@ -78,7 +78,7 @@ router.get('/task/:user_id', authenticateToken, async (req: AuthorizedRequest, r
   try {
     Object.values(CalendarQueryKeys).forEach((key) => validate(key, req.query[key] as string));
   } catch (error) {
-    return res.status(400).send({ msg: error.message });
+    return res.status(400).json({ msg: error.message });
   }
 
   const year = parseInt(req.query.year as string);
@@ -91,13 +91,13 @@ router.get('/task/:user_id', authenticateToken, async (req: AuthorizedRequest, r
   const result = Array.from({ length: lastDay }, () => false);
   try {
     const friend = (await executeSql('select idx from user where user_id = ?', [friendId])) as RowDataPacket;
-    if (friend.length === 0) return res.status(404).send({ msg: '존재하지 않는 사용자예요.' });
+    if (friend.length === 0) return res.status(404).json({ msg: '존재하지 않는 사용자예요.' });
 
     const { idx: friendIdx } = friend[0];
     if (userIdx === friendIdx) return res.redirect(`/api/${API_VERSION}/calendar/task?year=${year}&month=${month}`);
 
     const isNotFriend = ((await executeSql('select * from friendship where (sender_idx = ? and receiver_idx = ?) or (sender_idx = ? and receiver_idx = ?)', [userIdx, friendIdx, friendIdx, userIdx])) as RowDataPacket).length === 0;
-    if (isNotFriend) return res.status(403).send({ msg: '친구가 아닌 사용자의 태스크를 조회할 수 없어요.' });
+    if (isNotFriend) return res.status(403).json({ msg: '친구가 아닌 사용자의 태스크를 조회할 수 없어요.' });
 
     const datesTaskExists = (await executeSql('select date_format(date, "%d") as date, count(idx) from task where public = true and user_idx = ? and date like ? group by date', [friendIdx, dateSearchFormat])) as RowDataPacket;
     datesTaskExists.forEach(({ date }) => {
@@ -106,7 +106,7 @@ router.get('/task/:user_id', authenticateToken, async (req: AuthorizedRequest, r
 
     res.json(result);
   } catch {
-    res.sendStatus(500);
+    res.status(500).json({ msg: '서버 에러가 발생했어요.' });
   }
 });
 
@@ -116,7 +116,7 @@ router.get('/goal', authenticateToken, async (req: AuthorizedRequest, res) => {
   try {
     Object.values(CalendarQueryKeys).forEach((key) => validate(key, req.query[key] as string));
   } catch (error) {
-    return res.status(400).send({ msg: error.message });
+    return res.status(400).json({ msg: error.message });
   }
 
   const year = parseInt(req.query.year as string);
@@ -139,7 +139,7 @@ router.get('/goal', authenticateToken, async (req: AuthorizedRequest, res) => {
 
     res.json(result);
   } catch {
-    res.sendStatus(500);
+    res.status(500).json({ msg: '서버 에러가 발생했어요.' });
   }
 });
 
@@ -150,7 +150,7 @@ router.get('/goal/:user_id', authenticateToken, async (req: AuthorizedRequest, r
   try {
     Object.values(CalendarQueryKeys).forEach((key) => validate(key, req.query[key] as string));
   } catch (error) {
-    return res.status(400).send({ msg: error.message });
+    return res.status(400).json({ msg: error.message });
   }
 
   const year = parseInt(req.query.year as string);
@@ -163,13 +163,13 @@ router.get('/goal/:user_id', authenticateToken, async (req: AuthorizedRequest, r
   const result = Array.from({ length: lastDay }, () => 0);
   try {
     const friend = (await executeSql('select idx from user where user_id = ?', [friendId])) as RowDataPacket;
-    if (friend.length === 0) return res.status(404).send({ msg: '존재하지 않는 사용자예요.' });
+    if (friend.length === 0) return res.status(404).json({ msg: '존재하지 않는 사용자예요.' });
 
     const { idx: friendIdx } = friend[0];
     if (userIdx === friendIdx) return res.redirect(`/api/${API_VERSION}/calendar/task?year=${year}&month=${month}`);
 
     const isNotFriend = ((await executeSql('select * from friendship where (sender_idx = ? and receiver_idx = ?) or (sender_idx = ? and receiver_idx = ?)', [userIdx, friendIdx, friendIdx, userIdx])) as RowDataPacket).length === 0;
-    if (isNotFriend) return res.status(403).send({ msg: '친구가 아닌 사용자의 태스크를 조회할 수 없어요.' });
+    if (isNotFriend) return res.status(403).json({ msg: '친구가 아닌 사용자의 태스크를 조회할 수 없어요.' });
 
     const taskLabelSql = 'select date, label_idx, amount from task_label inner join task on task_label.task_idx = task.idx where done = true and user_idx = ? and date like ?';
     const currentAmountSql = 'cast(ifnull(sum(task_label.amount), 0) as unsigned)';
@@ -182,7 +182,7 @@ router.get('/goal/:user_id', authenticateToken, async (req: AuthorizedRequest, r
 
     res.json(result);
   } catch {
-    res.sendStatus(500);
+    res.status(500).json({ msg: '서버 에러가 발생했어요.' });
   }
 });
 

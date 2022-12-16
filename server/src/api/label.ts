@@ -47,7 +47,7 @@ router.get('/', authenticateToken, async (req: AuthorizedRequest, res) => {
     );
     res.json(labels);
   } catch {
-    res.sendStatus(500);
+    res.status(500).json({ msg: '서버 에러가 발생했어요.' });
   }
 });
 
@@ -57,18 +57,18 @@ router.get('/:user_id', authenticateToken, async (req: AuthorizedRequest, res) =
 
   try {
     const friend = (await executeSql('select idx from user where user_id = ?', [friendId])) as RowDataPacket;
-    if (friend.length === 0) return res.status(404).send({ msg: '존재하지 않는 사용자예요.' });
+    if (friend.length === 0) return res.status(404).json({ msg: '존재하지 않는 사용자예요.' });
 
     const { idx: friendIdx } = friend[0];
     if (userIdx === friendIdx) return res.redirect(`/api/${API_VERSION}/label`);
 
     const isNotFriend = ((await executeSql('select * from friendship where (sender_idx = ? and receiver_idx = ?) or (sender_idx = ? and receiver_idx = ?)', [userIdx, friendIdx, friendIdx, userIdx])) as RowDataPacket).length === 0;
-    if (isNotFriend) return res.status(403).send({ msg: '친구가 아닌 사용자의 라벨을 조회할 수 없어요.' });
+    if (isNotFriend) return res.status(403).json({ msg: '친구가 아닌 사용자의 라벨을 조회할 수 없어요.' });
 
     const labels = await executeSql('select idx, title, color, unit from label where label.user_idx = ?', [friendIdx]);
     res.json(labels);
   } catch {
-    res.sendStatus(500);
+    res.status(500).json({ msg: '서버 에러가 발생했어요.' });
   }
 });
 
@@ -90,9 +90,9 @@ router.post('/', authenticateToken, async (req: AuthorizedRequest, res) => {
     if (existLabel) return res.status(409).json({ msg: '이미 존재하는 라벨이에요.' });
 
     const { insertId } = (await executeSql('insert into label (title, color, unit, user_idx) values (?, ?, ?, ?)', [title, color, unit, userIdx])) as OkPacket;
-    res.status(201).send({ idx: insertId });
+    res.status(201).json({ idx: insertId });
   } catch {
-    res.sendStatus(500);
+    res.status(500).json({ msg: '서버 에러가 발생했어요.' });
   }
 });
 
@@ -131,9 +131,9 @@ router.patch('/:label_idx', authenticateToken, async (req: AuthorizedRequest, re
     values.push(labelIdx);
 
     if (status !== 409 && (title || color)) await executeSql(sql, values);
-    res.sendStatus(status);
+    res.status(status).json({ msg: status === 409 ? '이미 존재하는 라벨이에요.' : '라벨이 수정되었어요.' });
   } catch (error) {
-    res.sendStatus(500);
+    res.status(500).json({ msg: '서버 에러가 발생했어요.' });
   }
 });
 
@@ -149,9 +149,9 @@ router.delete('/:label_idx', authenticateToken, async (req: AuthorizedRequest, r
     if (labelUsageCount > 0) return res.status(409).json({ msg: '사용 중인 라벨은 삭제할 수 없어요.' });
 
     await executeSql('delete from label where user_idx = ? and idx = ?', [userIdx, labelIdx]);
-    res.sendStatus(200);
+    res.status(200).json({ msg: '라벨이 삭제되었어요.' });
   } catch (error) {
-    res.sendStatus(500);
+    res.status(500).json({ msg: '서버 에러가 발생했어요.' });
   }
 });
 

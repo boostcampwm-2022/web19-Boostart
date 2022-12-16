@@ -165,14 +165,14 @@ export const GoalModalLabel = styled.div<{ color?: string }>`
   align-items: center;
   border: solid 1px ${(props) => (props.color ? 'transparent' : 'black')};
 
-  width: 20rem;
+  width: 21rem;
   height: 1.5rem;
   padding: 0.4rem;
   border-radius: 20rem;
 `;
 
 export const GoalModalLabelTitleInput = styled.input`
-  width: 15rem;
+  width: 16rem;
   font-size: 1.7rem;
 
   margin: auto;
@@ -195,10 +195,10 @@ export const GoalModalLabelSetButton = styled.button`
   background-color: transparent;
 `;
 
-export const GoalModalAmountInput = styled.input`
-  width: 3.2rem;
+export const GoalModalAmountInput = styled.input<{ length: number }>`
+  width: 3.5rem;
 
-  font-size: 1.3rem;
+  font-size: ${(props) => (props.length === 0 ? 0.8 : 1.5 / Math.sqrt(props.length))}rem;
   text-align: center;
 
   background-color: transparent;
@@ -291,7 +291,7 @@ export const LabelModalLabelCreateButton = styled.button`
 `;
 
 export const GoalModalLabelName = styled.input<{ filled: boolean }>`
-  width: 6rem;
+  width: 7rem;
   font-size: ${(props) => (props.filled ? '1.5rem' : '0.8rem')};
   color: black;
 
@@ -308,9 +308,10 @@ export const VertialRule = styled.div`
   margin: 5px 0;
 `;
 
-export const GoalModalOverInput = styled.div`
+export const GoalModalOverInput = styled.div<{ selected: boolean }>`
   width: 2rem;
   text-align: center;
+  ${(props) => (!props.selected ? 'color: #aaaaaa' : '')};
 `;
 
 export const GoalList = styled.div`

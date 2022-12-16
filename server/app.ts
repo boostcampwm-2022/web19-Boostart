@@ -12,6 +12,8 @@ import * as redis from 'redis';
 import jwt from 'jsonwebtoken';
 import { connectionIdToUserIdx, userIdxToSocketId } from './src/core/store';
 import { globalSocket } from './src/core/socket';
+import { executeSql } from './src/db';
+import { AlarmType } from './src/api/emoticon';
 
 const options = {
   cert: fs.readFileSync('../rootca.pem'),
@@ -161,7 +163,7 @@ io.on('connection', (socket: AuthorizedSocket) => {
     }
   });
 
-  socket.on('registAuthor', (author) => {
+  socket.on('registAuthor', async (author) => {
     const roomName = visitingRoom.get(socket.id);
     const userIdx = socket.uid;
     if (!roomName || !diaryObjects[roomName]) return;
@@ -172,6 +174,15 @@ io.on('connection', (socket: AuthorizedSocket) => {
     }
     onlineList.push(parseInt(userIdx));
     updateAuthorList(roomName);
+
+    // if (자기 자신) return;
+    const DATE_FORMAT_LENGTH = 10;
+    const receiverId = roomName.substring(0, roomName.length - DATE_FORMAT_LENGTH);
+    console.log(receiverId);
+    const date = roomName.substring(roomName.length - DATE_FORMAT_LENGTH);
+    const { receiverIdx } = (await executeSql('select idx as receiverIdx from user where user_id = ?', [receiverId]))[0];
+    const redirectURI = '#';
+    await executeSql(`insert into alarm (publisher_idx, receiver_idx, type, content, redirect, status) values (?, ?, '${AlarmType.DIARY_EDIT}', ?, '${redirectURI}', false)`, [userIdx, receiverIdx, date]);
   });
 
   socket.on('turnToOffline', () => {

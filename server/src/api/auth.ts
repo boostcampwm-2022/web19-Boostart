@@ -83,7 +83,7 @@ const OAUTH_REQUEST_PARAMS = {
 
 router.post('/login', async (req, res) => {
   const { userId, password } = req.body;
-  if (!(userId && password)) return res.sendStatus(400);
+  if (!(userId && password)) return res.status(400).json({ msg: '아이디와 비밀번호를 입력해주세요.' });
   let user;
   [user] = (await executeSql('select * from user where user_id = ?', [userId])) as RowDataPacket[];
   if (!user) return res.status(401).json({ msg: '아이디 또는 비밀번호가 틀렸어요.' });
@@ -92,32 +92,32 @@ router.post('/login', async (req, res) => {
   [user] = (await executeSql('select * from user where user_id = ? and password = ?', [userId, encrypted])) as RowDataPacket[];
   if (!user) return res.status(401).json({ msg: '아이디 또는 비밀번호가 틀렸어요.' });
 
-  const token = generateAccessToken({ userIdx: user.idx });
+  const token = generateAccessToken({ userIdx: user.idx, userId: user.user_id, username: user.username, profileImg: user.profile_img });
   res.cookie('token', token, {
     httpOnly: true,
   });
 
-  res.sendStatus(200);
+  res.status(200).json({ msg: '로그인에 성공했어요.' });
 });
 
 const validateOAuthType = generateUnionTypeChecker(OAUTH_TYPES);
 
 router.get(`/login/:oauth_type`, (req, res) => {
   const oauthType = req.params.oauth_type;
-  if (!validateOAuthType(oauthType)) return res.sendStatus(400);
+  if (!validateOAuthType(oauthType)) return res.status(400).json({ msg: '적절하지 않은 로그인 형식이에요.' });
   res.redirect(OAUTH_REDIRECT_URI[oauthType]);
 });
 
 router.get('/login/:oauth_type/callback', async (req, res) => {
   const { code } = req.query;
   const oauthType = req.params.oauth_type;
-  if (!validateOAuthType(oauthType)) return res.sendStatus(400);
+  if (!validateOAuthType(oauthType)) return res.status(400).json({ msg: '적절하지 않은 로그인 형식이에요.' });
 
   const accessToken = await httpGetAccessToken(oauthType, code);
   const oauthEmail = await httpGetOAuthUserIdentifier(oauthType, accessToken); // 변수 이름. (카카오에서는 이메일 얻기 위해 검수 필요)
 
   const [user] = (await executeSql('select * from user where oauth_type = ? and oauth_email = ?', [oauthType, oauthEmail])) as RowDataPacket[];
-  const token = generateAccessToken(user ? { userIdx: user.idx } : { oauthType, oauthEmail });
+  const token = generateAccessToken(user ? { userIdx: user.idx, userId: user.user_id, username: user.username, profileImg: user.profile_img } : { oauthType, oauthEmail });
 
   res.cookie('token', token, {
     httpOnly: true,
@@ -136,7 +136,7 @@ router.post('/signup', async (req: SignupRequest, res) => {
     profileImg.mv('./uploads/' + profileImgFilename);
   }
 
-  if (!(userId && password && username)) return res.sendStatus(400);
+  if (!(userId && password && username)) return res.status(400).json({ msg: '아이디, 비밀번호, 닉네임을 모두 입력해 주세요.' });
   // TODO: 유효성 검증
 
   const token = req.cookies.token;
@@ -146,8 +146,8 @@ router.post('/signup', async (req: SignupRequest, res) => {
   let oauthEmail: string;
   if (token) {
     ({ oauthType, oauthEmail } = jwt.verify(token, TOKEN_SECRET));
-    if (!(oauthType && oauthEmail)) return res.status(401).send({ msg: '잘못된 토큰이에요.' });
-    if (!validateOAuthType(oauthType)) return res.status(401).send({ msg: '잘못된 토큰이에요.' });
+    if (!(oauthType && oauthEmail)) return res.status(401).json({ msg: '잘못된 토큰이에요.' });
+    if (!validateOAuthType(oauthType)) return res.status(401).json({ msg: '잘못된 토큰이에요.' });
 
     [user] = (await executeSql('select * from user where oauth_type = ? and oauth_email = ?', [oauthType, oauthEmail])) as RowDataPacket[];
     if (user) {
@@ -167,7 +167,7 @@ router.post('/signup', async (req: SignupRequest, res) => {
     ? executeSql('insert into `user` (user_id, password, username, profile_img, oauth_type, oauth_email, salt) values (?, ?, ?, ?, ?, ?, ?)', [userId, encrypted, username, profileImgFilename, oauthType, oauthEmail, salt])
     : executeSql('insert into `user` (user_id, password, username, profile_img, salt) values (?, ?, ?, ?, ?)', [userId, encrypted, username, profileImgFilename, salt]));
   console.log(`회원가입 성공: ${userId}, ${username}`);
-  res.sendStatus(201);
+  res.status(201).json({ msg: '회원가입이 완료되었어요.' });
 });
 
 router.get('/check-login', authenticateToken, (req: AuthorizedRequest, res) => {
@@ -176,7 +176,7 @@ router.get('/check-login', authenticateToken, (req: AuthorizedRequest, res) => {
 
 router.get('/logout', authenticateToken, (req, res) => {
   res.clearCookie('token');
-  res.sendStatus(204);
+  res.status(204).json({ msg: '로그아웃이 완료되었어요.' });
 });
 
 export default router;
