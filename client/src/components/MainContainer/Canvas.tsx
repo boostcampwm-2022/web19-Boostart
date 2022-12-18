@@ -357,8 +357,8 @@ const Canvas = ({ setAuthorList, setOnlineList }: CanvasProps) => {
           <MarkerIcon onClick={() => enterDrawingMode(10)} />
           <PaintIcon onClick={() => enterDrawingMode(18)} />
           <RectIcon onClick={() => createNewShape('rect')} />
-          <CircleIcon onClick={() => createNewShape('triangle')} />
-          <TriangleIcon onClick={() => createNewShape('circle')} />
+          <CircleIcon onClick={() => createNewShape('circle')} />
+          <TriangleIcon onClick={() => createNewShape('triangle')} />
           <TextIcon onClick={() => createNewText()} />
           <ColorPicker type="color" ref={colorRef} onChange={changeBrushColor} />
         </Palette>
