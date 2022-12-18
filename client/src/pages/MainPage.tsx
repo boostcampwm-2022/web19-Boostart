@@ -38,7 +38,7 @@ const MainPage = () => {
     return async function (userIdx: number) {
       try {
         const response = await action(`${HOST}/api/v1/friend/accept/${userIdx}`);
-        alert(response.status);
+        alert(response.data.msg);
       } catch (error) {
         console.log(error);
       }
