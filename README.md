@@ -79,15 +79,15 @@
 
 <br>
 
-## 기술적 고민 - [노션](https://www.notion.so/mikaniz/127548b26c254f42bf85f8963f8fd2be?v=60b5863159d845cbb77a1c38fa231952) / [기술 발표](https://www.youtube.com/watch?v=A--cReu9rgE)
-- 🕐 [**`렌더링 효율성`** 까지 개선한 **`드래그 앤 드롭`**](https://www.notion.so/mikaniz/127548b26c254f42bf85f8963f8fd2be?v=60b5863159d845cbb77a1c38fa231952)
-- 🎨 [**`Redis`**, **`socket.io`** 를 이용한 **`실시간 공유 그림판`**](https://www.notion.so/mikaniz/127548b26c254f42bf85f8963f8fd2be?v=60b5863159d845cbb77a1c38fa231952)
-- 🔏 [로그인, 회원가입, 일정생성 시의 **`유효성 검증`**](https://www.notion.so/mikaniz/af770bf344f949bbaa9b3eda6cc2006c)
-- 🚶 [터벅터벅 **`Raw Query`** ](https://www.notion.so/mikaniz/af770bf344f949bbaa9b3eda6cc2006c)
-- ⚙️ [완벽한 **`RESTful API`** ?](https://www.notion.so/mikaniz/af770bf344f949bbaa9b3eda6cc2006c)
-- ✍️ [사용자 편의를 고려한 LOG 생성 **`인터페이스`** ](https://www.notion.so/mikaniz/af770bf344f949bbaa9b3eda6cc2006c)
-- 🌀 [**`애니메이션`** 을 통한 한층 더 기분 좋은, 고퀄리티의 UI/UX](https://www.notion.so/mikaniz/af770bf344f949bbaa9b3eda6cc2006c)
-- 🎫 [**`PR`** 에 티켓을 달아주세요](https://www.notion.so/mikaniz/af770bf344f949bbaa9b3eda6cc2006c) 
+## 기술적 고민 - [노션](https://mikaniz.notion.site/127548b26c254f42bf85f8963f8fd2be?v=60b5863159d845cbb77a1c38fa231952) / [기술 발표](https://www.youtube.com/watch?v=A--cReu9rgE)
+- 🕐 [**`렌더링 효율성`** 까지 개선한 **`드래그 앤 드롭`**](https://mikaniz.notion.site/1bf8fe670232484d84dbd880f176b438)
+- 🎨 [**`Redis`**, **`socket.io`** 를 이용한 **`실시간 공유 그림판`**](https://mikaniz.notion.site/Redis-socket-io-f2701f4bb4354e93ab3f8b8656801cc6)
+- 🔏 [로그인, 회원가입, 일정생성 시의 **`유효성 검증`**](https://mikaniz.notion.site/af770bf344f949bbaa9b3eda6cc2006c)
+- 🚶 [터벅터벅 **`Raw Query`** ](https://mikaniz.notion.site/Raw-Query-c66a2b0b0e6f4db692d78db72cc308f5)
+- ⚙️ [완벽한 **`RESTful API`** ?](https://mikaniz.notion.site/RESTful-API-2aa885e4362e41d786492515d6e0f834)
+- ✍️ [사용자 편의를 고려한 LOG 생성 **`인터페이스`** ](https://mikaniz.notion.site/LOG-550b280e89fc46f184f4d44e7691837d)
+- 🌀 [**`애니메이션`** 을 통한 한층 더 기분 좋은, 고퀄리티의 UI/UX](https://mikaniz.notion.site/UI-UX-70c561f8f0ba45d6adaaa5da9b160ea7)
+- 🎫 [**`PR`** 에 티켓을 달아주세요](https://mikaniz.notion.site/PR-95732bea02ab4b3fa3f5459d347af5a1) 
 
 <br>
 
