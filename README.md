@@ -3,7 +3,7 @@
 # Boostart - 당신의 하루를 시작하세요!
 ![main__](https://user-images.githubusercontent.com/73420533/207780689-7db6e89c-becd-48bf-870d-01bc81bb499b.gif)
 ### 데일리 플래너 + 실시간 공유 그림일기 + SNS
-### 🙆‍♂️[~~배포 페이지~~](https://49.50.166.179)🙆‍
+### 🙆‍♂️[배포 페이지](https://49.50.166.179)🙆‍♀️ 
 <br>
 <div align=left>
 
